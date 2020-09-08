@@ -1,26 +1,11 @@
-import random
+from extract import extract_data
 
-with open('dialog_acts.dat') as f:
-    data = f.readlines()
-
-data = [sentence[:-1] for sentence in data]
-
-# random.shuffle(data)
-
-train_size = round(len(data) * 0.85)
-training = data[:train_size]
-test = data[train_size:]
-
-dialog_acts_train = [sentence.split(' ')[0] for sentence in training]
-sentences_train = [sentence.split(' ')[1:] for sentence in training]
-dialog_acts_test = [sentence.split(' ')[0] for sentence in test]
-sentences_test = [sentence.split(' ')[1:] for sentence in test]
-
+data = extract_data("dialog_acts.dat")
 
 def majority_baseline():
     counts = dict()
         
-    for act in dialog_acts_train:
+    for act in data['dialog_acts_train']:
         if act in counts:
             counts[act] += 1
         else:
@@ -31,7 +16,7 @@ def majority_baseline():
             
     classification = []
     
-    for sentence in sentences_test:
+    for sentence in data['sentences_test']:
         classification.append(most_common_act)
         
     return classification
@@ -39,7 +24,7 @@ def majority_baseline():
 
 def rule_based_baseline():
     classification = []
-    
+    sentences_test = data['sentences_test']
     for sentence in sentences_test:
         if any(x in ['thank', 'thanks', 'appreciate', 'grateful'] for x in sentence):
             classification.append('thankyou')
@@ -75,11 +60,26 @@ def rule_based_baseline():
             classification.append('inform')
             
     return classification
-    
-#classification = []
-klas = rule_based_baseline()
-    
-    
-    
+
+def testBaselines():
+    mBaseline = majority_baseline()
+    rbBaseline = rule_based_baseline()  
+    i = 0
+    rbCorrect = 0
+    for output in rbBaseline: 
+        if output == data['dialog_acts_test'][i]:
+            rbCorrect += 1
+        i += 1
+    print(str(round(rbCorrect/len(data['sentences_test']),3)) + " accuracy on the rule-based baseline")
+    i = 0
+    mCorrect = 0
+    for output in mBaseline: 
+        if output == data['dialog_acts_test'][i]:
+            mCorrect += 1
+        i += 1
+    print(str(round(mCorrect/len(data['sentences_test']),3)) + " accuracy on the majority baseline")
+
+if input("Baseline systems generated. Type 'test' to test.") == 'test':
+    testBaselines()    
     
     
