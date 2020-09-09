@@ -1,11 +1,18 @@
 from extract import extract_data
 
-data = extract_data("dialog_acts.dat")
-
-def majority_baseline():
+def majority_baseline(input):
+    """
+        Returns a classification (list) that labels every utterance with the most common dialog act, given a dataset.
+        The index of a value in the classification list corresponds with the same index in the testset.
+        @param input: should consist of the following keys: 
+            - 'dialog_acts_train'
+            - 'sentences_train'
+            - 'dialog_acts_test'
+            - 'sentences_test'
+    """
     counts = dict()
         
-    for act in data['dialog_acts_train']:
+    for act in input['dialog_acts_train']:
         if act in counts:
             counts[act] += 1
         else:
@@ -16,15 +23,27 @@ def majority_baseline():
             
     classification = []
     
-    for sentence in data['sentences_test']:
+    for sentence in input['sentences_test']:
         classification.append(most_common_act)
         
     return classification
 
+def rule_based_baseline(input):
+    """
+        Returns a classification that labels every utterance based on a pre-defined ruleset, given a dataset.
 
-def rule_based_baseline():
+        The ruleset is constructed by checking the data and seeing which terms are often associated with which dialog acts. If that term is in the sentence, 
+        we give it the corresponding dialog act classification. If no matching term is found, we default to the "inform" dialog act.
+
+        The higher dialog acts in our if-...-else construction are expected to be more determining than the lower dialog acts 
+        (e.g. the word "thank" takes priority over the word 'other').
+
+        The index of a value in the classification list corresponds with the same index in the testset.
+
+        @param input: should consist of the same keys as in majority_baseline()
+    """
     classification = []
-    sentences_test = data['sentences_test']
+    sentences_test = input['sentences_test']
     for sentence in sentences_test:
         if any(x in ['thank', 'thanks', 'appreciate', 'grateful'] for x in sentence):
             classification.append('thankyou')
@@ -61,13 +80,17 @@ def rule_based_baseline():
             
     return classification
 
-def testBaselines():
-    mBaseline = majority_baseline()
-    rbBaseline = rule_based_baseline()  
+def testBaselines(input):
+    """
+        Calculates the accuracy of both baseline classifications and prints them to the console.
+        Accuracy is calculated by taking the number of correct classifications and dividing it by the total number of classifications.
+    """ 
+    mBaseline = majority_baseline(input)
+    rbBaseline = rule_based_baseline(input)  
     i = 0
     rbCorrect = 0
     for output in rbBaseline: 
-        if output == data['dialog_acts_test'][i]:
+        if output == data['dialog_acts_test'][i]: 
             rbCorrect += 1
         i += 1
     print(str(round(rbCorrect/len(data['sentences_test']),3)) + " accuracy on the rule-based baseline")
@@ -79,7 +102,8 @@ def testBaselines():
         i += 1
     print(str(round(mCorrect/len(data['sentences_test']),3)) + " accuracy on the majority baseline")
 
+data = extract_data("dialog_acts.dat")
 if input("Baseline systems generated. Type 'test' to test.") == 'test':
-    testBaselines()    
+    testBaselines(data)    
     
     
