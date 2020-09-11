@@ -43,11 +43,17 @@ def rule_based_baseline(input):
         @param input: should consist of the same keys as in majority_baseline()
     """
     classification = []
-    sentences_test = input['sentences_test']
+    check_data_type = isinstance(input, dict)
+    
+    if check_data_type:
+        sentences_test = input['sentences_test']
+    else:
+        sentences_test = [input]
+        
     for sentence in sentences_test:
         if any(x in ['thank', 'thanks', 'appreciate', 'grateful'] for x in sentence):
             classification.append('thankyou')
-        elif 'goodbye'in sentence:
+        elif any(x in ['goodbye', 'bye'] for x in sentence):
             classification.append('bye')
         elif any(x in ['other', 'another', 'anything', 'else'] for x in sentence):
             classification.append('reqalts')
@@ -65,7 +71,7 @@ def rule_based_baseline(input):
             classification.append('negate')
         elif any(x in ['dont', 'cheap', 'part', 'vegetarian', 'matter'] for x in sentence):
             classification.append('inform')
-        elif any(x in ['again', 'reoeat', 'back'] for x in sentence):
+        elif any(x in ['again', 'repeat', 'back'] for x in sentence):
             classification.append('repeat')
         elif any(x in ['start', 'over', 'reset', 'restart'] for x in sentence):
             classification.append('restart')
@@ -73,7 +79,7 @@ def rule_based_baseline(input):
             classification.append('request')
         elif any(x in ['serve'] for x in sentence) or sentence[0] == 'is' or sentence[0] == 'does':
             classification.append('confirm')
-        elif any(x in ['wait', 'unintelligible', 'noise', 'cough', 'sorry', 'sill', 'knocking', 'um', 'laughing'] for x in sentence):
+        elif any(x in ['wait', 'unintelligible', 'noise', 'cough', 'sorry', 'sil', 'knocking', 'um', 'laughing'] for x in sentence):
             classification.append('null')
         else:
             classification.append('inform')
