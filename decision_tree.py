@@ -16,10 +16,19 @@ def decisionTree():
     dialog_acts_test  = data["dialog_acts_test"]
     sentences_test    = data["sentences_test"]
 
+    matrix = {}
+        
+    for matrixAct in dialog_acts_train:
+        if matrixAct not in matrix:
+            matrix[matrixAct] = {}
+            for matrixActSecond in dialog_acts_train:
+                if matrixActSecond not in matrix[matrixAct]:
+                    matrix[matrixAct][matrixActSecond] = 0
+    
     # Get maximum length of sentence
     max_len_train = len(max(sentences_train,key=len))
-    max_len_test = len(max(sentences_test,key=len))
-    max_len = max_len_train
+    max_len_test  = len(max(sentences_test,key=len))
+    max_len       = max_len_train
 
     if (max_len_test > max_len_train):
         max_len = max_len_test
@@ -36,11 +45,11 @@ def decisionTree():
     # Convert string lists to binary lists, since SciKit decision tree does not support string data        
     oneHotEncoder = OneHotEncoder(sparse=False, handle_unknown='ignore')
     oneHotEncoder.fit(sentences_train)
-    oneHotLabels = oneHotEncoder.transform(sentences_train)
+    binarySentences = oneHotEncoder.transform(sentences_train)
 
     # Create the decision tree
     decisionTreeClassifier = tree.DecisionTreeClassifier()
-    decisionTreeClassifier = decisionTreeClassifier.fit(oneHotLabels, dialog_acts_train)
+    decisionTreeClassifier = decisionTreeClassifier.fit(binarySentences, dialog_acts_train)
 
     # Print decision tree
     # r = export_text(decisionTreeClassifier)
@@ -50,11 +59,21 @@ def decisionTree():
     while True:
         print("Message: ")
         choice = input("> ")
-        
+
         # Write 'test' in console to start testing sequence
         if (choice == 'test'):
+            matrix = {}
+            
+            for matrixAct in dialog_acts_train:
+                if matrixAct not in matrix:
+                    matrix[matrixAct] = {}
+                    for matrixActSecond in dialog_acts_train:
+                        if matrixActSecond not in matrix[matrixAct]:
+                            matrix[matrixAct][matrixActSecond] = 0
+
             tested = 0
             correct = 0
+            
             for n in range(0, len(dialog_acts_test), 1):
                 dialog = dialog_acts_test[n]
                 sentence = sentences_test[n]
@@ -64,12 +83,16 @@ def decisionTree():
                 
                 if (answer[0] == dialog):
                     correct = correct + 1
-                tested = tested + 1    
-            
-            print("Tested sentences: " + str(tested))
-            print("Correctly classified: " + str(correct))
+                matrix[answer[0]][dialog] = matrix[answer[0]][dialog] + 1
+                tested = tested + 1
+                    
+            print(10*' ' + ' | '.join(matrix.keys()))
+            for key, value in matrix.items():
+                print("%-10s" % (key), end = '')
+                print(*value.values(), sep = 7*' ' + "|")
+            print("Total tested sentences: " + str(tested))
+            print("Total correctly classified: " + str(correct))
             print("Finished testing, results: " + str(float(100 / tested * correct)) + "% correct")
-            break
         else:
             # Label user input
             choice = choice.lower().split(' ')
@@ -81,7 +104,7 @@ def decisionTree():
                 choice = choice[0:max_len]
 
             prediction = oneHotEncoder.transform([choice])
-            answer = decisionTreeClassifier.predict(prediction)
+            answer     = decisionTreeClassifier.predict(prediction)
 
             print(answer)
 
