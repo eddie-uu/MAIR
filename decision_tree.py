@@ -54,6 +54,7 @@ def decisionTree(decisionType):
                 for matrixActSecond in dialog_acts_train:
                     if matrixActSecond not in matrix[matrixAct]: matrix[matrixAct][matrixActSecond] = 0
 
+        f = open("wrong answers.txt", "w")
         for n in range(0, len(dialog_acts_test), 1):
             dialog = dialog_acts_test[n]
             sentence = sentences_test[n]
@@ -61,13 +62,18 @@ def decisionTree(decisionType):
             prediction = oneHotEncoder.transform([sentence])
             answer = decisionTreeClassifier.predict(prediction)
                     
-            if (answer[0] == dialog): correct = correct + 1
+            if (answer[0] == dialog):
+                correct = correct + 1
+            else:
+                s = ' '.join(sentence)
+                f.write(s + " -- Predicted: " + answer[0] + " -- Actually: " + dialog + "\n")
                 
             tested = tested + 1
             predictions.append(answer[0])
             actually.append(dialog)
             matrix[answer[0]][dialog] = matrix[answer[0]][dialog] + 1
-                
+
+        f.close()        
         print(10*' ' + ' | '.join(matrix.keys()))
         for key, value in matrix.items():
             print("%-10s" % (key), end = '')
