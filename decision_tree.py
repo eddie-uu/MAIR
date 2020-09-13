@@ -3,44 +3,31 @@ from sklearn import tree
 from sklearn.tree import export_text
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.metrics import confusion_matrix
 from extract import extract_data
 import numpy as np
 
 def decisionTree():
     # Parsed data from "dialog_acts.dat", with 85% training data
-    data              = extract_data("dialog_acts.dat", 0.85)
+    extractData              = extract_data("dialog_acts.dat", 0.85)
 
     # Array of values from each data key
-    dialog_acts_train = data["dialog_acts_train"]
-    sentences_train   = data["sentences_train"]
-    dialog_acts_test  = data["dialog_acts_test"]
-    sentences_test    = data["sentences_test"]
+    dialog_acts_train = extractData["dialog_acts_train"]
+    sentences_train   = extractData["sentences_train"]
+    dialog_acts_test  = extractData["dialog_acts_test"]
+    sentences_test    = extractData["sentences_test"]
 
-    matrix = {}
-        
-    for matrixAct in dialog_acts_train:
-        if matrixAct not in matrix:
-            matrix[matrixAct] = {}
-            for matrixActSecond in dialog_acts_train:
-                if matrixActSecond not in matrix[matrixAct]:
-                    matrix[matrixAct][matrixActSecond] = 0
-    
     # Get maximum length of sentence
     max_len_train = len(max(sentences_train,key=len))
     max_len_test  = len(max(sentences_test,key=len))
-    max_len       = max_len_train
-
-    if (max_len_test > max_len_train):
-        max_len = max_len_test
+    max_len       = max_len_test if max_len_test > max_len_train else max_len_train
 
     # Make all sentences equal in length to parse with OneHotEncoder to binary
     for sentence in sentences_train:
-        for n in range(len(sentence), max_len, 1):
-            sentence.insert(n, '')
+        for n in range(len(sentence), max_len, 1): sentence.insert(n, '')
 
     for sentence in sentences_test:
-        for n in range(len(sentence), max_len, 1):
-            sentence.insert(n, '')
+        for n in range(len(sentence), max_len, 1): sentence.insert(n, '')
 
     # Convert string lists to binary lists, since SciKit decision tree does not support string data        
     oneHotEncoder = OneHotEncoder(sparse=False, handle_unknown='ignore')
@@ -57,23 +44,25 @@ def decisionTree():
 
     # Console writeline
     while True:
-        print("Message: ")
+        print("Type message: ")
         choice = input("> ")
 
         # Write 'test' in console to start testing sequence
         if (choice == 'test'):
-            matrix = {}
-            
+            matrix      = {}
+            labels      = []
+            predictions = []
+            actually    = []
+            tested      = 0
+            correct     = 0
+
             for matrixAct in dialog_acts_train:
                 if matrixAct not in matrix:
                     matrix[matrixAct] = {}
+                    labels.append(matrixAct)
                     for matrixActSecond in dialog_acts_train:
-                        if matrixActSecond not in matrix[matrixAct]:
-                            matrix[matrixAct][matrixActSecond] = 0
+                        if matrixActSecond not in matrix[matrixAct]: matrix[matrixAct][matrixActSecond] = 0
 
-            tested = 0
-            correct = 0
-            
             for n in range(0, len(dialog_acts_test), 1):
                 dialog = dialog_acts_test[n]
                 sentence = sentences_test[n]
@@ -81,15 +70,18 @@ def decisionTree():
                 prediction = oneHotEncoder.transform([sentence])
                 answer = decisionTreeClassifier.predict(prediction)
                 
-                if (answer[0] == dialog):
-                    correct = correct + 1
-                matrix[answer[0]][dialog] = matrix[answer[0]][dialog] + 1
+                if (answer[0] == dialog): correct = correct + 1
                 tested = tested + 1
-                    
+                predictions.append(answer[0])
+                actually.append(dialog)
+                matrix[answer[0]][dialog] = matrix[answer[0]][dialog] + 1
+            
             print(10*' ' + ' | '.join(matrix.keys()))
             for key, value in matrix.items():
                 print("%-10s" % (key), end = '')
                 print(*value.values(), sep = 7*' ' + "|")
+            
+            # print(confusion_matrix(actually, predictions, labels=labels))
             print("Total tested sentences: " + str(tested))
             print("Total correctly classified: " + str(correct))
             print("Finished testing, results: " + str(float(100 / tested * correct)) + "% correct")
@@ -98,18 +90,16 @@ def decisionTree():
             choice = choice.lower().split(' ')
 
             if (len(choice) < max_len):
-                for n in range(len(choice), max_len, 1):
-                    choice.insert(n, '')
+                for n in range(len(choice), max_len, 1): choice.insert(n, '')
             else:
                 choice = choice[0:max_len]
 
             prediction = oneHotEncoder.transform([choice])
             answer     = decisionTreeClassifier.predict(prediction)
 
-            print(answer)
+            print("Answer is: " + answer[0])
 
             # Quit program if the answer given is labeled 'bye'
-            if answer[0] == 'bye':
-                break
+            if answer[0] == 'bye': break
 
 decisionTree()
