@@ -87,6 +87,7 @@ def rule_based_baseline(input):
     return classification
 
 def testBaselines(input):
+    data = extract_data("dialog_acts.dat")
     """
         Calculates the accuracy of both baseline classifications and prints them to the console.
         Accuracy is calculated by taking the number of correct classifications and dividing it by the total number of classifications.
@@ -107,9 +108,4 @@ def testBaselines(input):
             mCorrect += 1
         i += 1
     print(str(round(mCorrect/len(data['sentences_test']),3)) + " accuracy on the majority baseline")
-
-data = extract_data("dialog_acts.dat")
-if input("Baseline systems generated. Type 'test' to test.") == 'test':
-    testBaselines(data)    
-    
     

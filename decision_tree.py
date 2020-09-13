@@ -7,7 +7,7 @@ from sklearn.metrics import confusion_matrix
 from extract import extract_data
 import numpy as np
 
-def decisionTree():
+def decisionTree(decisionType):
     # Parsed data from "dialog_acts.dat", with 85% training data
     extractData = extract_data("dialog_acts.dat", 0.85)
 
@@ -38,50 +38,51 @@ def decisionTree():
     decisionTreeClassifier = tree.DecisionTreeClassifier()
     decisionTreeClassifier = decisionTreeClassifier.fit(binarySentences, dialog_acts_train)
 
-    # Console writeline
-    while True:
-        print("Type message: ")
-        choice = input("> ")
+    # Write 'test' in console to start testing sequence
+    if (decisionType == 'test'):
+        matrix      = {}
+        labels      = []
+        predictions = []
+        actually    = []
+        tested      = 0
+        correct     = 0
 
-        # Write 'test' in console to start testing sequence
-        if (choice == 'test'):
-            matrix      = {}
-            labels      = []
-            predictions = []
-            actually    = []
-            tested      = 0
-            correct     = 0
+        for matrixAct in dialog_acts_train:
+            if matrixAct not in matrix:
+                matrix[matrixAct] = {}
+                labels.append(matrixAct)
+                for matrixActSecond in dialog_acts_train:
+                    if matrixActSecond not in matrix[matrixAct]: matrix[matrixAct][matrixActSecond] = 0
 
-            for matrixAct in dialog_acts_train:
-                if matrixAct not in matrix:
-                    matrix[matrixAct] = {}
-                    labels.append(matrixAct)
-                    for matrixActSecond in dialog_acts_train:
-                        if matrixActSecond not in matrix[matrixAct]: matrix[matrixAct][matrixActSecond] = 0
+        for n in range(0, len(dialog_acts_test), 1):
+            dialog = dialog_acts_test[n]
+            sentence = sentences_test[n]
 
-            for n in range(0, len(dialog_acts_test), 1):
-                dialog = dialog_acts_test[n]
-                sentence = sentences_test[n]
-
-                prediction = oneHotEncoder.transform([sentence])
-                answer = decisionTreeClassifier.predict(prediction)
+            prediction = oneHotEncoder.transform([sentence])
+            answer = decisionTreeClassifier.predict(prediction)
+                    
+            if (answer[0] == dialog): correct = correct + 1
                 
-                if (answer[0] == dialog): correct = correct + 1
-                tested = tested + 1
-                predictions.append(answer[0])
-                actually.append(dialog)
-                matrix[answer[0]][dialog] = matrix[answer[0]][dialog] + 1
-            
-            print(10*' ' + ' | '.join(matrix.keys()))
-            for key, value in matrix.items():
-                print("%-10s" % (key), end = '')
-                print(*value.values(), sep = 7*' ' + "|")
-            
-            # print(confusion_matrix(actually, predictions, labels=labels))
-            print("Total tested sentences: " + str(tested))
-            print("Total correctly classified: " + str(correct))
-            print("Finished testing, results: " + str(float(100 / tested * correct)) + "% correct")
-        else:
+            tested = tested + 1
+            predictions.append(answer[0])
+            actually.append(dialog)
+            matrix[answer[0]][dialog] = matrix[answer[0]][dialog] + 1
+                
+        print(10*' ' + ' | '.join(matrix.keys()))
+        for key, value in matrix.items():
+            print("%-10s" % (key), end = '')
+            print(*value.values(), sep = 7*' ' + "|")
+                
+        # print(confusion_matrix(actually, predictions, labels=labels))
+        print("Total tested sentences: " + str(tested))
+        print("Total correctly classified: " + str(correct))
+        print("Finished testing, results: " + str(float(100 / tested * correct)) + "% correct")
+    else:
+        # Console writeline
+        while True:
+            print("Type message: ")
+            choice = input("> ")
+
             # Label user input
             choice = choice.lower().split(' ')
 
@@ -97,5 +98,3 @@ def decisionTree():
 
             # Quit program if the answer given is labeled 'bye'
             if answer[0] == 'bye': break
-
-decisionTree()
