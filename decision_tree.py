@@ -9,7 +9,7 @@ import numpy as np
 
 def decisionTree():
     # Parsed data from "dialog_acts.dat", with 85% training data
-    extractData              = extract_data("dialog_acts.dat", 0.85)
+    extractData = extract_data("dialog_acts.dat", 0.85)
 
     # Array of values from each data key
     dialog_acts_train = extractData["dialog_acts_train"]
@@ -37,10 +37,6 @@ def decisionTree():
     # Create the decision tree
     decisionTreeClassifier = tree.DecisionTreeClassifier()
     decisionTreeClassifier = decisionTreeClassifier.fit(binarySentences, dialog_acts_train)
-
-    # Print decision tree
-    # r = export_text(decisionTreeClassifier)
-    # print(r)
 
     # Console writeline
     while True:
