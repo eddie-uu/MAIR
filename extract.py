@@ -8,6 +8,8 @@ def extract_data(file_name, split=0.85, seed=42):
         in the form of lists of words. dialog_acts_train and dialog_acts_test 
         are the dialog acts in the order that corresponds to the indices of the 
         sentences. They are lists of strings.
+        Note that the data should be in the form of one sentence per line with 
+        the label in front if it seperated by a space.
 
         @param file_name: name of the data file
         @param split: the data split of the traing/test set, between 0 and 1.
