@@ -3,6 +3,7 @@ from baseline_systems import majority_baseline
 from baseline_systems import rule_based_baseline
 from baseline_systems import testBaselines
 from decision_tree import decisionTree
+from mlp import mlp, mlp_test
 
 def main():
     # List of commands
@@ -23,13 +24,22 @@ def main():
     elif userInput == '2':
         decisionTree('test')
     elif userInput == '3':
-        print('neural network test')
+        mlp("dialog_acts.dat")
     elif userInput == '4':
         classify_user_input()
     elif userInput == '5':
         decisionTree('')
     elif userInput == '6':
-        print('neural network')
+        print("Currently not implemented.")
+        # See mlp_test for explanation.
+        # model, id_dict = mlp("dialog_acts.dat")
+        # print("You can quit by typing 'stop'.")
+        # while True:
+        #     sentence = input("Please write your sentence here:\n")
+        #     if sentence == "stop":
+        #         break
+        #     prediction = mlp_test(model, sentence, id_dict)
+        #     print(f"We predict your sentence belongs to the {prediction} class.")
 
 def classify_user_input():
     data = extract_data("dialog_acts.dat")

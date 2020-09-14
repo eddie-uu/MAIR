@@ -111,6 +111,29 @@ def mlp(data_file, layers=(16, 32), pickle_file="vectors.pkl",
             total += 1
 
     print("Accuracy:", total / len(data["sentences_test"]))
+    return clf, id_to_label
+
+def mlp_test(model, input_sentence, id_to_label=None):
+    """
+        Predicts the label of a sentence based on a pre-trained machine learning
+        model.
+
+        @param model: pre-trained scikit-learn machine learning model.
+        @param input sentence: sentence to predict the label of. (string)
+        @param id_to_label: optional, dictionary converting class identifiers 
+            to class labels.
+    """
+    # TODO: we'll probably turn all this into a single class so we can access the 
+    # embeddings here. Note that it will take quite long to get embeddings for 
+    # unseen words, though this can be mitigated by having a seperate file with 
+    # common words.
+    raise NotImplementedError("Not currently available.")
+    # input_sentence = input_sentence.lower().split(' ')
+    # pred_id = model.predict([input_sentence])[0]
+    # if id_to_label is None:
+    #     return pred_id
+    # else:
+    #     return id_to_label[pred_id]
 
 if __name__ == "__main__":
     mlp("dialog_acts.dat")
