@@ -22,12 +22,15 @@ def FlowControl():
         if suggestions[i]["area"] != None: print("in the " + suggestions[i]["area"] + " of town", end= " ")
         if suggestions[i]["pricerange"] != None: print("in the " + suggestions[i]["pricerange"] + " pricerange", end= "")
         print(".")
-        if input("Are you interested in this restaurant or would you like an alternative? Type 1 to continue, 2 for an alternative.") == "1":
+        choice = input("Are you interested in this restaurant or would you like an alternative? Type 1 to continue, 2 for an alternative.")
+        if choice == "1":
             satisfied = True
-        else:
+        elif choice == "2":
             i += 1
+        else:
+            print("Sorry, I didn't catch that. Please try again.")
     if not satisfied:
-        print("Sadly we have no restaurants available that match your preferences. Try again. ")
+        print("Sadly we have no restaurants available that match your preferences. Try again. \n")
         FlowControl()
     satisfied = 0
     while not satisfied:
@@ -40,7 +43,7 @@ def FlowControl():
             satisfied = True
         else:
             print("Sorry, I didn't catch that. Please try again.")
-    print("We hope you have a great meal at " + suggestions[i]['restaurantname']+ "!")
+    print("We hope you have a great meal at " + suggestions[i]['restaurantname'] + "!")
 
 
 
