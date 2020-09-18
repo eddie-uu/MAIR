@@ -1,36 +1,45 @@
 import re
+def checkPattern(text, patterns, defaultValue = ''):
+    for pattern in patterns:
+        match = re.search(pattern['pattern'], text)
+        if match:
+            text = match.group(pattern['group']) if defaultValue == '' else defaultValue 
+    return text
 
 def keywordAlgorithm(text, mode):
     text = text.lower()
-    dontCarePatterns = ['any', 'doesnt matter', 'dont care']
-    # If currently asked about food
+    dontCarePatterns = [{'pattern': 'any'}, {'pattern': 'doesnt matter'}, {'pattern': 'dont care'}]
+    
     if mode == 'food':
-        filterPatterns = ['cheap', 'moderately', 'expensive']
         foodPatterns = [{'pattern': '(.+?) (food)', 'group': 1},
                         {'pattern': '(serving|serves|serve) (.*)', 'group': 2},
                         {'pattern': '(with|about) (.*)', 'group': 2},
                         {'pattern': '(for|a) (.*)', 'group': 2},
                         {'pattern': '(.+?) (restaurant)', 'group': 1}]
 
-        for footPattern in foodPatterns:
-            match = re.search(footPattern['pattern'], text)
-            if match:
-                text = match.group(footPattern['group'])
-
-        for dontCarePattern in dontCarePatterns:
-            match = re.search(dontCarePattern, text)
-            if match:
-                text = 'any'
+        text = checkPattern(text, foodPatterns)
+        text = checkPattern(text, dontCarePatterns, 'dontcare')
         return text
 
     elif mode == 'price':
-        pricePatterns = ['cheap', 'moderate', 'expensive', 'moderately']
-        print(str(pricePatterns))
+        pricePatterns = [{'pattern': '(cheap)', 'group': 1},
+                         {'pattern': '(moderately)', 'group': 1},
+                         {'pattern':'(expensive)', 'group': 1}]
+        
+        text = checkPattern(text, pricePatterns)
+        text = checkPattern(text, dontCarePatterns, 'dontcare')
+        return text
     elif mode == 'location':
-        areaPatterns = ['centre', 'north', 'south', 'east', 'west']
-        print(text)
-    
-text = 'im looking for a moderately priced restaurant that serves'
+        areaPatterns = [{'pattern': '(center)', 'group': 1},
+                        {'pattern': '(north)', 'group': 1},
+                        {'pattern': '(south)', 'group': 1},
+                        {'pattern': '(east)', 'group': 1},
+                        {'pattern': '(west)', 'group': 1}]
+
+        text = checkPattern(text, areaPatterns)
+        text = checkPattern(text, dontCarePatterns, 'dontcare')
+        return text
+
 texts = ['I\'m looking for world food',
          'I want a restaurant that serves world food',
          'I want a restaurant serving Swedish food',
@@ -51,7 +60,7 @@ texts = ['I\'m looking for world food',
          'moderately priced restaurant in the south part of town',
          'a cheap mexican restaurant',
          'It doesnt matter']
-mode = 'food'
+mode = 'location'
 
 integer = 1
 for message in texts:
