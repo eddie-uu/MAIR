@@ -6,39 +6,62 @@ def checkPattern(text, patterns, defaultValue = ''):
             text = match.group(pattern['group']) if defaultValue == '' else defaultValue 
     return text
 
-def keywordAlgorithm(text, mode):
+def keywordAlgorithm(text, mode = ''):
+    response = {'history': []}
     text = text.lower()
-    dontCarePatterns = [{'pattern': 'any'}, {'pattern': 'doesnt matter'}, {'pattern': 'dont care'}]
+    baseDontCarePatterns = [{'pattern': 'doesnt matter'}, {'pattern': 'dont care'}]
     
-    if mode == 'food':
-        foodPatterns = [{'pattern': '(.+?) (food)', 'group': 1},
-                        {'pattern': '(serving|serves|serve) (.*)', 'group': 2},
-                        {'pattern': '(with|about) (.*)', 'group': 2},
-                        {'pattern': '(for|a) (.*)', 'group': 2},
-                        {'pattern': '(.+?) (restaurant)', 'group': 1}]
-
-        text = checkPattern(text, foodPatterns)
-        text = checkPattern(text, dontCarePatterns, 'dontcare')
-        return text
-
-    elif mode == 'price':
+    if mode == 'price' or mode == '':
         pricePatterns = [{'pattern': '(cheap)', 'group': 1},
                          {'pattern': '(moderately)', 'group': 1},
                          {'pattern':'(expensive)', 'group': 1}]
+        priceDontCarePatterns = baseDontCarePatterns
+        priceDontCarePatterns.append({'pattern': 'any price'})
         
-        text = checkPattern(text, pricePatterns)
-        text = checkPattern(text, dontCarePatterns, 'dontcare')
-        return text
-    elif mode == 'location':
+        result = checkPattern(text, pricePatterns)
+        endResult = checkPattern(result, priceDontCarePatterns, 'dontcare')
+        if len(endResult.split()) < 2 and endResult != '':
+            text = text if endResult == 'dontcare' else text.replace(result, '')
+            text = text.replace(' priced ', '')
+            response['priceRange'] = endResult
+
+    if mode == 'location' or mode == '':
         areaPatterns = [{'pattern': '(center)', 'group': 1},
                         {'pattern': '(north)', 'group': 1},
                         {'pattern': '(south)', 'group': 1},
                         {'pattern': '(east)', 'group': 1},
                         {'pattern': '(west)', 'group': 1}]
+        areaDontCarePatterns = baseDontCarePatterns
+        areaDontCarePatterns.append({'pattern': 'any area'})
+        areaDontCarePatterns.append({'pattern': 'any part'})
 
-        text = checkPattern(text, areaPatterns)
-        text = checkPattern(text, dontCarePatterns, 'dontcare')
-        return text
+        result = checkPattern(text, areaPatterns)
+        endResult = checkPattern(result, areaDontCarePatterns, 'dontcare')
+
+        if len(endResult.split()) < 2 and endResult != '':
+            text = text if endResult == 'dontcare' else text.replace(result, '')
+            response['location'] = endResult
+
+    if mode == 'food' or mode == '':
+        foodPatterns = [{'pattern': '(.+?) (food)', 'group': 1},
+                        {'pattern': '(serving|serves|serve) (.*)', 'group': 2},
+                        {'pattern': '(with|about) (.*)', 'group': 2},
+                        {'pattern': '(for|a) (.*)', 'group': 2},
+                        {'pattern': '(.+?) (restaurant)', 'group': 1}]
+        foodDontCarePatterns = baseDontCarePatterns
+        foodDontCarePatterns.append({'pattern': 'any type'})
+
+        result = checkPattern(text, foodPatterns)
+        endResult = checkPattern(result, foodDontCarePatterns, 'dontcare')
+        
+        foodType = True
+        for words in endResult.split():
+            if len(words) < 3: foodType = False
+
+        if foodType and endResult != '':
+            response['food'] = endResult
+    
+    return response
 
 texts = ['I\'m looking for world food',
          'I want a restaurant that serves world food',
@@ -60,10 +83,11 @@ texts = ['I\'m looking for world food',
          'moderately priced restaurant in the south part of town',
          'a cheap mexican restaurant',
          'It doesnt matter']
-mode = 'location'
+mode = ''
 
 integer = 1
+
 for message in texts:
     found = keywordAlgorithm(message, mode)
-    print(str(integer) + " " + found)
+    print(str(integer) + " " + str(found))
     integer += 1
