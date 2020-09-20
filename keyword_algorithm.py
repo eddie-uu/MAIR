@@ -40,7 +40,7 @@ def keywordAlgorithm(text, mode = ''):
 
         if len(endResult.split()) < 2 and endResult != '':
             text = text if endResult == 'dontcare' else text.replace(result, '')
-            response['location'] = endResult
+            response['area'] = endResult
 
     if mode == 'food' or mode == '':
         foodPatterns = [{'pattern': '(.+?) (food)', 'group': 1},
