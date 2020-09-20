@@ -11,7 +11,7 @@ def keywordAlgorithm(text, mode = ''):
     text = text.lower()
     baseDontCarePatterns = [{'pattern': 'doesnt matter'}, {'pattern': 'dont care'}]
     
-    if mode == 'price' or mode == '':
+    if mode == 'pricerange' or mode == '':
         pricePatterns = [{'pattern': '(cheap)', 'group': 1},
                          {'pattern': '(moderately)', 'group': 1},
                          {'pattern': '(expensive)', 'group': 1},
@@ -23,12 +23,15 @@ def keywordAlgorithm(text, mode = ''):
         result    = result.split()[-1] if len(result.split()) > 1 and result != text else result
         endResult = checkPattern(result, priceDontCarePatterns, 'dontcare')
         
+        if len(endResult.split()) > 1 and mode == 'pricerange':
+            endResult = 'dontcare'
+
         if len(endResult.split()) < 2 and endResult != '':
             text = text if endResult == 'dontcare' else text.replace(result, '')
             text = text.replace(' priced ', '')
             response['priceRange'] = endResult
 
-    if mode == 'location' or mode == '':
+    if mode == 'area' or mode == '':
         areaPatterns = [{'pattern': '(center|centre)', 'group': 1},
                         {'pattern': '(north)', 'group': 1},
                         {'pattern': '(south)', 'group': 1},
@@ -42,6 +45,9 @@ def keywordAlgorithm(text, mode = ''):
         result    = checkPattern(text, areaPatterns)
         result    = result.split()[-1] if len(result.split()) > 1 and result != text else result
         endResult = checkPattern(result, areaDontCarePatterns, 'dontcare')
+
+        if len(endResult.split()) > 1 and mode == 'area':
+            endResult = 'dontcare'
 
         if len(endResult.split()) < 2 and endResult != '':
             text = text if endResult == 'dontcare' else text.replace(result, '')
@@ -62,6 +68,10 @@ def keywordAlgorithm(text, mode = ''):
         foodType = True
         for words in endResult.split():
             if len(words) < 3: foodType = False
+
+        if not foodType and mode == 'food':
+            endResult = 'dontcare'
+            foodType = True
 
         if foodType and endResult != '': response['food'] = endResult
     
@@ -91,7 +101,7 @@ mode = ''
 
 integer = 1
 
-for message in texts:
-    found = keywordAlgorithm(message, mode)
-    print(str(integer) + " " + str(found))
-    integer += 1
+# for message in texts:
+#    found = keywordAlgorithm(message, mode)
+#    print(str(integer) + " " + str(found))
+#    integer += 1
