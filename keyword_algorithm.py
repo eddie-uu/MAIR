@@ -1,4 +1,5 @@
 import re
+# Checks regex patterns (matching keywords) in sentence and returns either the sentence back if not found or the keyword match
 def checkPattern(text, patterns, defaultValue = ''):
     for pattern in patterns:
         match = re.search(pattern['pattern'], text)
@@ -6,31 +7,42 @@ def checkPattern(text, patterns, defaultValue = ''):
             text = match.group(pattern['group']) if defaultValue == '' else defaultValue 
     return text
 
+# Perform the algorithm for a sentence, pass a search mode (food, area or pricerange) if context is mentioned
 def keywordAlgorithm(text, mode = ''):
     response = {}
     text = text.lower()
+
+    # General patterns for any option
     baseDontCarePatterns = [{'pattern': 'doesnt matter'}, {'pattern': 'dont care'}]
     
+    # Checks whether the given sentence has a pricerange mentioned
     if mode == 'pricerange' or mode == '':
+        # Price patterns / matching keywords
         pricePatterns = [{'pattern': '(cheap)', 'group': 1},
                          {'pattern': '(moderately)', 'group': 1},
                          {'pattern': '(expensive)', 'group': 1},
                          {'pattern': '(.+?) (priced)', 'group': 1}]                 
+        
+        # Add additional dontcare pattern specific to prices
         priceDontCarePatterns = baseDontCarePatterns
         priceDontCarePatterns.append({'pattern': 'any price'})
         
+        # Check the given sentence
         result    = checkPattern(text, pricePatterns)
         result    = result.split()[-1] if len(result.split()) > 1 and result != text else result
         endResult = checkPattern(result, priceDontCarePatterns, 'dontcare')
         
+        # If the given answer is invalid and the context is specific for pricerange, return dontcare
         if len(endResult.split()) > 1 and mode == 'pricerange':
             endResult = 'dontcare'
 
+        # Add price range to response
         if len(endResult.split()) < 2 and endResult != '':
             text = text if endResult == 'dontcare' else text.replace(result, '')
             text = text.replace(' priced ', '')
-            response['priceRange'] = endResult
+            response['pricerange'] = endResult
 
+    # Same functionality as pricerange, but for area
     if mode == 'area' or mode == '':
         areaPatterns = [{'pattern': '(center|centre)', 'group': 1},
                         {'pattern': '(north)', 'group': 1},
@@ -53,6 +65,7 @@ def keywordAlgorithm(text, mode = ''):
             text = text if endResult == 'dontcare' else text.replace(result, '')
             response['area'] = endResult
 
+    # Same functionality as pricerange, but for food
     if mode == 'food' or mode == '':
         foodPatterns = [{'pattern': '(.+?) (food)', 'group': 1},
                         {'pattern': '(serving|serves|serve) (.*)', 'group': 2},
@@ -76,32 +89,3 @@ def keywordAlgorithm(text, mode = ''):
         if foodType and endResult != '': response['food'] = endResult
     
     return response
-
-texts = ['I\'m looking for world food',
-         'I want a restaurant that serves world food',
-         'I want a restaurant serving Swedish food',
-         'I\'m looking for a restaurant in the center',
-         'I would like a cheap restaurant in the west part of town',
-         'I\'m looking for a moderately priced restaurant in the west part of town',
-         'I\'m looking for a restaurant in any area that serves Tuscan food',
-         'Can I have an expensive restaurant',
-         'I\'m looking for an expensive restaurant and it should serve international food',
-         'I need a Cuban restaurant that is moderately priced',
-         'I\'m looking for a moderately priced restaurant with Catalan food',
-         'What is a cheap restaurant in the south part of town',
-         'What about Chinese food',
-         'I wanna find a cheap restaurant',
-         'I\'m looking for Persian food please',
-         'Find a Cuban restaurant in the center',
-         'is there a moderately priced restaurant that serves british food',
-         'moderately priced restaurant in the south part of town',
-         'a cheap mexican restaurant',
-         'It doesnt matter']
-mode = ''
-
-integer = 1
-
-# for message in texts:
-#    found = keywordAlgorithm(message, mode)
-#    print(str(integer) + " " + str(found))
-#    integer += 1
