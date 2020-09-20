@@ -3,6 +3,8 @@ from baseline_systems import majority_baseline
 from baseline_systems import rule_based_baseline
 from baseline_systems import testBaselines
 from decision_tree import decisionTree
+from decision_tree import createDecisionTree
+from decision_tree import predict
 from mlp import mlp, mlp_test
 
 def main():
@@ -22,13 +24,15 @@ def main():
         data = extract_data("dialog_acts.dat")
         testBaselines(data)
     elif userInput == '2':
-        decisionTree('test')
+        # decisionTree('test')
+        print('u')
     elif userInput == '3':
         mlp("dialog_acts.dat")
     elif userInput == '4':
         classify_user_input()
     elif userInput == '5':
-        decisionTree('')
+        print('a')
+        # decisionTree('')
     elif userInput == '6':
         print("Currently not implemented.")
         # See mlp_test for explanation.
@@ -54,4 +58,7 @@ def classify_user_input():
         print('Majority classification is: '  + majority_baseline(data)[0])
         print('Rule based classification is: '  + rule_based_baseline(sentence)[0])
 
-main()
+def main2():
+    tree = createDecisionTree()
+    print(predict('I would like a cheap restaurant in the west part of town', tree))
+main2()
