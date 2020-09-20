@@ -3,6 +3,7 @@ from baseline_systems import majority_baseline
 from baseline_systems import rule_based_baseline
 from baseline_systems import testBaselines
 from decision_tree import decisionTree
+from dialog_flow import flowControl
 from mlp import mlp, mlp_test
 
 def main():
@@ -14,7 +15,7 @@ def main():
     print("4. baseline")
     print("5. decision tree")
     print("6. neural network")
-    print("")
+    print("7. dialog")
 
     userInput = input("> ")
 
@@ -31,6 +32,8 @@ def main():
         decisionTree('')
     elif userInput == '6':
         print("Currently not implemented.")
+    elif userInput == '7':
+        dialogFlow()
         # See mlp_test for explanation.
         # model, id_dict = mlp("dialog_acts.dat")
         # print("You can quit by typing 'stop'.")
