@@ -12,16 +12,15 @@ def keywordAlgorithm(text, mode = ''):
     baseDontCarePatterns = [{'pattern': 'doesnt matter'}, {'pattern': 'dont care'}]
     
     if mode == 'price' or mode == '':
-        pricePatterns = [{'pattern': '(.+?) (priced)', 'group': 1},
-                         {'pattern': '(cheap)', 'group': 1},
+        pricePatterns = [{'pattern': '(cheap)', 'group': 1},
                          {'pattern': '(moderately)', 'group': 1},
-                         {'pattern': '(expensive)', 'group': 1}]
+                         {'pattern': '(expensive)', 'group': 1},
+                         {'pattern': '(.+?) (priced)', 'group': 1}]                 
         priceDontCarePatterns = baseDontCarePatterns
         priceDontCarePatterns.append({'pattern': 'any price'})
         
-        result = checkPattern(text, pricePatterns)
-        if len(result.split()) > 1 and result != text:
-            result = result.split()[-1]
+        result    = checkPattern(text, pricePatterns)
+        result    = result.split()[-1] if len(result.split()) > 1 and result != text else result
         endResult = checkPattern(result, priceDontCarePatterns, 'dontcare')
         
         if len(endResult.split()) < 2 and endResult != '':
@@ -30,19 +29,18 @@ def keywordAlgorithm(text, mode = ''):
             response['priceRange'] = endResult
 
     if mode == 'location' or mode == '':
-        areaPatterns = [{'pattern': '(in the) (.*)', 'group': 2},
-                        {'pattern': '(center|centre)', 'group': 1},
+        areaPatterns = [{'pattern': '(center|centre)', 'group': 1},
                         {'pattern': '(north)', 'group': 1},
                         {'pattern': '(south)', 'group': 1},
                         {'pattern': '(east)', 'group': 1},
-                        {'pattern': '(west)', 'group': 1}]
+                        {'pattern': '(west)', 'group': 1},
+                        {'pattern': '(in the) (.*)', 'group': 2}]
         areaDontCarePatterns = baseDontCarePatterns
         areaDontCarePatterns.append({'pattern': 'any area'})
         areaDontCarePatterns.append({'pattern': 'any part'})
 
-        result = checkPattern(text, areaPatterns)
-        if len(result.split()) > 1 and result != text:
-            result = result.split()[-1]
+        result    = checkPattern(text, areaPatterns)
+        result    = result.split()[-1] if len(result.split()) > 1 and result != text else result
         endResult = checkPattern(result, areaDontCarePatterns, 'dontcare')
 
         if len(endResult.split()) < 2 and endResult != '':
@@ -58,15 +56,14 @@ def keywordAlgorithm(text, mode = ''):
         foodDontCarePatterns = baseDontCarePatterns
         foodDontCarePatterns.append({'pattern': 'any type'})
 
-        result = checkPattern(text, foodPatterns)
+        result    = checkPattern(text, foodPatterns)
         endResult = checkPattern(result, foodDontCarePatterns, 'dontcare')
         
         foodType = True
         for words in endResult.split():
             if len(words) < 3: foodType = False
 
-        if foodType and endResult != '':
-            response['food'] = endResult
+        if foodType and endResult != '': response['food'] = endResult
     
     return response
 
