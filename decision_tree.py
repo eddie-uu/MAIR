@@ -7,6 +7,61 @@ from sklearn.metrics import confusion_matrix
 from extract import extract_data
 import numpy as np
 
+from sklearn import datasets
+from sklearn import tree
+from sklearn.tree import export_text
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.metrics import confusion_matrix
+from extract import extract_data
+import numpy as np
+
+def createDecisionTree():
+    # Parsed data from "dialog_acts.dat", with 85% training data
+    extractData = extract_data("dialog_acts.dat", 0.85)
+
+    # Array of values from each data key
+    dialog_acts_train = extractData["dialog_acts_train"]
+    sentences_train   = extractData["sentences_train"]
+    sentences_test    = extractData["sentences_test"]
+
+    # Get maximum length of sentence
+    max_len_train = len(max(sentences_train,key=len))
+    max_len_test  = len(max(sentences_test,key=len))
+    max_len       = max_len_test if max_len_test > max_len_train else max_len_train
+
+    # Make all sentences equal in length to parse with OneHotEncoder to binary
+    for sentence in sentences_train:
+        for n in range(len(sentence), max_len, 1): sentence.insert(n, '')
+
+    for sentence in sentences_test:
+        for n in range(len(sentence), max_len, 1): sentence.insert(n, '')
+
+    # Convert string lists to binary lists, since SciKit decision tree does not support string data        
+    oneHotEncoder = OneHotEncoder(sparse=False, handle_unknown='ignore')
+    oneHotEncoder.fit(sentences_train)
+    binarySentences = oneHotEncoder.transform(sentences_train)
+
+    # Create the decision tree
+    decisionTreeClassifier = tree.DecisionTreeClassifier()
+    decisionTreeClassifier = decisionTreeClassifier.fit(binarySentences, dialog_acts_train)
+
+    return {'decisionTree': decisionTreeClassifier, 'oneHotEncoder': oneHotEncoder, 'max_len': max_len} 
+
+def predict(choice, tree):
+    # Label user input
+    choice = choice.lower().split(' ')
+
+    if (len(choice) < tree['max_len']):
+        for n in range(len(choice), tree['max_len'], 1): choice.insert(n, '')
+    else:
+        choice = choice[0:tree['max_len']]
+
+    prediction = tree['oneHotEncoder'].transform([choice])
+    answer     = tree['decisionTree'].predict(prediction)
+
+    return answer[0]
+
 def decisionTree(decisionType):
     # Parsed data from "dialog_acts.dat", with 85% training data
     extractData = extract_data("dialog_acts.dat", 0.85)
