@@ -13,7 +13,7 @@ def keywordAlgorithm(text, mode = ''):
     text = text.lower()
 
     # General patterns for any option
-    baseDontCarePatterns = [{'pattern': 'doesnt matter'}, {'pattern': 'dont care'}]
+    baseDontCarePatterns = [{'pattern': 'doesnt matter'}, {'pattern': 'dont care'}, {'pattern': 'any'}]
     
     # Checks whether the given sentence has a pricerange mentioned
     if mode == 'pricerange' or mode == '':
