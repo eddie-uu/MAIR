@@ -12,21 +12,26 @@ def keywordAlgorithm(text, mode = ''):
     baseDontCarePatterns = [{'pattern': 'doesnt matter'}, {'pattern': 'dont care'}]
     
     if mode == 'price' or mode == '':
-        pricePatterns = [{'pattern': '(cheap)', 'group': 1},
+        pricePatterns = [{'pattern': '(.+?) (priced)', 'group': 1},
+                         {'pattern': '(cheap)', 'group': 1},
                          {'pattern': '(moderately)', 'group': 1},
-                         {'pattern':'(expensive)', 'group': 1}]
+                         {'pattern': '(expensive)', 'group': 1}]
         priceDontCarePatterns = baseDontCarePatterns
         priceDontCarePatterns.append({'pattern': 'any price'})
         
         result = checkPattern(text, pricePatterns)
+        if len(result.split()) > 1 and result != text:
+            result = result.split()[-1]
         endResult = checkPattern(result, priceDontCarePatterns, 'dontcare')
+        
         if len(endResult.split()) < 2 and endResult != '':
             text = text if endResult == 'dontcare' else text.replace(result, '')
             text = text.replace(' priced ', '')
             response['priceRange'] = endResult
 
     if mode == 'location' or mode == '':
-        areaPatterns = [{'pattern': '(center)', 'group': 1},
+        areaPatterns = [{'pattern': '(in the) (.*)', 'group': 2},
+                        {'pattern': '(center|centre)', 'group': 1},
                         {'pattern': '(north)', 'group': 1},
                         {'pattern': '(south)', 'group': 1},
                         {'pattern': '(east)', 'group': 1},
@@ -36,6 +41,8 @@ def keywordAlgorithm(text, mode = ''):
         areaDontCarePatterns.append({'pattern': 'any part'})
 
         result = checkPattern(text, areaPatterns)
+        if len(result.split()) > 1 and result != text:
+            result = result.split()[-1]
         endResult = checkPattern(result, areaDontCarePatterns, 'dontcare')
 
         if len(endResult.split()) < 2 and endResult != '':
