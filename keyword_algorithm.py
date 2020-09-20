@@ -7,7 +7,7 @@ def checkPattern(text, patterns, defaultValue = ''):
     return text
 
 def keywordAlgorithm(text, mode = ''):
-    response = {'history': []}
+    response = {}
     text = text.lower()
     baseDontCarePatterns = [{'pattern': 'doesnt matter'}, {'pattern': 'dont care'}]
     
