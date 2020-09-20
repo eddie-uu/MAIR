@@ -2,15 +2,20 @@ import pandas as pd
 import Levenshtein
 from nltk.corpus import wordnet 
 from collections import defaultdict
+import re
 
 def extract_info(csv_file, request):
     data = pd.read_csv(csv_file)
-    # flag = []
+    request = {k:v for k,v in request.items() if v != 'dontcare'}
     for pref_type in request:
         data = modify_data(data, pref_type, request[pref_type])
     data = data.sample(frac=1)
+    data["restaurantname"] = data["restaurantname"].apply(lambda m: " ".join([word.capitalize() for word in m.split(" ")]))
+    # data["phone"] = data["phone"].apply(lambda m: ))
     return data
 
+# def fix_phone_number(phone_number):
+#     if re.match("^[0-9 ]+$", myString):
 
 def modify_data(data, pref_type, user_input):
     user_input = user_input.lower()
@@ -41,8 +46,8 @@ def levenshtein_or_synonym(word, options, threshold):
             distances[op].add(dist)
     distances = {op:max(dists) for (op,dists) in distances.items()}
     best = max(distances, key=distances.get)
-    if best <= threshold:
+    if distances[best] <= threshold:
         return best
 
 if __name__ == "__main__":
-    print(extract_info("restaurant_info.csv", {"pricerange":"cheap", "area":"centre", "food":"indian"}))
+    print(extract_info("restaurant_info.csv", {"pricerange":"cheap", "area":"south", "food":"dontcare"}))
