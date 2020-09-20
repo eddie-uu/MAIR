@@ -11,11 +11,14 @@ import re
 from keyword_algorithm import keywordAlgorithm
 from extract_info import extract_info
 import decision_tree as dt
-#dtree = dt.createDecisionTree()
+dtree = dt.createDecisionTree()
 def Welcome():
+    """
+    Starts the dialog, and begins the state transitioning function.
+    """
     print("Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.")
     firstmsg = input()
-    first_msg_classification = "inform" #dt.predict(firstmsg, dtree)
+    first_msg_classification = dt.predict(firstmsg, dtree) #"inform"
     if first_msg_classification in ["inform", "hello", "thankyou"]:
         getUserPreferences(firstmsg)
     if first_msg_classification == "bye":
@@ -23,6 +26,9 @@ def Welcome():
 
 
 def getUserPreferences(message):
+    """
+    Finds out what type of restaurant the user is looking for.
+    """
     query = keywordAlgorithm(message)
     if "pricerange" not in query.keys():
         query = {**query, **keywordAlgorithm(input("In what price range are you looking?"), mode="pricerange")}
@@ -34,6 +40,9 @@ def getUserPreferences(message):
     checkPreferences(query)
 
 def checkPreferences(query):
+    """
+    Confirms the retrieved preferences with the user, and modifies them if needed.
+    """
     print("You are looking for a restaurant", end="")
     if not query["pricerange"] == "dontcare":
         print(" in the " + query["pricerange"] + " pricerange", end="")
@@ -42,7 +51,8 @@ def checkPreferences(query):
     if not query["area"] == "dontcare":
         print(" in the " + query["area"] + " of town", end="")
     print(". Is this correct? Type yes or no.")
-    if input().lower() == "no":
+    msg = input().lower()
+    if dt.predict(msg, dtree) in ["negate", "deny"]:
         wrong = input("Which of the following is wrong? \n 1. Price range \n 2. Food type \n 3. Area")
         if wrong == "1":
             query = {**query, **keywordAlgorithm(input("In what price range are you looking?"), mode = "pricerange")}
@@ -51,11 +61,18 @@ def checkPreferences(query):
         elif wrong == "3":
             query = {**query, **keywordAlgorithm(input("In what area are you looking?"), mode="area")}
         checkPreferences(query)
-    else: getSuggestions(query)
+    elif dt.predict(msg, dtree) in ["affirm", "thankyou"]:
+        getSuggestions(query)
+    else:
+        print("Sorry, I didn't understand that.")
+        checkPreferences(query)
 
 
 
 def getSuggestions(query):
+    """
+    Retrieves the suggestions from the database, given our user input.
+    """
     suggestions = extract_info("restaurant_info.csv", query)
     i = 0
     satisfied = False
@@ -82,6 +99,9 @@ def getSuggestions(query):
     giveInformation(suggestions, i)
 
 def giveInformation(suggestions, suggestionIndex):
+    """
+    Asks whether the user needs extra information, and provides it where necessary.
+    """
     satisfied = 0
     while not satisfied:
         choice = input("Would you like some more information about: \n 1. Phone number \n 2. Address \n 3. No information needed.")
@@ -102,6 +122,9 @@ def giveInformation(suggestions, suggestionIndex):
     Goodbye(suggestions.iloc[suggestionIndex]['restaurantname'])
 
 def Goodbye(restaurantname = ""):
+    """
+    Ends the dialog.
+    """
     if restaurantname != "":
         print("We hope you have a great meal at " + restaurantname + "!")
     else: print("Goodbye!")
