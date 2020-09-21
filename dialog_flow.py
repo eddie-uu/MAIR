@@ -84,11 +84,12 @@ def getSuggestions(query):
             "in the " + suggestions.iloc[i]["pricerange"] + " pricerange", end="")
         print(".")
         choice = input(
-            "Are you interested in this restaurant or would you like an alternative? Type 1 to continue, 2 for an alternative.")
-        if choice == "1":
+            "Are you interested in this restaurant?")
+        if choice in ["affirm", "thankyou"]:
             satisfied = True
-        elif choice == "2":
+        elif choice in ["negate", "deny", "reqalts", "reqmore"]:
             i += 1
+            print("The following restaurant might be a good alternative.")
         else:
             print("Sorry, I didn't catch that. Please try again.")
     if not satisfied:
@@ -104,18 +105,20 @@ def giveInformation(suggestions, suggestionIndex):
     """
     satisfied = 0
     while not satisfied:
-        choice = input("Would you like some more information about: \n 1. Phone number \n 2. Address \n 3. No information needed.")
-        if choice == "1":
-            if suggestions.iloc[[suggestionIndex]]["phone"].empty:
-                print("Sadly we have no phone number available for this restaurant.")
-            else: print("The phone number is " + suggestions.iloc[suggestionIndex]["phone"] + ".")
-        elif choice == "2":
-            if suggestions.iloc[[suggestionIndex]]["addr"].empty or suggestions.iloc[[suggestionIndex]]["postcode"].empty:
-                print("Sadly we have no address available for this restaurant.")
-            else:
-                print("The address is " + suggestions.iloc[suggestionIndex]["addr"] + " " +
-                      suggestions.iloc[suggestionIndex]["postcode"] + ".")
-        elif choice == "3":
+        more_info = input("Would you like some more information about the restaurant?")
+        if more_info in ["affirm", "thankyou"]:
+            choice = input("What information would you like to have \n 1. Phone number \n 2. Address.")
+            if choice == "1":
+                if suggestions.iloc[[suggestionIndex]]["phone"].empty:
+                    print("Sadly we have no phone number available for this restaurant.")
+                else: print("The phone number is " + suggestions.iloc[suggestionIndex]["phone"] + ".")
+            elif choice == "2":
+                if suggestions.iloc[[suggestionIndex]]["addr"].empty or suggestions.iloc[[suggestionIndex]]["postcode"].empty:
+                    print("Sadly we have no address available for this restaurant.")
+                else:
+                    print("The address is " + suggestions.iloc[suggestionIndex]["addr"] + " " +
+                          suggestions.iloc[suggestionIndex]["postcode"] + ".")
+        elif more_info in ["negate", "deny"]:
             satisfied = True
         else:
             print("Sorry, I didn't catch that. Please try again.")
