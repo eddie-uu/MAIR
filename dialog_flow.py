@@ -6,6 +6,8 @@ wij sturen dictionary =(query)
 krijgen van Bence een lijst van dictionaries (zoals in .csv) met suggesties
 (of lege lijst) het kan zijn dat sommige gegevens leeg zijn: dan none.
 """
+import nltk
+nltk.download('wordnet')
 import pandas as pd
 import re
 from keyword_algorithm import keywordAlgorithm
@@ -85,9 +87,9 @@ def getSuggestions(query):
         print(".")
         choice = input(
             "Are you interested in this restaurant?")
-        if choice in ["affirm", "thankyou"]:
+        if dt.predict(choice, dtree) in ["affirm", "thankyou"]:
             satisfied = True
-        elif choice in ["negate", "deny", "reqalts", "reqmore"]:
+        elif dt.predict(choice, dtree) in ["negate", "deny", "reqalts", "reqmore"]:
             i += 1
             print("The following restaurant might be a good alternative.")
         else:
@@ -106,7 +108,7 @@ def giveInformation(suggestions, suggestionIndex):
     satisfied = 0
     while not satisfied:
         more_info = input("Would you like some more information about the restaurant?")
-        if more_info in ["affirm", "thankyou"]:
+        if dt.predict(more_info, dtree) in ["affirm", "thankyou"]:
             choice = input("What information would you like to have \n 1. Phone number \n 2. Address.")
             if choice == "1":
                 if suggestions.iloc[[suggestionIndex]]["phone"].empty:
@@ -118,7 +120,7 @@ def giveInformation(suggestions, suggestionIndex):
                 else:
                     print("The address is " + suggestions.iloc[suggestionIndex]["addr"] + " " +
                           suggestions.iloc[suggestionIndex]["postcode"] + ".")
-        elif more_info in ["negate", "deny"]:
+        elif dt.predict(more_info, dtree) in ["negate", "deny"]:
             satisfied = True
         else:
             print("Sorry, I didn't catch that. Please try again.")
