@@ -113,27 +113,38 @@ def mlp(data_file, layers=(16, 32), pickle_file="vectors.pkl",
     print("Accuracy:", total / len(data["sentences_test"]))
     return clf, id_to_label
 
-def mlp_test(model, input_sentence, id_to_label=None):
+def mlp_test(model, input_sentence, id_to_label=None, pickle_file="vectors.pkl"):
     """
         Predicts the label of a sentence based on a pre-trained machine learning
-        model.
+        model. Ignores words not found in the train or test set.
 
         @param model: pre-trained scikit-learn machine learning model.
         @param input sentence: sentence to predict the label of. (string)
         @param id_to_label: optional, dictionary converting class identifiers 
             to class labels.
+        @param pickle_file: as in mlp(), speedily gets the training vectors
     """
-    # TODO: we'll probably turn all this into a single class so we can access the 
-    # embeddings here. Note that it will take quite long to get embeddings for 
-    # unseen words, though this can be mitigated by having a seperate file with 
-    # common words.
-    raise NotImplementedError("Not currently available.")
-    # input_sentence = input_sentence.lower().split(' ')
-    # pred_id = model.predict([input_sentence])[0]
-    # if id_to_label is None:
-    #     return pred_id
-    # else:
-    #     return id_to_label[pred_id]
+    if os.path.exists(pickle_file):
+        with open(pickle_file, 'rb') as f:
+            vectors = pickle.load(f)
+    input_sentence = input_sentence.lower().split(' ')
+    # Almost certainly 300
+    vec_len = len(vectors["the"])
+    sent_vectors = []
+    for word in input_sentence:
+        if word in vectors:
+            sent_vectors.append(vectors[word])
+    if sent_vectors == []:
+        # Set base vector to all zeroes
+        av_vector = [np.zeros((vec_len,))]
+    else:
+        av_vector = sum(sent_vectors) / len(sent_vectors)
+    pred_id = model.predict([av_vector])[0]
+    if id_to_label is None:
+        return pred_id
+    else:
+        return id_to_label[pred_id]
 
 if __name__ == "__main__":
-    mlp("dialog_acts.dat")
+    model, id_to_label = mlp("dialog_acts.dat")
+    print(mlp_test(model, "how about a turkish restaurant in the center", id_to_label))
