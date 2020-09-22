@@ -1,4 +1,4 @@
- [ ] Use Neural Network for classifying
- [ ] Use our classifier more in dialog_flow.py
- [ ] Perform a system comparison (which one is better? why? ) from multiple perspectives (accuracy, robustness, interpretability etc. ). 
- [ ] Evaluate the results better (i.e. other metrics other than accuracy). 
+ - [ ] Use Neural Network for classifying
+ - [ ] Use our classifier more in dialog_flow.py
+ - [ ] Perform a system comparison (which one is better? why? ) from multiple perspectives (accuracy, robustness, interpretability etc. ). 
+ - [ ] Evaluate the results better (i.e. other metrics other than accuracy). 
