@@ -12,7 +12,7 @@ id 	antedecent 	consequent 	t/f 	level 	description
 11 	expensive, long time, mediocre food 	bad restaurant 	True 	1 	despite the mediocre food, the expense and logn wait times are not worth it
 12 	good restaurant, romantic 	date 	True 	2 	a good romantic restaurant is ideal for a date
 13 	bad restaurant 	date 	False 	2 	a bad restaurant is not recommended for a date
-14 	not romantic 	date 	False 	2 	a non-romantic restaurant
+14 	not romantic 	date 	False 	2 	a non-romantic restaurantis not recommended for a date
 15 	french 	romantic 	True 	1 	a french restaurant is always romantic
 16 	seafood 	vegetarian 	False 	1 	a seafood restaurant does not usually have any vegetarian options
 17 	steakhouse 	vegetarian 	False 	1 	a steakhouse does not usually have any vegetarian options
