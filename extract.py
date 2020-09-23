@@ -50,13 +50,8 @@ def extract_settings():
     
     return json_object
 
-def change_setting(setting, value):
-    settings_file = open("settings.json", "r")
-    json_object = json.load(settings_file)
-    settings_file.close()
-    
-    json_object[setting]["value"] = value
-    settings = json.dumps(json_object, indent=4)
+def change_setting(setting):
+    settings = json.dumps(setting, indent=4)
     settings_file = open("settings.json", "w")
     settings_file.write(settings)
     settings_file.close()

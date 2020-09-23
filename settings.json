@@ -1,11 +1,11 @@
 {
     "LEVENSHTEIN_EDIT_DISTANCE": {
-        "value": 3,
+        "value": "4",
         "valueType": "int",
         "text": "Levenshtein edit distance for preference extraction"
     },
     "CORRECTNESS_LEVENSHTEIN": {
-        "value": "IDK",
+        "value": "True",
         "valueType": "bool",
         "text": "Ask user about correctness of match for Levenshtein results"
     },
@@ -20,7 +20,7 @@
         "text": "Allow preferences to be stated in a single utterance only, or in multiple utterances with one preference per utterance only, or without restrictions (any number of utterances and any number of preferences per utterance)"
     },
     "BASELINE_CLASSIFIER": {
-        "value": "classifier",
+        "value": "recognition",
         "valueType": "ENUM",
         "valueOptions": [
             {
