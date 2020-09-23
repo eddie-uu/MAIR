@@ -7,7 +7,7 @@ krijgen van Bence een lijst van dictionaries (zoals in .csv) met suggesties
 (of lege lijst) het kan zijn dat sommige gegevens leeg zijn: dan none.
 """
 import nltk
-nltk.download('wordnet')
+#nltk.download('wordnet')
 import pandas as pd
 import re
 from keyword_algorithm import keywordAlgorithm
@@ -22,22 +22,47 @@ def Welcome():
     firstmsg = input()
     first_msg_classification = dt.predict(firstmsg, dtree) #"inform"
     if first_msg_classification in ["inform", "hello", "thankyou"]:
-        getUserPreferences(firstmsg)
+        query = keywordAlgorithm(firstmsg)
+        getUserPreferences(query)
     if first_msg_classification == "bye":
         Goodbye()
+def checkQuery(query):
+    solutions = extract_info("restaurant_info.csv", query)
+    if len(solutions) == 0:
+        print("Sadly, there is no restaurant that aligns with your preferences.")
+        restatePreferences(query)
+    if len(solutions) == 1 or len(query) == 3:
+        getSuggestions(query)
+    if len(solutions) > 1:
+        getUserPreferences(query)
 
 
-def getUserPreferences(message):
+def restatePreferences(query):
+    wrong = input("Which of the following would you like to change? \n 1. Price range \n 2. Food type \n 3. Area")
+    if wrong == "1":
+        query = {**query, **keywordAlgorithm(input("In what price range are you looking?"), mode="pricerange")}
+    elif wrong == "2":
+        query = {**query, **keywordAlgorithm(input("For what type of food are you looking?"), mode="food")}
+    elif wrong == "3":
+        query = {**query, **keywordAlgorithm(input("In what area are you looking?"), mode="area")}
+def getUserPreferences(query):
     """
     Finds out what type of restaurant the user is looking for.
     """
-    query = keywordAlgorithm(message)
+
+
     if "pricerange" not in query.keys():
         query = {**query, **keywordAlgorithm(input("In what price range are you looking?"), mode="pricerange")}
+        checkQuery(query)
+        return
     if "food" not in query.keys():
         query = {**query, **keywordAlgorithm(input("For what type of food are you looking?"), mode="food")}
+        checkQuery(query)
+        return
     if "area" not in query.keys():
         query = {**query, **keywordAlgorithm(input("In what area are you looking?"), mode="area")}
+        checkQuery(query)
+        return
 
     checkPreferences(query)
 
@@ -91,7 +116,7 @@ def getSuggestions(query):
             satisfied = True
         elif dt.predict(choice, dtree) in ["negate", "deny", "reqalts", "reqmore"]:
             i += 1
-            print("The following restaurant might be a good alternative.")
+            print("Looking for alternatives...")
         else:
             print("Sorry, I didn't catch that. Please try again.")
     if not satisfied:
