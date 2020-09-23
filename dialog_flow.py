@@ -16,7 +16,7 @@ from keyword_algorithm import keywordAlgorithm
 from extract_info import extract_info
 from extract import extract_settings, change_setting
 import decision_tree as dt
-# dtree = dt.createDecisionTree()
+dtree = dt.createDecisionTree()
 
 def Welcome():
     """
@@ -27,12 +27,11 @@ def Welcome():
     if (firstmsg == 'settings'):
         configurateSettings()
     else:
-        print('bye')
-        #first_msg_classification = dt.predict(firstmsg, dtree) #"inform"
-        #if first_msg_classification in ["inform", "hello", "thankyou"]:
-        #    getUserPreferences(firstmsg)
-        #if first_msg_classification == "bye":
-        #    Goodbye()
+        first_msg_classification = dt.predict(firstmsg, dtree) #"inform"
+        if first_msg_classification in ["inform", "hello", "thankyou"]:
+            getUserPreferences(firstmsg)
+        if first_msg_classification == "bye":
+            Goodbye()
 
 def configurateSettings():
     settings = extract_settings()
