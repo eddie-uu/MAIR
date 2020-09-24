@@ -16,74 +16,16 @@ def Welcome():
     """
     print("Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.")
     firstmsg = input()
+    query = extract_info("restaurant_info.csv",firstmsg)
     if (firstmsg == 'settings'):
         configurateSettings()
     else:
         first_msg_classification = dt.predict(firstmsg, dtree)  # "inform"
         if first_msg_classification in ["inform", "hello", "thankyou"]:
-            getUserPreferences(firstmsg)
+            getUserPreferences(query)
         if first_msg_classification == "bye":
             Goodbye()
 
-
-def configurateSettings():
-    settings = extract_settings()
-
-    # print(json.dumps(settings, indent=4))
-    finishedSettings = False
-    while not finishedSettings:
-        print("Which setting would you like to change?")
-        counter = 1
-        settingsIndex = {}
-
-        for setting in settings:
-            print(str(counter) + ". " + settings[setting]["text"])
-            settingsIndex[str(counter)] = {"key": setting, "value": settings[setting]}
-            counter += 1
-
-        saveAndRestart = counter
-        cancel = counter + 1
-        print(str(saveAndRestart) + ". Save and close")
-        print(str(cancel) + ". Cancel")
-
-        choice = input("> ")
-
-        if (choice == str(saveAndRestart)):
-            finishedSettings = True
-            change_setting(settings)
-            print("Configurations have been saved, closing application now...")
-        elif (choice == str(cancel)):
-            finishedSettings = True
-            print("Configurations will remain the same, closing application now...")
-        elif choice in settingsIndex:
-            settingKey = settingsIndex[choice]["key"]
-            settingValues = settingsIndex[choice]["value"]
-
-            validChoices = {"int": "^\d+$", "bool": 'true|false'}
-            print("Current setting for " + str(settingKey) + " is: " + str(settingValues["value"]))
-            print("To which value would you like to change this? (Value must be of the type: " + str(
-                settingValues["valueType"]) + " )")
-
-            if (settingValues["valueType"] == "ENUM"):
-                enumOptions = ""
-                for option in settingValues["valueOptions"]:
-                    print("- " + str(option["value"]))
-                    enumOptions += str(option["value"]).lower() + "|"
-                validChoices["ENUM"] = enumOptions[:-1] if len(enumOptions) > 0 else enumOptions
-
-            choice = input("> ")
-
-            pattern = re.compile(validChoices[str(settingValues["valueType"])])
-            if pattern.match(choice) != None:
-                print("Settings for " + settingKey + " have been changed from " + str(
-                    settingValues["value"]) + " to " + choice)
-                settings[settingKey]["value"] = choice
-            else:
-                print("Sorry, the given input is invalid")
-            time.sleep(1)
-        else:
-            print("Sorry, the given input could not be recognized")
-            time.sleep(1)
 
 def checkQuery(query):
     solutions = extract_info("restaurant_info.csv", query)
@@ -94,6 +36,17 @@ def checkQuery(query):
         getSuggestions(query)
     if len(solutions) > 1:
         getUserPreferences(query)
+
+
+def restatePreferences(query):
+    wrong = input("Which of the following would you like to change? \n 1. Price range \n 2. Food type \n 3. Area")
+    if wrong == "1":
+        query = {**query, **keywordAlgorithm(input("In what price range are you looking?"), mode="pricerange")}
+    elif wrong == "2":
+        query = {**query, **keywordAlgorithm(input("For what type of food are you looking?"), mode="food")}
+    elif wrong == "3":
+        query = {**query, **keywordAlgorithm(input("In what area are you looking?"), mode="area")}
+
 
 def configurateSettings():
     settings = extract_settings()
@@ -152,12 +105,10 @@ def configurateSettings():
             print("Sorry, the given input could not be recognized")
             time.sleep(1)
 
-def getUserPreferences(message):
+def getUserPreferences(query):
     """
     Finds out what type of restaurant the user is looking for.
     """
-
-
     if "pricerange" not in query.keys():
         query = {**query, **keywordAlgorithm(input("In what price range are you looking?"), mode="pricerange")}
         checkQuery(query)
