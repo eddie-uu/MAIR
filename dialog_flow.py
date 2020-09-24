@@ -1,31 +1,90 @@
-"""
-dictionary pricerange area food van Eddie
-
-wij sturen dictionary =(query)
-
-krijgen van Bence een lijst van dictionaries (zoals in .csv) met suggesties
-(of lege lijst) het kan zijn dat sommige gegevens leeg zijn: dan none.
-"""
 import nltk
+import time
 #nltk.download('wordnet')
 import pandas as pd
 import re
+import json
 from keyword_algorithm import keywordAlgorithm
 from extract_info import extract_info
+from extract import extract_settings, change_setting
 import decision_tree as dt
 dtree = dt.createDecisionTree()
+
 def Welcome():
     """
     Starts the dialog, and begins the state transitioning function.
     """
     print("Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.")
     firstmsg = input()
-    first_msg_classification = dt.predict(firstmsg, dtree) #"inform"
-    if first_msg_classification in ["inform", "hello", "thankyou"]:
-        query = keywordAlgorithm(firstmsg)
-        getUserPreferences(query)
-    if first_msg_classification == "bye":
-        Goodbye()
+    if (firstmsg == 'settings'):
+        configurateSettings()
+    else:
+        first_msg_classification = dt.predict(firstmsg, dtree)  # "inform"
+        if first_msg_classification in ["inform", "hello", "thankyou"]:
+            getUserPreferences(firstmsg)
+        if first_msg_classification == "bye":
+            Goodbye()
+
+
+def configurateSettings():
+    settings = extract_settings()
+
+    # print(json.dumps(settings, indent=4))
+    finishedSettings = False
+    while not finishedSettings:
+        print("Which setting would you like to change?")
+        counter = 1
+        settingsIndex = {}
+
+        for setting in settings:
+            print(str(counter) + ". " + settings[setting]["text"])
+            settingsIndex[str(counter)] = {"key": setting, "value": settings[setting]}
+            counter += 1
+
+        saveAndRestart = counter
+        cancel = counter + 1
+        print(str(saveAndRestart) + ". Save and close")
+        print(str(cancel) + ". Cancel")
+
+        choice = input("> ")
+
+        if (choice == str(saveAndRestart)):
+            finishedSettings = True
+            change_setting(settings)
+            print("Configurations have been saved, closing application now...")
+        elif (choice == str(cancel)):
+            finishedSettings = True
+            print("Configurations will remain the same, closing application now...")
+        elif choice in settingsIndex:
+            settingKey = settingsIndex[choice]["key"]
+            settingValues = settingsIndex[choice]["value"]
+
+            validChoices = {"int": "^\d+$", "bool": 'true|false'}
+            print("Current setting for " + str(settingKey) + " is: " + str(settingValues["value"]))
+            print("To which value would you like to change this? (Value must be of the type: " + str(
+                settingValues["valueType"]) + " )")
+
+            if (settingValues["valueType"] == "ENUM"):
+                enumOptions = ""
+                for option in settingValues["valueOptions"]:
+                    print("- " + str(option["value"]))
+                    enumOptions += str(option["value"]).lower() + "|"
+                validChoices["ENUM"] = enumOptions[:-1] if len(enumOptions) > 0 else enumOptions
+
+            choice = input("> ")
+
+            pattern = re.compile(validChoices[str(settingValues["valueType"])])
+            if pattern.match(choice) != None:
+                print("Settings for " + settingKey + " have been changed from " + str(
+                    settingValues["value"]) + " to " + choice)
+                settings[settingKey]["value"] = choice
+            else:
+                print("Sorry, the given input is invalid")
+            time.sleep(1)
+        else:
+            print("Sorry, the given input could not be recognized")
+            time.sleep(1)
+
 def checkQuery(query):
     solutions = extract_info("restaurant_info.csv", query)
     if len(solutions) == 0:
