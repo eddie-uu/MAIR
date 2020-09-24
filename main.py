@@ -24,7 +24,7 @@ def main():
         testBaselines(data)
     elif userInput == '2':
         # decisionTree('test')
-        print('u')
+        print('decision tree')
     elif userInput == '3':
         mlp("dialog_acts.dat")
     elif userInput == '4':
@@ -58,8 +58,3 @@ def classify_user_input():
     if (len(sentence) > 0):
         print('Majority classification is: '  + majority_baseline(data)[0])
         print('Rule based classification is: '  + rule_based_baseline(sentence)[0])
-
-def main2():
-    tree = createDecisionTree()
-    print(predict('I would like a cheap restaurant in the west part of town', tree))
-#main2()
