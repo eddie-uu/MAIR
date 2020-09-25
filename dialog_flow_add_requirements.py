@@ -129,9 +129,13 @@ def getExtraPreferences(suggestions):
         else:
             print("Sorry I didn't understand that. Please try again.")
     
+    ##TODO geef additional_pref door aan Bence 
+    
+    new_suggestions = functiebence(additional_pref) ##TODO fucntienaam aanpassen
+    
     i = 0
     for restaurant in suggestions:
-        if suggestions[i] in check(suggestions[i]) #check if restaurant is still suitable after adding new preferences, check= functie bence
+        if suggestions[i] in new_suggestions: #check if restaurant is still suitable after adding new preferences
             print(suggestions.iloc[i]['restaurantname'] + " meets all your preferences")
         else:
             print(suggestions.iloc[i]['restaurantname'] + " does not meet all your preferences")
