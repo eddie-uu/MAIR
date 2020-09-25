@@ -26,6 +26,12 @@ except ImportError:
     # Python 3
     import builtins as __builtin__
 
+def input(prompt = ''):
+    if configurations['RESPONSE_DELAY']['value'].lower() == 'true':
+        time.sleep(1)
+
+    return __builtin__.input(prompt)
+
 def print(*args, **kwargs):
     if configurations['RESPONSE_DELAY']['value'].lower() == 'true':
         time.sleep(1)
@@ -47,7 +53,7 @@ def Welcome():
         first_msg_classification = dt.predict(firstmsg, dtree) #"inform"
         if first_msg_classification in ["inform", "hello", "thankyou"]:
             getUserPreferences(firstmsg)
-        if first_msg_classification == "bye":
+        elif first_msg_classification == "bye":
             Goodbye()
 
 def configurateSettings():
