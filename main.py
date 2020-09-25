@@ -20,13 +20,13 @@ def main():
     userInput = input("> ")
 
     if userInput == '1':
-        data = extract_data("dialog_acts.dat")
+        data = extract_data("data/dialog_acts.dat")
         testBaselines(data)
     elif userInput == '2':
         # decisionTree('test')
         print('decision tree')
     elif userInput == '3':
-        mlp("dialog_acts.dat")
+        mlp("data/dialog_acts.dat")
     elif userInput == '4':
         classify_user_input()
     elif userInput == '5':
@@ -47,7 +47,7 @@ def main():
         #     print(f"We predict your sentence belongs to the {prediction} class.")
 
 def classify_user_input():
-    data = extract_data("dialog_acts.dat")
+    data = extract_data("data/dialog_acts.dat")
     
     """
     Classifies input from the user into a certain dialog act group.  

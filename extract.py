@@ -41,20 +41,14 @@ def extract_data(file_name, split=0.85, seed=42):
             "dialog_acts_test":dialog_acts_test, "sentences_test":sentences_test}
 
 def extract_settings():
-    settings_file = open("settings.json", "r")
+    settings_file = open("data/settings.json", "r")
     json_object = json.load(settings_file)
     settings_file.close()
-    
-    # for key in json_object.keys():
-    #    print(key)
-    
+
     return json_object
 
 def change_setting(setting):
     settings = json.dumps(setting, indent=4)
-    settings_file = open("settings.json", "w")
+    settings_file = open("data/settings.json", "w")
     settings_file.write(settings)
     settings_file.close()
-
-# change_setting('CORRECTNESS_LEVENSHTEIN', "False")
-# settings = extract_settings()

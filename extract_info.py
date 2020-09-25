@@ -116,4 +116,4 @@ def levenshtein_or_synonym(word, options, threshold):
         return best
 
 if __name__ == "__main__":
-    print(extract_info("restaurant_info.csv", {"pricerange":"expensiive", "area":"center", "food":"thai!"}))
+    print(extract_info("data/restaurant_info.csv", {"pricerange":"expensiive", "area":"center", "food":"thai!"}))

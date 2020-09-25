@@ -146,5 +146,5 @@ def mlp_test(model, input_sentence, id_to_label=None, pickle_file="vectors.pkl")
         return id_to_label[pred_id]
 
 if __name__ == "__main__":
-    model, id_to_label = mlp("dialog_acts.dat")
+    model, id_to_label = mlp("data/dialog_acts.dat")
     print(mlp_test(model, "how about a turkish restaurant in the center", id_to_label))

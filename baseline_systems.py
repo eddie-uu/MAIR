@@ -87,7 +87,7 @@ def rule_based_baseline(input):
     return classification
 
 def testBaselines(input):
-    data = extract_data("dialog_acts.dat")
+    data = extract_data("data/dialog_acts.dat")
     """
         Calculates the accuracy of both baseline classifications and prints them to the console.
         Accuracy is calculated by taking the number of correct classifications and dividing it by the total number of classifications.

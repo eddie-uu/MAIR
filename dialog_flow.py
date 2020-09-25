@@ -6,17 +6,34 @@ wij sturen dictionary =(query)
 krijgen van Bence een lijst van dictionaries (zoals in .csv) met suggesties
 (of lege lijst) het kan zijn dat sommige gegevens leeg zijn: dan none.
 """
-import nltk
-import time
-nltk.download('wordnet')
-import pandas as pd
-import re
-import json
+from __future__ import print_function
 from keyword_algorithm import keywordAlgorithm
 from extract_info import extract_info
 from extract import extract_settings, change_setting
+import nltk
+import time
+import pandas as pd
+import re
+import json
 import decision_tree as dt
+nltk.download('wordnet')
 dtree = dt.createDecisionTree()
+configurations = extract_settings()
+
+try:
+    import __builtin__
+except ImportError:
+    # Python 3
+    import builtins as __builtin__
+
+def print(*args, **kwargs):
+    if configurations['RESPONSE_DELAY']['value'].lower() == 'true':
+        time.sleep(1)
+
+    for arg in args:
+        if isinstance(arg, str) and configurations['OUTPUT_IN_CAPS']['value'].lower() == 'true':
+            return __builtin__.print(arg.upper())
+    return __builtin__.print(*args, **kwargs)
 
 def Welcome():
     """
@@ -35,8 +52,9 @@ def Welcome():
 
 def configurateSettings():
     settings = extract_settings()
-    
-    # print(json.dumps(settings, indent=4))
+    responseDelay = configurations['RESPONSE_DELAY']['value']
+    configurations['RESPONSE_DELAY']['value'] = 'false'
+
     finishedSettings = False
     while not finishedSettings:
         print("Which setting would you like to change?")
@@ -66,7 +84,7 @@ def configurateSettings():
             settingKey = settingsIndex[choice]["key"]
             settingValues = settingsIndex[choice]["value"]
 
-            validChoices = {"int": "^\d+$", "bool": 'true|false'}
+            validChoices = {"int": "^\d+$", "bool": 'true|false|True|False|TRUE|FALSE'}
             print("Current setting for " + str(settingKey) + " is: " + str(settingValues["value"]))
             print("To which value would you like to change this? (Value must be of the type: " + str(settingValues["valueType"]) + " )")
 
@@ -89,6 +107,8 @@ def configurateSettings():
         else:
             print("Sorry, the given input could not be recognized")
             time.sleep(1)
+
+    configurations['RESPONSE_DELAY']['value'] = responseDelay
 
 def getUserPreferences(message):
     """
@@ -138,7 +158,7 @@ def getSuggestions(query):
     """
     Retrieves the suggestions from the database, given our user input.
     """
-    suggestions = extract_info("restaurant_info.csv", query)
+    suggestions = extract_info("data/restaurant_info.csv", query)
     i = 0
     satisfied = False
     while len(suggestions) > i and not satisfied:

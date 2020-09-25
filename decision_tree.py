@@ -18,7 +18,7 @@ import numpy as np
 
 def createDecisionTree():
     # Parsed data from "dialog_acts.dat", with 85% training data
-    extractData = extract_data("dialog_acts.dat", 0.85)
+    extractData = extract_data("data/dialog_acts.dat", 0.85)
 
     # Array of values from each data key
     dialog_acts_train = extractData["dialog_acts_train"]
@@ -64,7 +64,7 @@ def predict(choice, tree):
 
 def decisionTree(decisionType):
     # Parsed data from "dialog_acts.dat", with 85% training data
-    extractData = extract_data("dialog_acts.dat", 0.85)
+    extractData = extract_data("data/dialog_acts.dat", 0.85)
 
     # Array of values from each data key
     dialog_acts_train = extractData["dialog_acts_train"]
@@ -109,7 +109,7 @@ def decisionTree(decisionType):
                 for matrixActSecond in dialog_acts_train:
                     if matrixActSecond not in matrix[matrixAct]: matrix[matrixAct][matrixActSecond] = 0
 
-        f = open("wrong answers.txt", "w")
+        f = open("data/wrong answers.txt", "w")
         for n in range(0, len(dialog_acts_test), 1):
             dialog = dialog_acts_test[n]
             sentence = sentences_test[n]
