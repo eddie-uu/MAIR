@@ -4,6 +4,7 @@ import time
 import pandas as pd
 import re
 import json
+import random
 from keyword_algorithm import keywordAlgorithm
 from extract_info import extract_info
 from extract import extract_settings, change_setting
@@ -16,27 +17,110 @@ def Welcome():
     """
     print("Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.")
     firstmsg = input()
-    query = extract_info("restaurant_info.csv",firstmsg)
-    if (firstmsg == 'settings'):
+    if (firstmsg == "settings"):
         configurateSettings()
     else:
+
         first_msg_classification = dt.predict(firstmsg, dtree)  # "inform"
         if first_msg_classification in ["inform", "hello", "thankyou"]:
-            getUserPreferences(query)
+            query = keywordAlgorithm(firstmsg)
+            checkQuery(query)
         if first_msg_classification == "bye":
             Goodbye()
 
 
 def checkQuery(query):
     solutions = extract_info("restaurant_info.csv", query)
+    print(len(solutions))
+    print(query)
     if len(solutions) == 0:
-        print("Sadly, there is no restaurant that aligns with your preferences.")
-        restatePreferences(query)
+        alternativeSuggestions(query)
     if len(solutions) == 1 or len(query) == 3:
+        if "pricerange" not in query:
+            query["pricerange"] = "dontcare"
+        if "food" not in query:
+            query["food"] = "dontcare"
+        if "area" not in query:
+            query["area"] = "dontcare"
+        if len(solutions) == 1: print("There is only one restaurant available that satisfies your preferences:")
         getSuggestions(query)
     if len(solutions) > 1:
         getUserPreferences(query)
 
+def alternativeSuggestions(oldquery):
+    print("There are no suggestions that satisfy your preferences. The following alternatives are available:")
+    alternatives = []
+    newquery = oldquery
+    #PRICERANGE SUBSTITUTIONS
+    if query["pricerange"] == "cheap":
+        newquery["pricerange"] = "moderate"
+        alternatives.append(extract_info("restaurant_info.csv", newquery))
+    elif query["pricerange"] == "moderate":
+        newquery["pricerange"] = "expensive"
+        alternatives.append(extract_info("restaurant_info.csv", newquery))
+    newquery = oldquery
+    #AREA SUBSTITUTIONS
+    if oldquery["area"] in ["centre", "north", "west"]:
+        for area in ["centre", "north", "west"]:
+            newquery["area"] = area
+            alternatives.append(extract_info("restaurant_info.csv", newquery))
+    if oldquery["area"] in ["centre", "north", "east"]:
+        for area in ["centre", "north", "east"]:
+            newquery["area"] = area
+            alternatives.append(extract_info("restaurant_info.csv", newquery))
+    if oldquery["area"] in ["centre", "south", "west"]:
+        for area in ["centre", "south", "west"]:
+            newquery["area"] = area
+            alternatives.append(extract_info("restaurant_info.csv", newquery))
+    if oldquery["area"] in ["centre", "south", "east"]:
+        for area in ["centre", "south", "east"]:
+            newquery["area"] = area
+            alternatives.append(extract_info("restaurant_info.csv", newquery))
+
+    #FOODTYPE SUBSTITUTIONS
+    newquery = oldquery
+    if oldquery["food"] in ["thai", "chinese", "korean", "vietnamese", "asian oriental"]:
+        for food in ["thai", "chinese", "korean", "vietnamese", "asian oriental"]:
+            newquery["food"] = food
+            alternatives.append(extract_info("restaurant_info.csv", newquery))
+    if oldquery["food"] in ["mediterranean", "spanish", "portuguese", "italian", "romanian", "tuscan", "catalan"]:
+        for food in ["mediterranean", "spanish", "portuguese", "italian", "romanian", "tuscan", "catalan"]:
+            newquery["food"] = food
+            alternatives.append(extract_info("restaurant_info.csv", newquery))
+    if oldquery["food"] in ["french", "european", "bistro", "swiss", "gastropub", "traditional"]:
+        for food in ["french", "european", "bistro", "swiss", "gastropub", "traditional"]:
+            newquery["food"] = food
+            alternatives.append(extract_info("restaurant_info.csv", newquery))
+    if oldquery["food"] in ["north american", "steakhouse", "british"]:
+        for food in ["north american", "steakhouse", "british"]:
+            newquery["food"] = food
+            alternatives.append(extract_info("restaurant_info.csv", newquery))
+    if oldquery["food"] in ["lebanese", "turkish", "persian"]:
+        for food in ["lebanese", "turkish", "persian"]:
+            newquery["food"] = food
+            alternatives.append(extract_info("restaurant_info.csv", newquery))
+    if oldquery["food"] in ["international", "modern european", "fusion"]:
+        for food in ["international", "modern european", "fusion"]:
+            newquery["food"] = food
+            alternatives.append(extract_info("restaurant_info.csv", newquery))
+    random.shuffle(alternatives)
+    for i in range(0, 3):
+        print(i + ": ", end="")
+        print(alternatives.iloc[i]['restaurantname'] + " is a nice place", end=" ")
+        if not alternatives.iloc[[i]]["food"].empty: print("serving " + alternatives.iloc[i]["food"], end=" ")
+        if not alternatives.iloc[[i]]["area"].empty: print("in the " + alternatives.iloc[i]["area"] + " of town", end=" ")
+        if not alternatives.iloc[[i]]["pricerange"].empty: print(
+            "in the " + alternatives.iloc[i]["pricerange"] + " pricerange", end="")
+        print(".")
+    print("Do you want to:")
+    print("1. Change your preferences")
+    print("2. Choose one of these alternatives")
+    input = input()
+    if input == 1:
+        restatePreferences(oldquery)
+    if input == 2:
+        suggindex = input("Which suggestion would you like?")
+        giveInformation(suggestions, suggindex)
 
 def restatePreferences(query):
     wrong = input("Which of the following would you like to change? \n 1. Price range \n 2. Food type \n 3. Area")
@@ -46,7 +130,7 @@ def restatePreferences(query):
         query = {**query, **keywordAlgorithm(input("For what type of food are you looking?"), mode="food")}
     elif wrong == "3":
         query = {**query, **keywordAlgorithm(input("In what area are you looking?"), mode="area")}
-
+    getSuggestions(query)
 
 def configurateSettings():
     settings = extract_settings()
@@ -122,7 +206,7 @@ def getUserPreferences(query):
         checkQuery(query)
         return
 
-    checkPreferences(query)
+    #checkPreferences(query)
 
 def checkPreferences(query):
     """
@@ -201,8 +285,8 @@ def giveInformation(suggestions, suggestionIndex):
                 if suggestions.iloc[[suggestionIndex]]["addr"].empty or suggestions.iloc[[suggestionIndex]]["postcode"].empty:
                     print("Sadly we have no address available for this restaurant.")
                 else:
-                    print("The address is " + suggestions.iloc[suggestionIndex]["addr"] + " " +
-                          suggestions.iloc[suggestionIndex]["postcode"] + ".")
+                    print("The address is " + str(suggestions.iloc[suggestionIndex]["addr"]) + " " +
+                          str(suggestions.iloc[suggestionIndex]["postcode"]) + ".")
         elif dt.predict(more_info, dtree) in ["negate", "deny"]:
             satisfied = True
         else:
