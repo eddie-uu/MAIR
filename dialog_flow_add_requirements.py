@@ -70,7 +70,7 @@ def checkPreferences(query):
         print("Sorry, I didn't understand that.")
         checkPreferences(query)
 
-def getExtraPreferences(suggestions):
+def getExtraPreferences(suggestions, query):
    
     satisfied = False
     additional_pref = []
@@ -143,7 +143,8 @@ def getExtraPreferences(suggestions):
         else:
             print("Sorry I didn't understand that. Please try again.") 
     
-    new_suggestions = implications(additional_pref)
+    new_suggestions = implications(additional_pref, query)
+    
     
     i = 0
     for restaurant in suggestions:
@@ -167,6 +168,8 @@ def getSuggestions(query):
     Retrieves the suggestions from the database, given our user input.
     """
     suggestions = extract_info("restaurant_info.csv", query)
+    getExtraPreferences(suggestions, query)
+    
     i = 0
     satisfied = False
     while len(suggestions) > i and not satisfied:
