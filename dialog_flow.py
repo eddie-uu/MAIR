@@ -261,11 +261,101 @@ def checkPreferences(query):
         print("Sorry, I didn't understand that.")
         checkPreferences(query)
 
+def getExtraPreferences(suggestions, query):
+    satisfied = False
+    additional_pref = []
+     
+    while not satisfied:
+        fmsg = input("would you like to add more preferences?")
+
+        if dtree.predict(fmsg) in ["negate", "deny"]:
+            print("Let's see which restaurants are in accorandence with your wishes.")
+            satisfied = True
+        elif dtree.predict(fmsg) in ["affirm", "thankyou"]:
+            smsg = input("What would you like to add? Choose one of the following options.\n 1. (not) busy \n 2. duration of your visit \n 3. child friendly \n 4. romantic \n 5. serves fast food \n 6. quality of the restaurant \n 7. suitable for a date \n 8. vegetarian options")
+            if smsg == "1":
+                choice = input("Do want a restaurant that is busy?").lower()
+                if dtree.predict(choice) in ["affirm", "thankyou"]:
+                    additional_pref += ["busy"]
+                    print("You want a restaurant that is busy.")
+                elif dtree.predict(choice) in ["negate", "deny"]:
+                    additional_pref += ["not busy"]
+                    print("You want a restaurant that is not busy.")
+                else: 
+                    print("Sorry I did not get that. Please try again.")
+            elif smsg == "2":
+                choice = input("Would you like to spend a lot of time in the restaurant?").lower()
+                if dtree.predict(choice) in ["affirm", "thankyou"]:
+                    additional_pref += ["long time"]
+                    print("You want to spend a long time at the restaurant.")
+                elif dtree.predict(choice) in ["negate", "deny"]:
+                    additional_pref += ["not long time"]
+                    print("You do not want to spend a long time at the restaurant.")
+                else:
+                    print("Sorry I did not get that. Please try again.")
+            elif smsg == "3":
+                additional_pref += ["children"]
+                print("You are looking for a restaurant that is child friendly.")
+            elif smsg == "4":
+                additional_pref += ["romantic"]
+                print("You are looking for a restaurant that is romantic.")
+            elif smsg == "5":
+                choice = input("Would you like a restaurant that serves fast food?").lower()
+                if dtree.predict(choice) in ["affirm", "thankyou"]:
+                    additional_pref += ["fast food"]
+                    print("You are looking for a restaurant that serves fast food.")
+                elif dtree.predict(choice) in ["negate", "deny"]:
+                    additional_pref += ["no fast food"]
+                    print("You are looking for a restaurant that does not serve fast food.")
+                else:
+                    print("Sorry I did not get that. Please try again.")
+            elif smsg == "6":
+                choice = input("Are you looking for a high quality restaurant?").lower()
+                if dtree.predict(choice) in ["affirm", "thankyou"]:
+                    additional_pref += ["good restaurant"]
+                    print("You are looking for a good restaurant.")
+                elif dtree.predict(choice) in ["negate", "deny"]:
+                    additional_pref += ["bad restaurant"]
+                    print("You are looking for a bad restaurant.")
+                else:
+                    print("Sorry I did not get that. Please try again.")
+                    getExtraPreferences(suggestions, query)
+            elif smsg == "7":
+                additional_pref += ["date"]
+                print("You are looking for a restaurant that is suitable for a date.")
+            elif smsg == "8":
+                additional_pref += ["vegetarian"]
+                print("You are looking for a restaurant that has vegetarian options.")
+            elif dtree.predict(smsg) in ["negate", "deny", "reqalts", "reqmore"]:
+                    print("Unfortunately, you can only choose one of the additional preferences above.")
+            else:
+                print("Sorry I did not understand that. Please try again")
+        else:
+            print("Sorry I didn't understand that. Please try again.") 
+    
+    new_suggestions = implications(additional_pref, query)
+    
+    i = 0
+    for restaurant in suggestions:
+        if suggestions[i] in new_suggestions: #check if restaurant is still suitable after adding new preferences
+            interested = input(suggestions.iloc[i]['restaurantname'] + " meets all your preferences \n Are you interested in this restaurant?").lower()
+            if dt.predict(interested, dtree) in ["affirm", "thankyou"]:
+                giveInformation(suggestions, i)
+            else:
+                print("No problem, let's continue.")
+        else:
+            print(suggestions.iloc[i]['restaurantname'] + " does not meet all your preferences")
+        i += 1
+    
+    print("There are no restaurants left. PLease try again.")
+    getExtraPreferences(suggestions, query)
+    
 def getSuggestions(query):
     """
     Retrieves the suggestions from the database, given our user input.
     """
     suggestions = eInfo.extract_info("data/restaurant_info.csv", query)
+    getExtraPreferences(suggestions, query)
     i = 0
     satisfied = False
     while len(suggestions) > i and not satisfied:
