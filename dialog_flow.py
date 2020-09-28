@@ -361,7 +361,9 @@ class DialogFlow:
         Retrieves the suggestions from the database, given our user input.
         """
         suggestions = self.eInfo.extract_info("data/restaurant_info.csv", query)
-        self.getExtraPreferences(suggestions, query)
+        if len(suggestions) > 1:
+            self.getExtraPreferences(suggestions, query)
+        
         i = 0
         satisfied = False
         while len(suggestions) > i and not satisfied:
@@ -377,7 +379,7 @@ class DialogFlow:
                 satisfied = True
             elif self.dtree.predict(choice) in ["negate", "deny", "reqalts", "reqmore"]:
                 i += 1
-                print("Looking for alternatives...")
+                #print("Looking for alternatives...")
             else:
                 print("Sorry, I didn't catch that. Please try again.")
         if not satisfied:
