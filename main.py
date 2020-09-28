@@ -32,19 +32,21 @@ def main():
         dt = DecisionTree()
         dt.preformDecisionTree('')
     elif userInput == '6':
-        print("Currently not implemented.")
+        loopMLP()
     elif userInput == '7':
         dialogFlow = DialogFlow()
         dialogFlow.Welcome()
+
+def loopMLP():
         # See mlp_test for explanation.
-        # model, id_dict = mlp("dialog_acts.dat")
-        # print("You can quit by typing 'stop'.")
-        # while True:
-        #     sentence = input("Please write your sentence here:\n")
-        #     if sentence == "stop":
-        #         break
-        #     prediction = mlp_test(model, sentence, id_dict)
-        #     print(f"We predict your sentence belongs to the {prediction} class.")
+    model, id_dict = mlp("dialog_acts.dat")
+    print("You can quit by typing 'stop'.")
+    while True:
+        sentence = input("Please write your sentence here:\n")
+        if sentence == "stop":
+            break
+        prediction = mlp_test(model, sentence, id_dict)
+        print(f"We predict your sentence belongs to the {prediction} class.")
 
 def classify_user_input():
     data = Extract("data/dialog_acts.dat")

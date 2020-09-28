@@ -9,6 +9,7 @@ import pandas as pd
 import re
 import json
 import random
+from imply import implications
 
 nltk.download('wordnet')
 

@@ -116,5 +116,6 @@ class ExtractInfo:
         if distances[best] <= threshold:
             return best
 
-#if __name__ == "__main__":
-#    print(extract_info("data/restaurant_info.csv", {"pricerange":"expensiive", "area":"center", "food":"thai!"}))
+if __name__ == "__main__":
+    # An example
+   print(extract_info("data/restaurant_info.csv", {"pricerange":"expensiive", "area":"center", "food":"thai!"}))
