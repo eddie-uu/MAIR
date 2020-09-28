@@ -1,4 +1,5 @@
 import random
+import json
 
 def extract_data(file_name, split=0.85, seed=42):
     """
@@ -8,6 +9,8 @@ def extract_data(file_name, split=0.85, seed=42):
         in the form of lists of words. dialog_acts_train and dialog_acts_test 
         are the dialog acts in the order that corresponds to the indices of the 
         sentences. They are lists of strings.
+        Note that the data should be in the form of one sentence per line with 
+        the label in front if it seperated by a space.
 
         @param file_name: name of the data file
         @param split: the data split of the traing/test set, between 0 and 1.
@@ -37,3 +40,21 @@ def extract_data(file_name, split=0.85, seed=42):
     return {"dialog_acts_train":dialog_acts_train, "sentences_train":sentences_train,
             "dialog_acts_test":dialog_acts_test, "sentences_test":sentences_test}
 
+def extract_settings():
+    settings_file = open("settings.json", "r")
+    json_object = json.load(settings_file)
+    settings_file.close()
+    
+    # for key in json_object.keys():
+    #    print(key)
+    
+    return json_object
+
+def change_setting(setting):
+    settings = json.dumps(setting, indent=4)
+    settings_file = open("settings.json", "w")
+    settings_file.write(settings)
+    settings_file.close()
+
+# change_setting('CORRECTNESS_LEVENSHTEIN', "False")
+# settings = extract_settings()

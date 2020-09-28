@@ -1,40 +1,61 @@
 from extract import extract_data
 import numpy as np
-# from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPClassifier
 import pickle
 import os
 from collections import defaultdict
+from sklearn import preprocessing
 
-def mlp():
-    data = extract_data("dialog_acts.dat")
+def mlp(data_file, layers=(16, 32), pickle_file="vectors.pkl", 
+        emb_file="fasttext_English.vec", split=0.85, seed=42, 
+        print_missing=False):
+    """
+        Trains a multilayer perceptron (feedforward neural network) on the average 
+        word embeddings of labeled sentences.
+        By default, uses the FastText model for word embeddings.
+        Returns the trained model.
+
+        @param data_file: data file containing labeled sentences. Should be 
+            compatible with the extract_data function.
+        @param layers: layers of the network. The default values have proven to
+            be excellent in testing.
+        @param pickle_file: greatly speeds up this function by skipping the step
+            of searching through the embedding file. Delete this file if you want
+            to use a new embedding file.
+        @param emb_file: .vec file containing pre-trained word embeddings.
+        @param split: percentage of training data represented as a float between
+            0 and 1.
+        @param seed: random seed for repreducability.
+        @param print_missing: if set to True, prints out sentences from both the
+            test and train set that could not be identified due to their words
+            not being present in the pre-trained embeddings.
+    """
+    data = extract_data(data_file, split=split, seed=seed)
 
     vectors = {}
     words = [word for sentence in data["sentences_train"] for word in sentence]
     words.append([word for sentence in data["sentences_test"] for word in sentence])
 
 
-    if os.path.exists("vectors.pkl"):
+    if os.path.exists(pickle_file):
         print("Loading previously saved vectors...")
-        with open("vectors.pkl", 'rb') as f:
+        with open(pickle_file, 'rb') as f:
             vectors = pickle.load(f)
     else:
         print("Finding vectors...")
-        with open("fasttext_English.vec", 'r', encoding="utf-8") as f:
+        with open(emb_file, 'r', encoding="utf-8") as f:
             for line in f:
                 tokens = line.replace('\n','').split(' ')
-                # We check if the word on this line is one of the words we want.
-                # We also skip the first line which has the number of words and 
-                # dimensions of the embeddings.
+                # The first line is not an embedding
                 if tokens[0] in words and len(tokens) > 2:
-                    # We save vectors as a numpy array of floats.
+                    # Embeddings are saved as numpy arrays
                     vectors[tokens[0]] = np.asarray(list(map(float, tokens[1:])))
-        with open("vectors.pkl", 'wb') as f_pickle:
+        with open(pickle_file, 'wb') as f_pickle:
             pickle.dump(vectors, f_pickle)
 
+    # Training labels should be numerical, and a way to refer back is needed
     temp = defaultdict(lambda: len(temp)) 
     conv_train_labels = [temp[ele] for ele in data["dialog_acts_train"]] 
-
     id_to_label = {}
     for i, ident in enumerate(conv_train_labels):
         id_to_label[ident] = data["dialog_acts_train"][i]
@@ -47,19 +68,24 @@ def mlp():
             if word in vectors:
                 sent_vectors.append(vectors[word])
         if sent_vectors == []:
-            # print("!!!!!!!!!!!!!!!!")
-            # print(sentence)
+            if print_missing:
+                print("The following sentence was not used in training:")
+                print(' '.join(sentence))
             continue
         av_vector = sum(sent_vectors) / len(sent_vectors)
         train_vectors.append(av_vector)
         train_labels.append(conv_train_labels[i])
 
-
+    # Start of alternative code that tries multiple different layer size configs.
     # print("Trying different configurations...")
-    # for l1 in range(10, 100, 10):
-    #     for l2 in range(5, 50, 5):
-            # print(l1, l2)
-    clf = MLPClassifier(solver='lbfgs', max_iter=1000, alpha=1e-5, hidden_layer_sizes=(20, 30), random_state=1)
+    # for l1 in range(5, 50, 5):
+    #     for l2 in range(10, 100, 10):
+
+    print("Training multilayer perceptron...")
+    clf = MLPClassifier(solver='lbfgs', max_iter=1000, alpha=1e-5, hidden_layer_sizes=layers, random_state=seed)
+    # sklearn expects standardized data
+    scaler = preprocessing.StandardScaler().fit(train_vectors)
+    train_vectors = scaler.transform(train_vectors)
     clf.fit(train_vectors, train_labels)
 
     total = 0
@@ -69,17 +95,56 @@ def mlp():
             if word in vectors:
                 sent_vectors.append(vectors[word])
         if sent_vectors == []:
+            if print_missing:
+                print("The following sentence could not be interpreted and " +
+                      "will be trivially classified as null:")
+                print(' '.join(sentence))
             predicted_label = "null"
             if predicted_label == true_label:
                 total += 1
             continue
         av_vector = sum(sent_vectors) / len(sent_vectors)
-        predicted_id = clf.predict([av_vector])[0]
+        av_vector = scaler.transform([av_vector])
+        predicted_id = clf.predict(av_vector)[0]
         predicted_label = id_to_label[predicted_id]
         if predicted_label == true_label:
             total += 1
 
     print("Accuracy:", total / len(data["sentences_test"]))
+    return clf, id_to_label
+
+def mlp_test(model, input_sentence, id_to_label=None, pickle_file="vectors.pkl"):
+    """
+        Predicts the label of a sentence based on a pre-trained machine learning
+        model. Ignores words not found in the train or test set.
+
+        @param model: pre-trained scikit-learn machine learning model.
+        @param input sentence: sentence to predict the label of. (string)
+        @param id_to_label: optional, dictionary converting class identifiers 
+            to class labels.
+        @param pickle_file: as in mlp(), speedily gets the training vectors
+    """
+    if os.path.exists(pickle_file):
+        with open(pickle_file, 'rb') as f:
+            vectors = pickle.load(f)
+    input_sentence = input_sentence.lower().split(' ')
+    # Almost certainly 300
+    vec_len = len(vectors["the"])
+    sent_vectors = []
+    for word in input_sentence:
+        if word in vectors:
+            sent_vectors.append(vectors[word])
+    if sent_vectors == []:
+        # Set base vector to all zeroes
+        av_vector = [np.zeros((vec_len,))]
+    else:
+        av_vector = sum(sent_vectors) / len(sent_vectors)
+    pred_id = model.predict([av_vector])[0]
+    if id_to_label is None:
+        return pred_id
+    else:
+        return id_to_label[pred_id]
 
 if __name__ == "__main__":
-    mlp()
+    model, id_to_label = mlp("dialog_acts.dat")
+    print(mlp_test(model, "how about a turkish restaurant in the center", id_to_label))
