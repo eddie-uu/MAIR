@@ -14,6 +14,7 @@ from keyword_algorithm import keywordAlgorithm
 from extract_info import extract_info
 import decision_tree as dt
 dtree = dt.createDecisionTree()
+from imply import implications
 def Welcome():
     """
     Starts the dialog, and begins the state transitioning function.
@@ -124,7 +125,7 @@ def getExtraPreferences(suggestions):
                     additional_pref += ["good restaurant"]
                     print("You are looking for a good restaurant.")
                 elif dt.predict(choice, dtree) in ["negate", "deny"]:
-                    additional_pref += ["bad restaurant"]  
+                    additional_pref += ["bad restaurant"]
                     print("You are looking for a bad restaurant.")
                 else:
                     print("Sorry I did not get that. Please try again.")
@@ -142,7 +143,7 @@ def getExtraPreferences(suggestions):
         else:
             print("Sorry I didn't understand that. Please try again.") 
     
-    new_suggestions = functiebence(additional_pref) ##TODO fucntienaam aanpassen
+    new_suggestions = implications(additional_pref)
     
     i = 0
     for restaurant in suggestions:
