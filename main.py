@@ -2,7 +2,7 @@ from extract import extract_data
 from baseline_systems import majority_baseline
 from baseline_systems import rule_based_baseline
 from baseline_systems import testBaselines
-from decision_tree import decisionTree
+from decision_tree import DecisionTree
 from dialog_flow import Welcome
 from mlp import mlp, mlp_test
 
@@ -23,19 +23,20 @@ def main():
         data = extract_data("data/dialog_acts.dat")
         testBaselines(data)
     elif userInput == '2':
-        # decisionTree('test')
-        print('decision tree')
+        dt = DecisionTree()
+        dt.decisionTree('test')
     elif userInput == '3':
         mlp("data/dialog_acts.dat")
     elif userInput == '4':
         classify_user_input()
     elif userInput == '5':
-        print('a')
-        # decisionTree('')
+        dt = DecisionTree()
+        dt.decisionTree('')
     elif userInput == '6':
         print("Currently not implemented.")
     elif userInput == '7':
-        Welcome()
+        print('test')
+        # Welcome()
         # See mlp_test for explanation.
         # model, id_dict = mlp("dialog_acts.dat")
         # print("You can quit by typing 'stop'.")
@@ -49,12 +50,12 @@ def main():
 def classify_user_input():
     data = extract_data("data/dialog_acts.dat")
     
-    """
-    Classifies input from the user into a certain dialog act group.  
-    """
+    # Classifies input from the user into a certain dialog act group.  
     
     sentence = (str(input('Enter sentence: '))).lower().split()
     
     if (len(sentence) > 0):
         print('Majority classification is: '  + majority_baseline(data)[0])
         print('Rule based classification is: '  + rule_based_baseline(sentence)[0])
+
+# main()

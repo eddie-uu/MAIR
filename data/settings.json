@@ -85,7 +85,7 @@
         "text": "Allow users to change their preferences or not"
     },
     "OUTPUT_IN_CAPS": {
-        "value": "true",
+        "value": "false",
         "valueType": "bool",
         "text": "OUTPUT IN ALL CAPS OR NOT"
     },

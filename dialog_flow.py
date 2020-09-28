@@ -7,17 +7,18 @@ krijgen van Bence een lijst van dictionaries (zoals in .csv) met suggesties
 (of lege lijst) het kan zijn dat sommige gegevens leeg zijn: dan none.
 """
 from __future__ import print_function
-from keyword_algorithm import keywordAlgorithm
+from keyword_algorithm import KeywordAlgorithm
 from extract_info import extract_info
 from extract import extract_settings, change_setting
+from decision_tree import DecisionTree
 import nltk
 import time
 import pandas as pd
 import re
 import json
-import decision_tree as dt
 nltk.download('wordnet')
-dtree = dt.createDecisionTree()
+dtree = DecisionTree()
+kAlgorithm = KeywordAlgorithm()
 configurations = extract_settings()
 
 try:
@@ -50,7 +51,7 @@ def Welcome():
     if (firstmsg == 'settings'):
         configurateSettings()
     else:
-        first_msg_classification = dt.predict(firstmsg, dtree) #"inform"
+        first_msg_classification = dtree.predict(firstmsg) #"inform"
         if first_msg_classification in ["inform", "hello", "thankyou"]:
             getUserPreferences(firstmsg)
         elif first_msg_classification == "bye":
@@ -120,13 +121,13 @@ def getUserPreferences(message):
     """
     Finds out what type of restaurant the user is looking for.
     """
-    query = keywordAlgorithm(message)
+    query = kAlgorithm.keywordAlgorithm(message)
     if "pricerange" not in query.keys():
-        query = {**query, **keywordAlgorithm(input("In what price range are you looking?"), mode="pricerange")}
+        query = {**query, **kAlgorithm.keywordAlgorithm(input("In what price range are you looking?"), mode="pricerange")}
     if "food" not in query.keys():
-        query = {**query, **keywordAlgorithm(input("For what type of food are you looking?"), mode="food")}
+        query = {**query, **kAlgorithm.keywordAlgorithm(input("For what type of food are you looking?"), mode="food")}
     if "area" not in query.keys():
-        query = {**query, **keywordAlgorithm(input("In what area are you looking?"), mode="area")}
+        query = {**query, **kAlgorithm.keywordAlgorithm(input("In what area are you looking?"), mode="area")}
 
     checkPreferences(query)
 
@@ -143,16 +144,16 @@ def checkPreferences(query):
         print(" in the " + query["area"] + " of town", end="")
     print(". Is this correct? Type yes or no.")
     msg = input().lower()
-    if dt.predict(msg, dtree) in ["negate", "deny"]:
+    if dtree.predict(msg) in ["negate", "deny"]:
         wrong = input("Which of the following is wrong? \n 1. Price range \n 2. Food type \n 3. Area")
         if wrong == "1":
-            query = {**query, **keywordAlgorithm(input("In what price range are you looking?"), mode = "pricerange")}
+            query = {**query, **kAlgorithm.keywordAlgorithm(input("In what price range are you looking?"), mode = "pricerange")}
         elif wrong == "2":
-            query = {**query, **keywordAlgorithm(input("For what type of food are you looking?"), mode="food")}
+            query = {**query, **kAlgorithm.keywordAlgorithm(input("For what type of food are you looking?"), mode="food")}
         elif wrong == "3":
-            query = {**query, **keywordAlgorithm(input("In what area are you looking?"), mode="area")}
+            query = {**query, **kAlgorithm.keywordAlgorithm(input("In what area are you looking?"), mode="area")}
         checkPreferences(query)
-    elif dt.predict(msg, dtree) in ["affirm", "thankyou"]:
+    elif dtree.predict(msg) in ["affirm", "thankyou"]:
         getSuggestions(query)
     else:
         print("Sorry, I didn't understand that.")
@@ -176,9 +177,9 @@ def getSuggestions(query):
         print(".")
         choice = input(
             "Are you interested in this restaurant?")
-        if dt.predict(choice, dtree) in ["affirm", "thankyou"]:
+        if dtree.predict(choice) in ["affirm", "thankyou"]:
             satisfied = True
-        elif dt.predict(choice, dtree) in ["negate", "deny", "reqalts", "reqmore"]:
+        elif dtree.predict(choice) in ["negate", "deny", "reqalts", "reqmore"]:
             i += 1
             print("The following restaurant might be a good alternative.")
         else:
@@ -197,7 +198,7 @@ def giveInformation(suggestions, suggestionIndex):
     satisfied = 0
     while not satisfied:
         more_info = input("Would you like some more information about the restaurant?")
-        if dt.predict(more_info, dtree) in ["affirm", "thankyou"]:
+        if dtree.predict(more_info) in ["affirm", "thankyou"]:
             choice = input("What information would you like to have \n 1. Phone number \n 2. Address.")
             if choice == "1":
                 if suggestions.iloc[[suggestionIndex]]["phone"].empty:
@@ -209,7 +210,7 @@ def giveInformation(suggestions, suggestionIndex):
                 else:
                     print("The address is " + suggestions.iloc[suggestionIndex]["addr"] + " " +
                           suggestions.iloc[suggestionIndex]["postcode"] + ".")
-        elif dt.predict(more_info, dtree) in ["negate", "deny"]:
+        elif dtree.predict(more_info) in ["negate", "deny"]:
             satisfied = True
         else:
             print("Sorry, I didn't catch that. Please try again.")
