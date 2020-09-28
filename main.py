@@ -1,12 +1,11 @@
 from extract import Extract
-from baseline_systems import majority_baseline
-from baseline_systems import rule_based_baseline
-from baseline_systems import testBaselines
+from baseline_systems import BaseLineSystem
 from decision_tree import DecisionTree
 from dialog_flow import Welcome
 from mlp import mlp, mlp_test
 
 def main():
+    baseLineSystem = BaseLineSystem()
     # List of commands
     print("Type one of the following numbers to execute the command: ")
     print("1. test baseline")
@@ -21,17 +20,17 @@ def main():
 
     if userInput == '1':
         data = Extract("data/dialog_acts.dat")
-        testBaselines(data)
+        baseLineSystem.testBaselines(data)
     elif userInput == '2':
         dt = DecisionTree()
-        dt.decisionTree('test')
+        dt.preformDecisionTree('test')
     elif userInput == '3':
         mlp("data/dialog_acts.dat")
     elif userInput == '4':
         classify_user_input()
     elif userInput == '5':
         dt = DecisionTree()
-        dt.decisionTree('')
+        dt.preformDecisionTree('')
     elif userInput == '6':
         print("Currently not implemented.")
     elif userInput == '7':
@@ -55,7 +54,7 @@ def classify_user_input():
     sentence = (str(input('Enter sentence: '))).lower().split()
     
     if (len(sentence) > 0):
-        print('Majority classification is: '  + majority_baseline(data)[0])
-        print('Rule based classification is: '  + rule_based_baseline(sentence)[0])
+        print('Majority classification is: '  + baseLineSystem.majority_baseline(data)[0])
+        print('Rule based classification is: '  + baseLineSystem.rule_based_baseline(sentence)[0])
 
 # main()

@@ -55,7 +55,7 @@
         "text": "Allow dialog restarts or not"
     },
     "RESPONSE_DELAY": {
-        "value": "True",
+        "value": "False",
         "valueType": "bool",
         "text": "Introduce a delay before showing system responses"
     },

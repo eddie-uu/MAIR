@@ -57,7 +57,7 @@ class DecisionTree:
 
         return answer[0]
 
-    def decisionTree(self, decisionType):
+    def preformDecisionTree(self, decisionType):
         # Make all sentences equal in length to parse with OneHotEncoder to binary
         for sentence in self.extractData.sentences_train:
             for n in range(len(sentence), self.max_len, 1): sentence.insert(n, '')
