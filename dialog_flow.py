@@ -61,6 +61,9 @@ class DialogFlow:
                 self.Goodbye()
 
     def checkQuery(self, query):
+        """
+        Checks whether the current query still has enough available restaurant options.
+        """
         solutions = self.eInfo.extract_info("data/restaurant_info.csv", query)
         print(len(solutions))
         print(query)
@@ -79,6 +82,9 @@ class DialogFlow:
             self.getUserPreferences(query)
 
     def alternativeSuggestions(self, oldquery):
+        """
+        Offers alternative suggestions if there are none matching the (old) query.
+        """
         print("There are no suggestions that satisfy your preferences. The following alternatives are available:")
         alternatives = []
         newquery = oldquery
@@ -154,6 +160,9 @@ class DialogFlow:
             self.giveInformation(suggestions, suggindex)
 
     def restatePreferences(self, query):
+        """
+        Allows the user to modify their query if something is wrong.
+        """
         wrong = input("Which of the following would you like to change? \n 1. Price range \n 2. Food type \n 3. Area")
         if wrong == "1":
             query = {**query, **self.kAlgorithm.keywordAlgorithm(input("In what price range are you looking?"), mode="pricerange")}
@@ -164,6 +173,9 @@ class DialogFlow:
         self.getSuggestions(query)
 
     def configurateSettings(self):
+        """
+        Allows changing of settings.
+        """
         settings = self.extract.extract_settings()
         self.configurations['RESPONSE_DELAY']['value'] = 'false'
 
