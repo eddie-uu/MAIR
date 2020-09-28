@@ -8,18 +8,21 @@ krijgen van Bence een lijst van dictionaries (zoals in .csv) met suggesties
 """
 from __future__ import print_function
 from keyword_algorithm import KeywordAlgorithm
-from extract_info import extract_info
-from extract import extract_settings, change_setting
 from decision_tree import DecisionTree
+from extract_info import ExtractInfo
+from extract import Extract
 import nltk
 import time
 import pandas as pd
 import re
 import json
+
 nltk.download('wordnet')
+eInfo = ExtractInfo()
 dtree = DecisionTree()
 kAlgorithm = KeywordAlgorithm()
-configurations = extract_settings()
+extract = Extract()
+configurations = extract.extract_settings()
 
 try:
     import __builtin__
@@ -58,7 +61,7 @@ def Welcome():
             Goodbye()
 
 def configurateSettings():
-    settings = extract_settings()
+    settings = extract.extract_settings()
     responseDelay = configurations['RESPONSE_DELAY']['value']
     configurations['RESPONSE_DELAY']['value'] = 'false'
 
@@ -82,7 +85,7 @@ def configurateSettings():
 
         if (choice == str(saveAndRestart)):
             finishedSettings = True
-            change_setting(settings)
+            extract.change_setting(settings)
             print("Configurations have been saved, closing application now...")
         elif (choice == str(cancel)):
             finishedSettings = True
@@ -159,13 +162,11 @@ def checkPreferences(query):
         print("Sorry, I didn't understand that.")
         checkPreferences(query)
 
-
-
 def getSuggestions(query):
     """
     Retrieves the suggestions from the database, given our user input.
     """
-    suggestions = extract_info("data/restaurant_info.csv", query)
+    suggestions = eInfo.extract_info("data/restaurant_info.csv", query)
     i = 0
     satisfied = False
     while len(suggestions) > i and not satisfied:

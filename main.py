@@ -1,4 +1,4 @@
-from extract import extract_data
+from extract import Extract
 from baseline_systems import majority_baseline
 from baseline_systems import rule_based_baseline
 from baseline_systems import testBaselines
@@ -20,7 +20,7 @@ def main():
     userInput = input("> ")
 
     if userInput == '1':
-        data = extract_data("data/dialog_acts.dat")
+        data = Extract("data/dialog_acts.dat")
         testBaselines(data)
     elif userInput == '2':
         dt = DecisionTree()
@@ -48,7 +48,7 @@ def main():
         #     print(f"We predict your sentence belongs to the {prediction} class.")
 
 def classify_user_input():
-    data = extract_data("data/dialog_acts.dat")
+    data = Extract("data/dialog_acts.dat")
     
     # Classifies input from the user into a certain dialog act group.  
     

@@ -1,10 +1,10 @@
-from extract import extract_data
-import numpy as np
-from sklearn.neural_network import MLPClassifier
-import pickle
-import os
+from extract import Extract
 from collections import defaultdict
 from sklearn import preprocessing
+from sklearn.neural_network import MLPClassifier
+import numpy as np
+import pickle
+import os
 
 def mlp(data_file, layers=(16, 32), pickle_file="vectors.pkl", 
         emb_file="fasttext_English.vec", split=0.85, seed=42, 
@@ -30,12 +30,11 @@ def mlp(data_file, layers=(16, 32), pickle_file="vectors.pkl",
             test and train set that could not be identified due to their words
             not being present in the pre-trained embeddings.
     """
-    data = extract_data(data_file, split=split, seed=seed)
+    data = Extract(data_file, split=split, seed=seed)
 
     vectors = {}
-    words = [word for sentence in data["sentences_train"] for word in sentence]
-    words.append([word for sentence in data["sentences_test"] for word in sentence])
-
+    words = [word for sentence in data.sentences_train for word in sentence]
+    words.append([word for sentence in data.sentences_test for word in sentence])
 
     if os.path.exists(pickle_file):
         print("Loading previously saved vectors...")
@@ -55,14 +54,14 @@ def mlp(data_file, layers=(16, 32), pickle_file="vectors.pkl",
 
     # Training labels should be numerical, and a way to refer back is needed
     temp = defaultdict(lambda: len(temp)) 
-    conv_train_labels = [temp[ele] for ele in data["dialog_acts_train"]] 
+    conv_train_labels = [temp[ele] for ele in data.dialog_acts_train] 
     id_to_label = {}
     for i, ident in enumerate(conv_train_labels):
-        id_to_label[ident] = data["dialog_acts_train"][i]
+        id_to_label[ident] = data.dialog_acts_train[i]
 
     train_vectors = []
     train_labels = []
-    for i, sentence in enumerate(data["sentences_train"]):
+    for i, sentence in enumerate(data.sentences_train):
         sent_vectors = []
         for word in sentence:
             if word in vectors:
@@ -89,7 +88,7 @@ def mlp(data_file, layers=(16, 32), pickle_file="vectors.pkl",
     clf.fit(train_vectors, train_labels)
 
     total = 0
-    for sentence, true_label in zip(data["sentences_test"], data["dialog_acts_test"]):
+    for sentence, true_label in zip(data.sentences_test, data.dialog_acts_test):
         sent_vectors = []
         for word in sentence:
             if word in vectors:
@@ -110,7 +109,7 @@ def mlp(data_file, layers=(16, 32), pickle_file="vectors.pkl",
         if predicted_label == true_label:
             total += 1
 
-    print("Accuracy:", total / len(data["sentences_test"]))
+    print("Accuracy:", total / len(data.sentences_test))
     return clf, id_to_label
 
 def mlp_test(model, input_sentence, id_to_label=None, pickle_file="vectors.pkl"):
@@ -134,16 +133,12 @@ def mlp_test(model, input_sentence, id_to_label=None, pickle_file="vectors.pkl")
     for word in input_sentence:
         if word in vectors:
             sent_vectors.append(vectors[word])
-    if sent_vectors == []:
-        # Set base vector to all zeroes
-        av_vector = [np.zeros((vec_len,))]
-    else:
-        av_vector = sum(sent_vectors) / len(sent_vectors)
+    
+    # Set base vector to all zeroes
+    av_vector = [np.zeros((vec_len,))] if sent_vectors == [] else sum(sent_vectors) / len(sent_vectors)
     pred_id = model.predict([av_vector])[0]
-    if id_to_label is None:
-        return pred_id
-    else:
-        return id_to_label[pred_id]
+    
+    return pred_id if id_to_label is None else id_to_label[pred_id]
 
 if __name__ == "__main__":
     model, id_to_label = mlp("data/dialog_acts.dat")
