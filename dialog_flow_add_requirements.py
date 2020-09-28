@@ -127,22 +127,25 @@ def getExtraPreferences(suggestions):
             else:
                 print("Sorry I did not understand that. Please try again")
         else:
-            print("Sorry I didn't understand that. Please try again.")
-    
-    ##TODO geef additional_pref door aan Bence 
+            print("Sorry I didn't understand that. Please try again.") 
     
     new_suggestions = functiebence(additional_pref) ##TODO fucntienaam aanpassen
     
     i = 0
     for restaurant in suggestions:
         if suggestions[i] in new_suggestions: #check if restaurant is still suitable after adding new preferences
-            print(suggestions.iloc[i]['restaurantname'] + " meets all your preferences")
+            interested = input(suggestions.iloc[i]['restaurantname'] + " meets all your preferences \n Are you interested in this restaurant?").lower()
+            if dt.predict(interested, dtree) in ["affirm", "thankyou"]:
+                giveInformation(suggestions, i)
+            else:
+                print("No problem, let's continue.")
         else:
             print(suggestions.iloc[i]['restaurantname'] + " does not meet all your preferences")
         i += 1
-        #apply all rules for which the properties of the restaurant satisfy the antecedent of the rule
+    
+    print("There are no restaurants left. PLease try again.")
+    getExtraPreferences(suggestions)
         
-        #contradictions
 
 
 def getSuggestions(query):
