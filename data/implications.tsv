@@ -19,3 +19,5 @@ id	antecedent	consequent	truth	level	description
 18	indian	vegetarian	True	1	an indian restaurant pretty much always has vegetarian options
 19	italian	vegetarian	True	1	an italian restaurant pretty much always has vegetarian options
 20	good food, centre	busy	True	1	restaurants in the centre serving good food are always busy
+21	not romantic, moderate	children	True	1	a moderately priced, not romantic restaurant is ideal with children
+22	fast food	children	True	2	a fast food restaurant is always a hit with children
