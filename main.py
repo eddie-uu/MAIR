@@ -1,7 +1,7 @@
 from extract import Extract
 from baseline_systems import BaseLineSystem
 from decision_tree import DecisionTree
-from dialog_flow import Welcome
+from dialog_flow import DialogFlow
 from mlp import mlp, mlp_test
 
 def main():
@@ -34,8 +34,8 @@ def main():
     elif userInput == '6':
         print("Currently not implemented.")
     elif userInput == '7':
-        print('test')
-        # Welcome()
+        dialogFlow = DialogFlow()
+        dialogFlow.Welcome()
         # See mlp_test for explanation.
         # model, id_dict = mlp("dialog_acts.dat")
         # print("You can quit by typing 'stop'.")
@@ -57,4 +57,4 @@ def classify_user_input():
         print('Majority classification is: '  + baseLineSystem.majority_baseline(data)[0])
         print('Rule based classification is: '  + baseLineSystem.rule_based_baseline(sentence)[0])
 
-# main()
+main()

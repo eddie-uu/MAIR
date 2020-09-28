@@ -1,33 +1,36 @@
-do you have an expensive restaurant                  -- Predicted: request -- Actually: inform
+do you have an expensive restaurant                  -- Predicted: reqalts -- Actually: inform
 i want a different res                   -- Predicted: inform -- Actually: reqalts
+okay give me address                    -- Predicted: reqalts -- Actually: request
 uh are there any that serves mediterranean                 -- Predicted: reqalts -- Actually: inform
 i want to find a                   -- Predicted: inform -- Actually: null
 not any more                     -- Predicted: inform -- Actually: deny
 left                       -- Predicted: inform -- Actually: null
 that information is not important                   -- Predicted: inform -- Actually: deny
-great could you tell me the address and phone number to that place           -- Predicted: inform -- Actually: request
 and asian                      -- Predicted: null -- Actually: inform
 ooh thank you good bye                   -- Predicted: thankyou -- Actually: bye
 uh no price range whats the                  -- Predicted: negate -- Actually: request
 did you see a korean restaurant                  -- Predicted: null -- Actually: inform
-okay thats all thank you good bye                 -- Predicted: bye -- Actually: thankyou
-thank you good bye no thank you good bye               -- Predicted: bye -- Actually: negate
+okay uh spanish food                    -- Predicted: ack -- Actually: inform
+okay thats all thank you good bye                 -- Predicted: request -- Actually: thankyou
+thank you good bye no thank you good bye               -- Predicted: request -- Actually: negate
 popular dish                      -- Predicted: null -- Actually: request
 cough im looking for expensive danish food                 -- Predicted: null -- Actually: inform
 do uh                      -- Predicted: inform -- Actually: null
 i want something else                    -- Predicted: inform -- Actually: reqalts
 is there a chinese restaurant in the cheap price range              -- Predicted: confirm -- Actually: inform
 alright                       -- Predicted: inform -- Actually: null
-okay uh                      -- Predicted: inform -- Actually: ack
+okay uh                      -- Predicted: request -- Actually: ack
 good thank you good bye                   -- Predicted: thankyou -- Actually: bye
-could you give me the number                  -- Predicted: reqalts -- Actually: request
 7:30                       -- Predicted: inform -- Actually: null
 uh i want to find                   -- Predicted: inform -- Actually: null
+that serves takes out food                   -- Predicted: null -- Actually: inform
 food do they serve                    -- Predicted: inform -- Actually: request
 what is it by                    -- Predicted: request -- Actually: null
+okay then any                     -- Predicted: request -- Actually: inform
 nor                       -- Predicted: inform -- Actually: null
-cheap restaurant uh italian food                   -- Predicted: request -- Actually: inform
+is it what what price range                  -- Predicted: confirm -- Actually: request
 expensive restaurant serve korean food                   -- Predicted: confirm -- Actually: inform
+does it serve kosher food                   -- Predicted: inform -- Actually: confirm
 finished                       -- Predicted: inform -- Actually: null
 thank you what is the phone number                 -- Predicted: thankyou -- Actually: request
 uh is there a korean restaurant in the center of town             -- Predicted: reqalts -- Actually: confirm
@@ -35,7 +38,8 @@ are there any barbecue restaurants                   -- Predicted: inform -- Act
 is there a venue in the west part of town              -- Predicted: confirm -- Actually: inform
 expe                       -- Predicted: inform -- Actually: null
 make a suggestion                     -- Predicted: inform -- Actually: null
-oh my god thank you goodbye                  -- Predicted: affirm -- Actually: thankyou
+type of foo                     -- Predicted: request -- Actually: null
+oh my god thank you goodbye                  -- Predicted: request -- Actually: thankyou
 you tell me                     -- Predicted: inform -- Actually: null
 bout                       -- Predicted: inform -- Actually: null
 i need cant                     -- Predicted: inform -- Actually: null
@@ -45,23 +49,21 @@ how bout any price range                   -- Predicted: inform -- Actually: req
 how bout the center part of town                 -- Predicted: inform -- Actually: reqalts
 okay how bout thai food                   -- Predicted: request -- Actually: reqalts
 kay thank you good bye                   -- Predicted: thankyou -- Actually: bye
-a cheap restaurant and it should be in the west part of town           -- Predicted: null -- Actually: inform
-great could you tell me the address and phone number to that place           -- Predicted: inform -- Actually: request
 what about in the center of town                 -- Predicted: reqalts -- Actually: inform
 prise me                      -- Predicted: inform -- Actually: null
 no there is no such venue how about portuguese food              -- Predicted: reqalts -- Actually: negate
-how about one that serves asian oriental food                -- Predicted: null -- Actually: reqalts
-thanks goodbye                      -- Predicted: bye -- Actually: thankyou
+looking for a restaurant                    -- Predicted: null -- Actually: inform
 can you find me a place that has thai food              -- Predicted: reqalts -- Actually: inform
-okay looking for a cheap restaurant serving caribbean food               -- Predicted: request -- Actually: inform
+can i get a post code                  -- Predicted: inform -- Actually: request
+okay looking for a cheap restaurant serving caribbean food               -- Predicted: reqalts -- Actually: inform
 yea you can give me the address                 -- Predicted: inform -- Actually: affirm
 well i dont care about the price range                -- Predicted: ack -- Actually: inform
 can you change romanian food to something else                -- Predicted: inform -- Actually: deny
-what european food                     -- Predicted: request -- Actually: inform
 system im looking for expensive restaurant                  -- Predicted: null -- Actually: inform
 what about a restaurant in the east part of town that serves indian type food         -- Predicted: inform -- Actually: reqalts
 would you like something                    -- Predicted: inform -- Actually: null
-okay thats all                     -- Predicted: inform -- Actually: bye
+okay thats all                     -- Predicted: request -- Actually: bye
+that serves restaurant in south part of town                -- Predicted: null -- Actually: inform
 okay how about                     -- Predicted: reqalts -- Actually: null
 free food                      -- Predicted: null -- Actually: inform
 what about expensive                     -- Predicted: inform -- Actually: reqalts
@@ -70,12 +72,13 @@ okay forget it goodbye                    -- Predicted: request -- Actually: bye
 thank you good bye crosstalk                   -- Predicted: thankyou -- Actually: bye
 and anything else                     -- Predicted: request -- Actually: reqalts
 dont care whats the phone number                  -- Predicted: request -- Actually: inform
+okay then any part of town                  -- Predicted: request -- Actually: inform
 noise may i have its address                  -- Predicted: inform -- Actually: request
 great thank you goodbye                    -- Predicted: thankyou -- Actually: bye
 whats the other one                    -- Predicted: reqalts -- Actually: null
 what about the center area                   -- Predicted: reqalts -- Actually: inform
 holy cow                      -- Predicted: inform -- Actually: null
-oh i need to be in the north                -- Predicted: affirm -- Actually: inform
+oh i need to be in the north                -- Predicted: request -- Actually: inform
 please                       -- Predicted: inform -- Actually: null
 and is this a moderately priced restaurant                 -- Predicted: request -- Actually: confirm
 that is all                     -- Predicted: inform -- Actually: null
