@@ -2,7 +2,7 @@ from pyswip import Prolog
 import os
 import pandas as pd
 import re
-from extract_info import extract_info
+from extract_info import ExtractInfo
 
 def convert_to_prolog(prolog_file="data/implications.pl", fact_file="data/restaurant_info.csv", 
                       fact_data=None, rule_file="data/implications.tsv"):
@@ -100,7 +100,7 @@ def implications(requirements, request):
     @param request: dictionary (str->str) mapping request types (corresponing to
         column names in the csv) to user inputs for that type. May be empty. 
     """
-    restaurants = extract_info("data/restaurant_info.csv", request)
+    restaurants = ExtractInfo().extract_info("data/restaurant_info.csv", request)
     if requirements == []:
         return restaurants
     convert_to_prolog()
