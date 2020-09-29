@@ -4,10 +4,16 @@ import pandas as pd
 import numpy as np
 import Levenshtein
 import re
+from extract import Extract
 
 class ExtractInfo:
     def __init__(self):
-        pass
+        try:
+            settings = Extract().extract_settings()
+            self.edit_dist = int(settings['LEVENSHTEIN_EDIT_DISTANCE']['value'])
+        except:
+            # Good default value
+            self.edit_dist = 3
 
     def extract_info(self, csv_file, request):
         """
@@ -78,12 +84,10 @@ class ExtractInfo:
         # All the different unique options in a column
         options = data[pref_type].dropna().unique()
         if user_input not in options:
-            # Note: edit distance set to 3. We didn't want to keep passing it up to
-            # higher functions, feel free to change it here.
-            user_input = self.levenshtein_or_synonym(user_input, options, 3)
+            user_input = self.levenshtein_or_synonym(user_input, options)
         return data if user_input is None else data.loc[data[pref_type] == user_input]
 
-    def levenshtein_or_synonym(self, word, options, threshold):
+    def levenshtein_or_synonym(self, word, options):
         """
             Inputs a target word and a list of options. It then chooses one of the
             options that best matches the word, or none of them. It determines this
@@ -92,7 +96,6 @@ class ExtractInfo:
 
             @param word: target word (string)
             @param options: list of candidate words (strings)
-            @param threshold: threshold for Levenshtein distance (integer)
         """
         save_syns = {}
         # First we check if simply a synonomous word was used
@@ -113,7 +116,7 @@ class ExtractInfo:
         # We only need the smallest edit distance
         distances = {op:min(dists) for (op,dists) in distances.items()}
         best = min(distances, key=distances.get)
-        if distances[best] <= threshold:
+        if distances[best] <= self.edit_dist:
             return best
 
 if __name__ == "__main__":
