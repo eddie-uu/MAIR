@@ -2,7 +2,7 @@ from extract import Extract
 from baseline_systems import BaseLineSystem
 from decision_tree import DecisionTree
 from dialog_flow import DialogFlow
-from mlp import mlp, mlp_test
+from mlp import mlp_loop, mlp
 
 def main():
     baseLineSystem = BaseLineSystem()
@@ -32,21 +32,10 @@ def main():
         dt = DecisionTree()
         dt.preformDecisionTree('')
     elif userInput == '6':
-        loopMLP()
+        mlp_loop()
     elif userInput == '7':
         dialogFlow = DialogFlow()
         dialogFlow.Welcome()
-
-def loopMLP():
-        # See mlp_test for explanation.
-    model, id_dict = mlp("dialog_acts.dat")
-    print("You can quit by typing 'stop'.")
-    while True:
-        sentence = input("Please write your sentence here:\n")
-        if sentence == "stop":
-            break
-        prediction = mlp_test(model, sentence, id_dict)
-        print(f"We predict your sentence belongs to the {prediction} class.")
 
 def classify_user_input():
     data = Extract("data/dialog_acts.dat")

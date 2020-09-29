@@ -1,6 +1,7 @@
 from __future__ import print_function
 from keyword_algorithm import KeywordAlgorithm
 from decision_tree import DecisionTree
+from mlp import mlp_test, mlp
 from extract_info import ExtractInfo
 from extract import Extract
 import nltk
@@ -10,6 +11,8 @@ import re
 import json
 import random
 from imply import implications
+import pickle
+import os
 
 nltk.download('wordnet')
 
@@ -39,6 +42,10 @@ def print(*args, **kwargs):
 
 class DialogFlow:
     def __init__(self):
+        if os.path.exists("data/mlp_model.pkl"):
+            self.mlp, self.id_dict = pickle.load("data/mlp_model.pkl")
+        else:
+            self.mlp, self.id_dict = mlp("data/dialog_acts.dat")
         self.eInfo = ExtractInfo()
         self.dtree = DecisionTree()
         self.kAlgorithm = KeywordAlgorithm()
@@ -54,6 +61,7 @@ class DialogFlow:
         if (firstmsg == "settings"):
             self.configurateSettings()
         else:
+            # TODO: replace each predict?
             first_msg_classification = self.dtree.predict(firstmsg) #"inform"
             if first_msg_classification in ["inform", "hello", "thankyou"]:
                 query = self.kAlgorithm.keywordAlgorithm(firstmsg)
