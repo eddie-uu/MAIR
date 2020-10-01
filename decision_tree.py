@@ -9,6 +9,7 @@ import numpy as np
 
 class DecisionTree:
     def __init__(self):
+        print('Creating decision tree...')
         # Parsed data from "dialog_acts.dat", with 85% training data
         extractData = Extract("data/dialog_acts.dat")
 
@@ -57,7 +58,7 @@ class DecisionTree:
 
         return answer[0]
 
-    def preformDecisionTree(self, decisionType):
+    def performDecisionTree(self, decisionType):
         # Make all sentences equal in length to parse with OneHotEncoder to binary
         for sentence in self.extractData.sentences_train:
             for n in range(len(sentence), self.max_len, 1): sentence.insert(n, '')
@@ -79,7 +80,8 @@ class DecisionTree:
                     matrix[matrixAct] = {}
                     labels.append(matrixAct)
                     for matrixActSecond in self.extractData.dialog_acts_train:
-                        if matrixActSecond not in matrix[matrixAct]: matrix[matrixAct][matrixActSecond] = 0
+                        if matrixActSecond not in matrix[matrixAct]:
+                            matrix[matrixAct][matrixActSecond] = 0
 
             f = open("data/wrong answers.txt", "w")
             for n in range(0, len(self.extractData.dialog_acts_test), 1):

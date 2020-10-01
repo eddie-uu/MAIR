@@ -1,8 +1,8 @@
 from extract import Extract
 
 class BaseLineSystem:
-    def __init(self):
-        pass
+    def __init__(self):
+        self.data = Extract("data/dialog_acts.dat")
 
     def majority_baseline(self, input):
         """
@@ -18,11 +18,8 @@ class BaseLineSystem:
         counts = dict()
             
         for act in input.dialog_acts_train:
-            if act in counts:
-                counts[act] += 1
-            else:
-                counts[act] = 1
-                
+            counts[act] = counts[act] + 1 if act in counts else 1
+            
             if counts[act] == max(counts.values()):
                 most_common_act = act
                 
@@ -50,67 +47,71 @@ class BaseLineSystem:
         classification = []
         check_data_type = isinstance(input, Extract)
         
-        if check_data_type:
-            sentences_test = input.sentences_test
-        else:
-            sentences_test = [input]
-            
+        sentences_test = input.sentences_test if check_data_type else [input]
+        
+        sentence_types = [
+            {'key': 'thankyou', 'value': ['thank', 'thanks', 'appreciate', 'grateful']},
+            {'key': 'bye',      'value': ['goodbye', 'bye']},
+            {'key': 'reqalts',  'value': ['other', 'another', 'anything', 'else']},
+            {'key': 'hello',    'value': ['hi', 'hello', 'hey']},
+            {'key': 'affirm',   'value': ['yes', 'right', 'correct', 'exactly']},
+            {'key': 'ack',      'value': ['okay']},
+            {'key': 'deny',     'value': ['wrong', 'not']},
+            {'key': 'reqmore',  'value': ['more', 'additional']},
+            {'key': 'negate',   'value': ['no']},
+            {'key': 'inform',   'value': ['dont', 'cheap', 'part', 'vegetarian', 'matter']},
+            {'key': 'repeat',   'value': ['again', 'repeat', 'back']},
+            {'key': 'restart',  'value': ['start', 'over', 'reset', 'restart']},
+            {'key': 'request',  'value': ['address', 'phone', 'number']},
+            {'key': 'confirm',  'value': ['serve', 'is', 'does']}, # or sentence[0] == 'is' or sentence[0] == 'does':
+            {'key': 'null',     'value': ['wait', 'unintelligible', 'noise', 'cough', 'sorry', 'sil', 'knocking', 'um', 'laughing']}
+        ]
+
         for sentence in sentences_test:
-            if any(x in ['thank', 'thanks', 'appreciate', 'grateful'] for x in sentence):
-                classification.append('thankyou')
-            elif any(x in ['goodbye', 'bye'] for x in sentence):
-                classification.append('bye')
-            elif any(x in ['other', 'another', 'anything', 'else'] for x in sentence):
-                classification.append('reqalts')
-            elif any(x in ['hi', 'hello', 'hey'] for x in sentence):
-                classification.append('hello')
-            elif any(x in ['yes', 'right', 'correct', 'exactly'] for x in sentence):
-                classification.append('affirm')
-            elif any(x in ['okay'] for x in sentence):
-                classification.append('ack')
-            elif any(x in ['wrong', 'not'] for x in sentence):
-                classification.append('deny')
-            elif any(x in ['more', 'additional'] for x in sentence):
-                classification.append('reqmore')
-            elif any(x in ['no'] for x in sentence):
-                classification.append('negate')
-            elif any(x in ['dont', 'cheap', 'part', 'vegetarian', 'matter'] for x in sentence):
+            added = False
+            for types in sentence_types:
+                if any(x in types['value'] for x in sentence):
+                    classification.append(types['key'])
+                    added = True
+                    break
+
+            if not added:
                 classification.append('inform')
-            elif any(x in ['again', 'repeat', 'back'] for x in sentence):
-                classification.append('repeat')
-            elif any(x in ['start', 'over', 'reset', 'restart'] for x in sentence):
-                classification.append('restart')
-            elif any(x in ['address', 'phone', 'number'] for x in sentence):
-                classification.append('request')
-            elif any(x in ['serve'] for x in sentence) or sentence[0] == 'is' or sentence[0] == 'does':
-                classification.append('confirm')
-            elif any(x in ['wait', 'unintelligible', 'noise', 'cough', 'sorry', 'sil', 'knocking', 'um', 'laughing'] for x in sentence):
-                classification.append('null')
-            else:
-                classification.append('inform')
-                
+
         return classification
 
-    def testBaselines(self, input):
-        data = Extract("data/dialog_acts.dat")
+    def testBaselines(self):
         """
             Calculates the accuracy of both baseline classifications and prints them to the console.
             Accuracy is calculated by taking the number of correct classifications and dividing it by the total number of classifications.
         """ 
-        mBaseline = self.majority_baseline(input)
-        rbBaseline = self.rule_based_baseline(input)  
+        mBaseline = self.majority_baseline(self.data)
+        rbBaseline = self.rule_based_baseline(self.data)  
+
         i = 0
         rbCorrect = 0
         for output in rbBaseline: 
-            if output == data.dialog_acts_test[i]: 
+            if output == self.data.dialog_acts_test[i]: 
                 rbCorrect += 1
             i += 1
-        print(str(round(rbCorrect/len(data.sentences_test),3)) + " accuracy on the rule-based baseline")
+
         i = 0
         mCorrect = 0
+
         for output in mBaseline: 
-            if output == data.dialog_acts_test[i]:
+            if output == self.data.dialog_acts_test[i]:
                 mCorrect += 1
             i += 1
-        print(str(round(mCorrect/len(data.sentences_test),3)) + " accuracy on the majority baseline")
+
+        print(str(round(rbCorrect/len(self.data.sentences_test),3)) + " accuracy on the rule-based baseline")
+        print(str(round(mCorrect/len(self.data.sentences_test),3)) + " accuracy on the majority baseline")
+
+    def classify_user_input(self):
+        # Classifies input from the user into a certain dialog act group.  
+        
+        sentence = (str(input('Enter sentence: '))).lower().split()
+        
+        if (len(sentence) > 0):
+            print('Majority classification is: '  + self.majority_baseline(self.data)[0])
+            print('Rule based classification is: '  + self.rule_based_baseline(sentence)[0])
         
