@@ -85,7 +85,7 @@ class ExtractInfo:
         options = data[pref_type].dropna().unique()
         if user_input not in options:
             user_input = self.levenshtein_or_synonym(user_input, options)
-        return data if user_input is None else data.loc[data[pref_type] == user_input]
+        return data[0:0] if user_input is None else data.loc[data[pref_type] == user_input]
 
     def levenshtein_or_synonym(self, word, options):
         """
@@ -121,4 +121,5 @@ class ExtractInfo:
 
 if __name__ == "__main__":
     # An example
-   print(ExtractInfo().extract_info("data/restaurant_info.csv", {"pricerange":"expensiive", "area":"center", "food":"thai!"}))
+#    print(ExtractInfo().extract_info("data/restaurant_info.csv", {"pricerange":"expensiive", "area":"center", "food":"thai!"}))
+    print(ExtractInfo().extract_info("data/restaurant_info.csv", {"pricerange":"cheap", "food":"gastropub"}))
