@@ -10,7 +10,7 @@ import pandas as pd
 import re
 import json
 import random
-from imply import implications
+from imply import Implications
 import pickle
 import os
 
@@ -360,7 +360,8 @@ class DialogFlow:
             else:
                 print("Sorry I didn't understand that. Please try again.") 
         
-        new_suggestions = implications(additional_pref, query)
+        imply = Implications()
+        new_suggestions = imply(additional_pref, query)
         
         i = 0
         for restaurant in suggestions:
