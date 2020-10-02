@@ -84,7 +84,7 @@ class KeywordAlgorithm:
 
             if not foodType and mode == 'food':
                 endResult = 'dontcare'
-                foodType = True
+                foodType  = True
 
             if foodType and endResult != '':
                 response['food'] = endResult

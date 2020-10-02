@@ -1,4 +1,3 @@
-from extract import Extract
 from baseline_systems import BaseLineSystem
 from decision_tree import DecisionTree
 from dialog_flow import DialogFlow

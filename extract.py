@@ -31,23 +31,22 @@ class Extract:
             random.shuffle(data)
 
             train_size = round(len(data) * split)
-            training = data[:train_size]
-            test = data[train_size:]
+            training   = data[:train_size]
+            test       = data[train_size:]
 
             self.dialog_acts_train = [sentence.split(' ')[0] for sentence in training]
-            self.sentences_train = [sentence.split(' ')[1:] for sentence in training]
-            self.dialog_acts_test = [sentence.split(' ')[0] for sentence in test]
-            self.sentences_test = [sentence.split(' ')[1:] for sentence in test]
+            self.sentences_train   = [sentence.split(' ')[1:] for sentence in training]
+            self.dialog_acts_test  = [sentence.split(' ')[0] for sentence in test]
+            self.sentences_test    = [sentence.split(' ')[1:] for sentence in test]
 
     def extract_settings(self):
         settings_file = open("data/settings.json", "r")
-        json_object = json.load(settings_file)
+        json_object   = json.load(settings_file)
         settings_file.close()
-
         return json_object
 
     def change_setting(self, setting):
-        settings = json.dumps(setting, indent=4)
+        settings      = json.dumps(setting, indent=4)
         settings_file = open("data/settings.json", "w")
         settings_file.write(settings)
         settings_file.close()

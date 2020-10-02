@@ -14,7 +14,6 @@ class BaseLineSystem:
                 - 'dialog_acts_test'
                 - 'sentences_test'
         """
-
         counts = dict()
             
         for act in input.dialog_acts_train:
@@ -44,10 +43,9 @@ class BaseLineSystem:
 
             @param input: should consist of the same keys as in majority_baseline()
         """
-        classification = []
+        classification  = []
         check_data_type = isinstance(input, Extract)
-        
-        sentences_test = input.sentences_test if check_data_type else [input]
+        sentences_test  = input.sentences_test if check_data_type else [input]
         
         sentence_types = [
             {'key': 'thankyou', 'value': ['thank', 'thanks', 'appreciate', 'grateful']},
@@ -85,7 +83,7 @@ class BaseLineSystem:
             Calculates the accuracy of both baseline classifications and prints them to the console.
             Accuracy is calculated by taking the number of correct classifications and dividing it by the total number of classifications.
         """ 
-        mBaseline = self.majority_baseline(self.data)
+        mBaseline  = self.majority_baseline(self.data)
         rbBaseline = self.rule_based_baseline(self.data)  
 
         i = 0

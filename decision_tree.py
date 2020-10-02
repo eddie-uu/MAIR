@@ -1,8 +1,7 @@
 from sklearn import datasets
 from sklearn import tree
 from sklearn.tree import export_text
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.metrics import confusion_matrix
 from extract import Extract
 import numpy as np
@@ -75,6 +74,8 @@ class DecisionTree:
             tested      = 0
             correct     = 0
 
+            self.extractData.dialog_acts_train.append('total')
+
             for matrixAct in self.extractData.dialog_acts_train:
                 if matrixAct not in matrix:
                     matrix[matrixAct] = {}
@@ -85,11 +86,11 @@ class DecisionTree:
 
             f = open("data/wrong answers.txt", "w")
             for n in range(0, len(self.extractData.dialog_acts_test), 1):
-                dialog = self.extractData.dialog_acts_test[n]
-                sentence = self.extractData.sentences_test[n]
-
+                dialog     = self.extractData.dialog_acts_test[n]
+                sentence   = self.extractData.sentences_test[n]
                 prediction = self.oneHotEncoder.transform([sentence])
-                answer = self.decisionTree.predict(prediction)
+                answer     = self.decisionTree.predict(prediction)
+                tested     = tested + 1
                         
                 if (answer[0] == dialog):
                     correct = correct + 1
@@ -97,21 +98,35 @@ class DecisionTree:
                     s = ' '.join(sentence)
                     f.write(s + " -- Predicted: " + answer[0] + " -- Actually: " + dialog + "\n")
                     
-                tested = tested + 1
                 predictions.append(answer[0])
                 actually.append(dialog)
                 matrix[answer[0]][dialog] = matrix[answer[0]][dialog] + 1
+                matrix[answer[0]]['total'] = matrix[answer[0]]['total'] + 1
+                matrix['total'][dialog] = matrix['total'][dialog] + 1
 
-            f.close()        
+            f.close()
             print(10*' ' + ' | '.join(matrix.keys()))
             for key, value in matrix.items():
                 print("%-10s" % (key), end = '')
                 print(*value.values(), sep = 7*' ' + "|")
-                    
-            # print(confusion_matrix(actually, predictions, labels=labels))
+            
+            totalTrue = 0
+            totalPrecisionPredicted = 0
+            totalRecallPredicted = 0
+
+            for key, value in matrix.items():
+                if key != 'total':
+                    totalTrue += value[key]
+                    totalPrecisionPredicted += value['total']
+                    totalRecallPredicted += matrix['total'][key]
+                    print("Precision for " + key + ": " + str(value[key] / value['total']))
+                    print("Recall for " + key + ": " + str(value[key] / matrix['total'][key]))
+
+            print("")
             print("Total tested sentences: " + str(tested))
             print("Total correctly classified: " + str(correct))
-            print("Finished testing, results: " + str(float(100 / tested * correct)) + "% correct")
+            print("Finished testing")
+            print("Accuracy: " + str(float(100 / tested * correct)) + "%")
         else:
             # Console writeline
             while True:
