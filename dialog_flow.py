@@ -43,7 +43,8 @@ def print(*args, **kwargs):
 class DialogFlow:
     def __init__(self):
         if os.path.exists("data/mlp_model.pkl"):
-            self.mlp, self.id_dict = pickle.load("data/mlp_model.pkl")
+            with open("data/mlp_model.pkl", 'rb') as f:
+                self.mlp, self.id_dict = pickle.load(f)
         else:
             self.mlp, self.id_dict = mlp("data/dialog_acts.dat")
         self.eInfo = ExtractInfo()
@@ -62,7 +63,7 @@ class DialogFlow:
             self.configurateSettings()
         else:
             first_msg_classification = mlp_test(self.mlp, firstmsg, self.id_dict) #"inform"
-            if first_msg_classification in ["inform", "hello", "thankyou"]:
+            if first_msg_classification in ["inform", "hello", "thankyou", "request"]:
                 query = self.kAlgorithm.keywordAlgorithm(firstmsg)
                 self.checkQuery(query)
             elif first_msg_classification == "bye":
@@ -97,73 +98,76 @@ class DialogFlow:
         alternatives = []
         newquery = oldquery
         #PRICERANGE SUBSTITUTIONS
-        if query["pricerange"] == "cheap":
-            newquery["pricerange"] = "moderate"
-            alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
-        elif query["pricerange"] == "moderate":
-            newquery["pricerange"] = "expensive"
-            alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+        if "pricerange" in oldquery.keys():
+            if oldquery["pricerange"] == "cheap":
+                newquery["pricerange"] = "moderate"
+                alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+            elif oldquery["pricerange"] == "moderate":
+                newquery["pricerange"] = "expensive"
+                alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
         newquery = oldquery
         #AREA SUBSTITUTIONS
-        if oldquery["area"] in ["centre", "north", "west"]:
-            for area in ["centre", "north", "west"]:
-                newquery["area"] = area
-                alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
-        if oldquery["area"] in ["centre", "north", "east"]:
-            for area in ["centre", "north", "east"]:
-                newquery["area"] = area
-                alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
-        if oldquery["area"] in ["centre", "south", "west"]:
-            for area in ["centre", "south", "west"]:
-                newquery["area"] = area
-                alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
-        if oldquery["area"] in ["centre", "south", "east"]:
-            for area in ["centre", "south", "east"]:
-                newquery["area"] = area
-                alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+        if "area" in oldquery.keys():
+            if oldquery["area"] in ["centre", "north", "west"]:
+                for area in ["centre", "north", "west"]:
+                    newquery["area"] = area
+                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+            if oldquery["area"] in ["centre", "north", "east"]:
+                for area in ["centre", "north", "east"]:
+                    newquery["area"] = area
+                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+            if oldquery["area"] in ["centre", "south", "west"]:
+                for area in ["centre", "south", "west"]:
+                    newquery["area"] = area
+                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+            if oldquery["area"] in ["centre", "south", "east"]:
+                for area in ["centre", "south", "east"]:
+                    newquery["area"] = area
+                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
 
         #FOODTYPE SUBSTITUTIONS
         newquery = oldquery
-        if oldquery["food"] in ["thai", "chinese", "korean", "vietnamese", "asian oriental"]:
-            for food in ["thai", "chinese", "korean", "vietnamese", "asian oriental"]:
-                newquery["food"] = food
-                alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
-        if oldquery["food"] in ["mediterranean", "spanish", "portuguese", "italian", "romanian", "tuscan", "catalan"]:
-            for food in ["mediterranean", "spanish", "portuguese", "italian", "romanian", "tuscan", "catalan"]:
-                newquery["food"] = food
-                alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
-        if oldquery["food"] in ["french", "european", "bistro", "swiss", "gastropub", "traditional"]:
-            for food in ["french", "european", "bistro", "swiss", "gastropub", "traditional"]:
-                newquery["food"] = food
-                alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
-        if oldquery["food"] in ["north american", "steakhouse", "british"]:
-            for food in ["north american", "steakhouse", "british"]:
-                newquery["food"] = food
-                alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
-        if oldquery["food"] in ["lebanese", "turkish", "persian"]:
-            for food in ["lebanese", "turkish", "persian"]:
-                newquery["food"] = food
-                alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
-        if oldquery["food"] in ["international", "modern european", "fusion"]:
-            for food in ["international", "modern european", "fusion"]:
-                newquery["food"] = food
-                alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+        if "food" in oldquery.keys():
+            if oldquery["food"] in ["thai", "chinese", "korean", "vietnamese", "asian oriental"]:
+                for food in ["thai", "chinese", "korean", "vietnamese", "asian oriental"]:
+                    newquery["food"] = food
+                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+            if oldquery["food"] in ["mediterranean", "spanish", "portuguese", "italian", "romanian", "tuscan", "catalan"]:
+                for food in ["mediterranean", "spanish", "portuguese", "italian", "romanian", "tuscan", "catalan"]:
+                    newquery["food"] = food
+                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+            if oldquery["food"] in ["french", "european", "bistro", "swiss", "gastropub", "traditional"]:
+                for food in ["french", "european", "bistro", "swiss", "gastropub", "traditional"]:
+                    newquery["food"] = food
+                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+            if oldquery["food"] in ["north american", "steakhouse", "british"]:
+                for food in ["north american", "steakhouse", "british"]:
+                    newquery["food"] = food
+                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+            if oldquery["food"] in ["lebanese", "turkish", "persian"]:
+                for food in ["lebanese", "turkish", "persian"]:
+                    newquery["food"] = food
+                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+            if oldquery["food"] in ["international", "modern european", "fusion"]:
+                for food in ["international", "modern european", "fusion"]:
+                    newquery["food"] = food
+                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
         random.shuffle(alternatives)
         for i in range(0, 3):
-            print(i + ": ", end="")
-            print(alternatives.iloc[i]['restaurantname'] + " is a nice place", end=" ")
-            if not alternatives.iloc[[i]]["food"].empty: print("serving " + alternatives.iloc[i]["food"], end=" ")
-            if not alternatives.iloc[[i]]["area"].empty: print("in the " + alternatives.iloc[i]["area"] + " of town", end=" ")
-            if not alternatives.iloc[[i]]["pricerange"].empty: print(
-                "in the " + alternatives.iloc[i]["pricerange"] + " pricerange", end="")
+            print(str(i) + ": ", end="")
+            print(alternatives[i]["restaurantname"] + " is a nice place", end=" ")
+            if not alternatives[i]["food"].empty: print("serving " + alternatives[i]["food"], end=" ")
+            if not alternatives[i]["area"].empty: print("in the " + alternatives[i]["area"] + " of town", end=" ")
+            if not alternatives[i]["pricerange"].empty: print(
+                "in the " + alternatives[i]["pricerange"] + " pricerange", end="")
             print(".")
         print("Do you want to:")
         print("1. Change your preferences")
         print("2. Choose one of these alternatives")
-        input = input()
-        if input == 1:
+        inp = input()
+        if inp == 1:
             self.restatePreferences(oldquery)
-        if input == 2:
+        if inp == 2:
             suggindex = input("Which suggestion would you like?")
             self.giveInformation(suggestions, suggindex)
 
