@@ -43,7 +43,8 @@ def print(*args, **kwargs):
 class DialogFlow:
     def __init__(self):
         if os.path.exists("data/mlp_model.pkl"):
-            self.mlp, self.id_dict = pickle.load("data/mlp_model.pkl")
+            with open("data/mlp_model.pkl", 'rb') as f:
+                self.mlp, self.id_dict = pickle.load(f)
         else:
             self.mlp, self.id_dict = mlp("data/dialog_acts.dat")
         self.eInfo = ExtractInfo()
