@@ -85,7 +85,7 @@
         "text": "Allow users to change their preferences or not"
     },
     "OUTPUT_IN_CAPS": {
-        "value": "true",
+        "value": "False",
         "valueType": "bool",
         "text": "OUTPUT IN ALL CAPS OR NOT"
     },
@@ -108,5 +108,10 @@
         "value": "True",
         "valueType": "bool",
         "text": "Print precision, recall & F1 for the test set of the MLP."
+    },
+    "ALTERNATIVES_NUMBER": {
+        "value": "3",
+        "valueType": "int",
+        "text": "Changes the maximum number of alternatives shown when there are no matches for the current preference"
     }
 }
