@@ -5,11 +5,11 @@ class keyword_algorithm:
         pass
 
     # Checks regex patterns (matching keywords) in sentence and returns either the sentence back if not found or the keyword match
-    def checkPattern(self, text, patterns, defaultValue = ''):
+    def checkPattern(self, text, patterns, default_value = ''):
         for pattern in patterns:
             match = re.search(pattern['pattern'], text)
             if match:
-                text = match.group(pattern['group']) if defaultValue == '' else defaultValue 
+                text = match.group(pattern['group']) if default_value == '' else default_value 
         return text
 
     # Perform the algorithm for a sentence, pass a search mode (food, area or pricerange) if context is mentioned
@@ -86,15 +86,15 @@ class keyword_algorithm:
             result    = self.checkPattern(text, food_patterns)
             end_result = self.checkPattern(result, food_dont_care_patterns, 'dontcare')
             
-            foodType = True
+            food_type = True
             for words in end_result.split():
-                if len(words) < 3: foodType = False
+                if len(words) < 3: food_type = False
 
-            if not foodType and mode == 'food':
+            if not food_type and mode == 'food':
                 end_result = 'dontcare'
-                foodType  = True
+                food_type  = True
 
-            if foodType and end_result != '':
+            if food_type and end_result != '':
                 response['food'] = end_result
         
         return response

@@ -80,8 +80,8 @@ class baseline_system(abstract_machine_learning_algorithm):
         return classification
 
     # overriding abstract method
-    def perform_algorithm(self, decisionType = False):
-        if decisionType:
+    def perform_algorithm(self, decision_type = False):
+        if decision_type:
             """
                 Calculates the accuracy of both baseline classifications and prints them to the console.
                 Accuracy is calculated by taking the number of correct classifications and dividing it by the total number of classifications.
@@ -93,18 +93,18 @@ class baseline_system(abstract_machine_learning_algorithm):
 
             self.extract_data.dialog_acts_train.append('total')
 
-            for matrixAct in self.extract_data.dialog_acts_train:
-                if matrixAct not in rb_matrix:
-                    rb_matrix[matrixAct] = {}
-                    m_matrix[matrixAct] = {}
-                    for matrixActSecond in self.extract_data.dialog_acts_train:
-                        if matrixActSecond not in rb_matrix[matrixAct]:
-                            rb_matrix[matrixAct][matrixActSecond] = 0
-                            m_matrix[matrixAct][matrixActSecond] = 0
+            for matrix_act in self.extract_data.dialog_acts_train:
+                if matrix_act not in rb_matrix:
+                    rb_matrix[matrix_act] = {}
+                    m_matrix[matrix_act] = {}
+                    for matrix_act_second in self.extract_data.dialog_acts_train:
+                        if matrix_act_second not in rb_matrix[matrix_act]:
+                            rb_matrix[matrix_act][matrix_act_second] = 0
+                            m_matrix[matrix_act][matrix_act_second] = 0
             
-            self.evaluateResults("rule-based", rb_baseline, rb_matrix)
+            self.evaluate_results("rule-based", rb_baseline, rb_matrix)
             print("")
-            self.evaluateResults("majority", m_baseline, m_matrix)
+            self.evaluate_results("majority", m_baseline, m_matrix)
         else:
             # Classifies input from the user into a certain dialog act group.  
             
@@ -114,7 +114,7 @@ class baseline_system(abstract_machine_learning_algorithm):
                 print('Majority classification is: '  + self.majority_baseline(self.extract_data)[0])
                 print('Rule based classification is: '  + self.rule_based_baseline(sentence)[0])
 
-    def evaluateResults(self, baselineType, baseline, matrix):
+    def evaluate_results(self, baseline_type, baseline, matrix):
         tested = 0
         correct = 0
         for output in baseline: 
@@ -128,13 +128,13 @@ class baseline_system(abstract_machine_learning_algorithm):
             matrix['total'][dialog] = matrix['total'][dialog] + 1
             tested += 1
 
-        print("Results on the " + baselineType + " baseline:")
+        print("Results on the " + baseline_type + " baseline:")
         print(10*' ' + ' | '.join(matrix.keys()))
         for key, value in matrix.items():
             print("%-10s" % (key), end = '')
             print(*value.values(), sep = 7*' ' + "|")
 
-        print(str((round(correct/tested,3) * 100)) + "% accuracy on the " + baselineType + " baseline")
+        print(str((round(correct/tested,3) * 100)) + "% accuracy on the " + baseline_type + " baseline")
         print("Individual values for labels: ")
         for key, value in matrix.items():
             if key != 'total':

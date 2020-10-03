@@ -49,9 +49,9 @@ class decision_tree(abstract_machine_learning_algorithm):
             pickle.dump(decision_tree_classifier, open(filename, 'wb'))
 
         self.one_hot_encoder = one_hot_encoder
-        self.decision_tree  = decision_tree_classifier
-        self.max_len       = max_len
-        self.extract_data   = extract_data
+        self.decision_tree   = decision_tree_classifier
+        self.max_len         = max_len
+        self.extract_data    = extract_data
 
     def predict(self, choice):
         # Label user input
@@ -68,7 +68,7 @@ class decision_tree(abstract_machine_learning_algorithm):
         return answer[0]
 
     # overriding abstract method
-    def perform_algorithm(self, decisionType = False):
+    def perform_algorithm(self, decision_type = False):
         # Make all sentences equal in length to parse with OneHotEncoder to binary
         for sentence in self.extract_data.sentences_train:
             for n in range(len(sentence), self.max_len, 1): sentence.insert(n, '')
@@ -77,19 +77,19 @@ class decision_tree(abstract_machine_learning_algorithm):
             for n in range(len(sentence), self.max_len, 1): sentence.insert(n, '')
   
         # Write 'test' in console to start testing sequence
-        if decisionType:
+        if decision_type:
             matrix  = {}
             tested  = 0
             correct = 0
 
             self.extract_data.dialog_acts_train.append('total')
 
-            for matrixAct in self.extract_data.dialog_acts_train:
-                if matrixAct not in matrix:
-                    matrix[matrixAct] = {}
-                    for matrixActSecond in self.extract_data.dialog_acts_train:
-                        if matrixActSecond not in matrix[matrixAct]:
-                            matrix[matrixAct][matrixActSecond] = 0
+            for matrix_act in self.extract_data.dialog_acts_train:
+                if matrix_act not in matrix:
+                    matrix[matrix_act] = {}
+                    for matrix_act_second in self.extract_data.dialog_acts_train:
+                        if matrix_act_second not in matrix[matrix_act]:
+                            matrix[matrix_act][matrix_act_second] = 0
 
             f = open("data/wrong answers.txt", "w")
             for n in range(0, len(self.extract_data.dialog_acts_test), 1):

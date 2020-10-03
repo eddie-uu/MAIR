@@ -39,12 +39,17 @@ def print(*args, **kwargs):
 
     for arg in args:
         if isinstance(arg, str) and extractConfig['OUTPUT_IN_CAPS']['value'].lower() == 'true':
-            return __builtin__.print(arg.upper())
+            return __builtin__.print(arg.upper(), **kwargs)
     return __builtin__.print(*args, **kwargs)
 
 class dialog_flow:
     def __init__(self):
         self.mLayerPerceptron = multi_layer_perceptron()
+        self.eInfo          = extract_info()
+        self.kAlgorithm     = keyword_algorithm()
+        self.ext            = extract()
+        self.configurations = self.ext.extract_settings()
+        
         if os.path.exists("data/mlp_model.pkl"):
             with open("data/mlp_model.pkl", 'rb') as f:
                 self.mlp, self.id_dict, self.scaler = pickle.load(f)
@@ -52,11 +57,6 @@ class dialog_flow:
             self.mlp, self.id_dict, self.scaler = self.mLayerPerceptron.mlp("data/dialog_acts.dat")
             with open("data/mlp_model.pkl", 'wb') as f_pickle:
                 pickle.dump((self.mlp, self.id_dict, self.scaler), f_pickle)
-        self.eInfo          = extract_info()
-        # self.dtree = DecisionTree()
-        self.kAlgorithm     = keyword_algorithm()
-        self.ext            = extract()
-        self.configurations = self.ext.extract_settings()
 
     def Welcome(self):
         """
