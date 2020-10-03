@@ -1,15 +1,15 @@
 from nltk.corpus import wordnet 
 from collections import defaultdict
+from extract import extract
 import pandas as pd
 import numpy as np
 import Levenshtein
 import re
-from extract import Extract
 
-class ExtractInfo:
+class extract_info:
     def __init__(self):
         try:
-            settings = Extract().extract_settings()
+            settings = extract().extract_settings()
             self.edit_dist = int(settings['LEVENSHTEIN_EDIT_DISTANCE']['value'])
         except:
             # Good default value
@@ -124,5 +124,5 @@ class ExtractInfo:
 
 if __name__ == "__main__":
     # An example
-#    print(ExtractInfo().extract_info("data/restaurant_info.csv", {"pricerange":"expensiive", "area":"center", "food":"thai!"}))
-    print(ExtractInfo().extract_info("data/restaurant_info.csv", {"pricerange":"cheap", "food":"gastropub"}))
+#    print(extract_info().extract_info("data/restaurant_info.csv", {"pricerange":"expensiive", "area":"center", "food":"thai!"}))
+    print(extract_info().extract_info("data/restaurant_info.csv", {"pricerange":"cheap", "food":"gastropub"}))
