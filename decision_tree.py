@@ -5,6 +5,8 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.metrics import confusion_matrix
 from extract import Extract
 import numpy as np
+import pickle
+import os
 
 class DecisionTree:
     def __init__(self):
@@ -29,14 +31,23 @@ class DecisionTree:
         for sentence in sentences_test:
             for n in range(len(sentence), max_len, 1): sentence.insert(n, '')
 
+        decisionTreeClassifier = None
+
         # Convert string lists to binary lists, since SciKit decision tree does not support string data        
         oneHotEncoder = OneHotEncoder(sparse=False, handle_unknown='ignore')
         oneHotEncoder.fit(sentences_train)
-        binarySentences = oneHotEncoder.transform(sentences_train)
 
-        # Create the decision tree
-        decisionTreeClassifier = tree.DecisionTreeClassifier()
-        decisionTreeClassifier = decisionTreeClassifier.fit(binarySentences, dialog_acts_train)
+        filename = 'data/decision_tree.pkl'
+        
+        if os.path.exists(filename):
+            decisionTreeClassifier = pickle.load(open(filename, 'rb'))
+        else:
+            # Create the decision tree
+            binarySentences = oneHotEncoder.transform(sentences_train)
+            decisionTreeClassifier = tree.DecisionTreeClassifier()
+            decisionTreeClassifier = decisionTreeClassifier.fit(binarySentences, dialog_acts_train)
+
+            pickle.dump(decisionTreeClassifier, open(filename, 'wb'))
 
         self.oneHotEncoder = oneHotEncoder
         self.decisionTree = decisionTreeClassifier
