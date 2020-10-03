@@ -15,6 +15,14 @@ class KeywordAlgorithm:
     # Perform the algorithm for a sentence, pass a search mode (food, area or pricerange) if context is mentioned
     def keywordAlgorithm(self, text, mode = ''):
         response = {}
+        sentences = text.split('and')
+
+        for sentence in sentences:
+            self.performAlgorithm(sentence, mode, response)
+        
+        return response
+
+    def performAlgorithm(self, text, mode, response):
         text = text.lower()
 
         # General patterns for any option
