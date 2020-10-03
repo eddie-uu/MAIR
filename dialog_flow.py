@@ -163,7 +163,7 @@ class dialog_flow:
         beginIndex = 0
         endIndex = 3
         while notSatisfied:
-            self.giveAlternatives(alternatives, beginIndex, endIndex) #Moet 1 ding geven, afhankelijk van endIndex size
+            self.giveAlternatives(alternatives, beginIndex) #Moet 1 ding geven, afhankelijk van endIndex size
             print("Do you want to:")
             print("1. Change your preferences")
             print("2. Choose one of these alternatives")
@@ -187,15 +187,14 @@ class dialog_flow:
                         else:
                             endIndex -= 1
 
-    def giveAlternatives(self, alternatives, beginIndex, endIndex):
-        for i in range(beginIndex, endIndex):
-            print(str(i + 1) + ": ", end="")
-            print(str(alternatives.iloc[i]["restaurantname"]) + " is a nice place", end=" ")
-            if not alternatives.iloc[[i]]["food"].empty: print("serving " + str(alternatives.iloc[i]["food"]), end=" ")
-            if not alternatives.iloc[[i]]["area"].empty: print("in the " + str(alternatives.iloc[i]["area"]) + " of town", end=" ")
-            if not alternatives.iloc[[i]]["pricerange"].empty: print(
-                "in the " + str(alternatives.iloc[i]["pricerange"]) + " pricerange", end="")
-            print(".")
+    def offerRestaurant(self, alternatives, index):
+        print(str(i + 1) + ": ", end="")
+        print(str(alternatives.iloc[index]["restaurantname"]) + " is a nice place", end=" ")
+        if not alternatives.iloc[[index]]["food"].empty: print("serving " + str(alternatives.iloc[index]["food"]), end=" ")
+        if not alternatives.iloc[[index]]["area"].empty: print("in the " + str(alternatives.iloc[index]["area"]) + " of town", end=" ")
+        if not alternatives.iloc[[index]]["pricerange"].empty: print(
+               "in the " + str(alternatives.iloc[index]["pricerange"]) + " pricerange", end="")
+        print(".")
 
     def restatePreferences(self, query):
         """
