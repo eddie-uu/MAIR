@@ -70,9 +70,13 @@ class dialog_flow:
             first_msg_classification = self.mLayerPerceptron.mlp_test(self.mlp, firstmsg, self.scaler, self.id_dict) #"inform"
             if first_msg_classification in ["inform", "hello", "thankyou", "request"]:
                 query = self.kAlgorithm.keyword_algorithm(firstmsg)
+                print(query)
                 self.checkQuery(query)
             elif first_msg_classification == "bye":
                 self.Goodbye()
+            else:
+                print("Sorry, I did not understand that.")
+                self.Welcome()
 
     def checkQuery(self, query):
         """
@@ -319,7 +323,7 @@ class dialog_flow:
         additional_pref = []
         
         while not satisfied:
-            fmsg = input("would you like to add more preferences?")
+            fmsg = input("Would you like to add more preferences?")
 
             if self.mLayerPerceptron.mlp_test(self.mlp, fmsg, self.scaler, self.id_dict) in ["negate", "deny"]:
                 print("Let's see which restaurants are in accordance with your wishes.")
@@ -392,18 +396,17 @@ class dialog_flow:
                 query["quality"] = quality
         imply = Implications()
         new_suggestions = imply(additional_pref, query)
-        print(suggestions.iloc[0]["restaurantname"])
-        print(new_suggestions.iloc[0]["restaurantname"])
-        print(new_suggestions)
         for i in range(len(suggestions)):
-            if str(suggestions.iloc[i]["restaurantname"]) in new_suggestions["restaurantname"]: #check if restaurant is still suitable after adding new preferences
+            if str(suggestions.iloc[i]["restaurantname"]) in new_suggestions["restaurantname"].tolist(): #check if restaurant is still suitable after adding new preferences
                 interested = input(suggestions.iloc[i]['restaurantname'] + " meets all your preferences \n Are you interested in this restaurant?").lower()
                 if self.mLayerPerceptron.mlp_test(self.mlp, interested, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
                     self.askExtraInfo(suggestions, i)
+                    return
                 else:
                     print("No problem, let's continue.")
-            else:
-                print(suggestions.iloc[i]['restaurantname'] + " does not meet all your preferences")
+            #else:
+            #   print(suggestions.iloc[i]['restaurantname'] + " does not meet all your preferences")
+
         print("There are no restaurants left. Please try again.")
         self.getExtraPreferences(suggestions, query)
         
@@ -412,17 +415,19 @@ class dialog_flow:
         Retrieves the suggestions from the database, given our user input.
         """
         suggestions = self.eInfo.extract_info("data/restaurant_info.csv", query)
+        satisfied = False
         if len(suggestions) > 1:
             self.getExtraPreferences(suggestions, query)
-        
+            satisfied = True
         i = 0
-        satisfied = False
+
         while len(suggestions) > i and not satisfied:
-            offerRestaurant(suggestions[i])
+            self.offerRestaurant(suggestions, i)
             choice = input(
                 "Are you interested in this restaurant?")
             if self.mLayerPerceptron.mlp_test(self.mlp, choice, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
                 satisfied = True
+                self.askExtraInfo(suggestions, i)
             elif self.mLayerPerceptron.mlp_test(self.mlp, choice, self.scaler, self.id_dict) in ["negate", "deny", "reqalts", "reqmore"]:
                 i += 1
                 #print("Looking for alternatives...")
@@ -433,7 +438,7 @@ class dialog_flow:
             self.Welcome()
             return
 
-        self.ask_extra_info(suggestions, i)
+
 
     def askExtraInfo(self, suggestions, suggestionIndex):
         """

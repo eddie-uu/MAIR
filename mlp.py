@@ -146,7 +146,7 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
                 sent_vectors.append(vectors[word])
         
         # Set base vector to all zeroes
-        av_vector = [np.zeros((vec_len,))] if sent_vectors == [] else sum(sent_vectors) / len(sent_vectors)
+        av_vector = np.zeros((vec_len,)) if sent_vectors == [] else sum(sent_vectors) / len(sent_vectors)
         av_vector = scaler.transform([av_vector])
         pred_id = model.predict(av_vector)[0]
         
