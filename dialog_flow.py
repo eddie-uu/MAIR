@@ -39,7 +39,7 @@ def print(*args, **kwargs):
 
     for arg in args:
         if isinstance(arg, str) and extractConfig['OUTPUT_IN_CAPS']['value'].lower() == 'true':
-            return __builtin__.print(arg.upper())
+            return __builtin__.print(arg.upper(), **kwargs)
     return __builtin__.print(*args, **kwargs)
 
 class dialog_flow:
@@ -65,14 +65,18 @@ class dialog_flow:
         print("Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.")
         firstmsg = input()
         if (firstmsg == "settings"):
-            self.configurateSettings()
+            self.configureSettings()
         else:
             first_msg_classification = self.mLayerPerceptron.mlp_test(self.mlp, firstmsg, self.scaler, self.id_dict) #"inform"
             if first_msg_classification in ["inform", "hello", "thankyou", "request"]:
                 query = self.kAlgorithm.keyword_algorithm(firstmsg)
+                print(query)
                 self.checkQuery(query)
             elif first_msg_classification == "bye":
                 self.Goodbye()
+            else:
+                print("Sorry, I did not understand that.")
+                self.Welcome()
 
     def checkQuery(self, query):
         """
@@ -156,14 +160,20 @@ class dialog_flow:
                     newquery["food"] = food
                     alternatives = pd.concat([alternatives, self.eInfo.extract_info("data/restaurant_info.csv", newquery)])
         alternatives = alternatives.sample(frac=1)
-        print("alternatives:")
-        print(alternatives)
-        print("done")
         notSatisfied = True
         beginIndex = 0
-        endIndex = 3
+        endIndex = int(self.configurations["ALTERNATIVES_NUMBER"]["value"])
+        if len(alternatives) == 0:
+            print("We could not find any alternatives for your query. Your input was undecipherable.")
+            self.Welcome()
+            return
         while notSatisfied:
-            self.giveAlternatives(alternatives, beginIndex) #Moet 1 ding geven, afhankelijk van endIndex size
+            if endIndex > len(alternatives):
+                for i in range(beginIndex, len(alternatives)):
+                    self.offerRestaurant(alternatives, i)
+            else:
+                for i in range(beginIndex, endIndex):
+                    self.offerRestaurant(alternatives, i)
             print("Do you want to:")
             print("1. Change your preferences")
             print("2. Choose one of these alternatives")
@@ -175,20 +185,16 @@ class dialog_flow:
                 notSatisfied = False
             if inp == "2":
                 suggindex = input("Which suggestion would you like?")
-                self.giveInformation(alternatives, suggindex-1)
+                self.askExtraInfo(alternatives, int(suggindex)-1)
                 notSatisfied = False
             if len(alternatives) > endIndex:
                 if inp == "3":
-                    beginIndex += 3
-                    endIndex += 3
-                    if len(alternatives) < endIndex:
-                        if len(alternatives) <  endIndex - 1:
-                            endIndex -= 2
-                        else:
-                            endIndex -= 1
+                    beginIndex += int(self.configurations["ALTERNATIVES_NUMBER"]["value"])
+                    endIndex += int(self.configurations["ALTERNATIVES_NUMBER"]["value"])
+
 
     def offerRestaurant(self, alternatives, index):
-        print(str(i + 1) + ": ", end="")
+        print(str(index + 1) + ": ", end="")
         print(str(alternatives.iloc[index]["restaurantname"]) + " is a nice place", end=" ")
         if not alternatives.iloc[[index]]["food"].empty: print("serving " + str(alternatives.iloc[index]["food"]), end=" ")
         if not alternatives.iloc[[index]]["area"].empty: print("in the " + str(alternatives.iloc[index]["area"]) + " of town", end=" ")
@@ -209,7 +215,7 @@ class dialog_flow:
             query = {**query, **self.kAlgorithm.keyword_algorithm(input("In what area are you looking?"), mode="area")}
         self.getSuggestions(query)
 
-    def configurateSettings(self):
+    def configureSettings(self):
         """
         Allows changing of settings.
         """
@@ -316,13 +322,16 @@ class dialog_flow:
             print("Sorry, I didn't understand that.")
             self.checkPreferences(query)
 
-    def getExtraPreferences(self, suggestions, query):
+    def getExtraPreferences(self, suggestions, query, again=False):
         satisfied = False
         additional_pref = []
         
         while not satisfied:
-            fmsg = input("would you like to add more preferences?")
-
+            if again:
+                fmsg = input("Would you like to try some different preferences?")
+                again = False
+            else:
+                fmsg = input("Would you like to add more preferences?")
             if self.mLayerPerceptron.mlp_test(self.mlp, fmsg, self.scaler, self.id_dict) in ["negate", "deny"]:
                 print("Let's see which restaurants are in accordance with your wishes.")
                 satisfied = True
@@ -394,43 +403,44 @@ class dialog_flow:
                 query["quality"] = quality
         imply = Implications()
         new_suggestions = imply(additional_pref, query)
-        
-        i = 0
-        for restaurant in suggestions:
-            if suggestions[i] in new_suggestions: #check if restaurant is still suitable after adding new preferences
-                interested = input(suggestions.iloc[i]['restaurantname'] + " meets all your preferences \n Are you interested in this restaurant?").lower()
-                if self.mLayerPerceptron.mlp_test(self.mlp, interested, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
-                    self.giveInformation(suggestions, i)
-                else:
-                    print("No problem, let's continue.")
-            else:
-                print(suggestions.iloc[i]['restaurantname'] + " does not meet all your preferences")
-            i += 1
-        
-        print("There are no restaurants left. PLease try again.")
-        self.getExtraPreferences(suggestions, query)
+        notUnderstood = True
+        for i in range(len(suggestions)):
+            if str(suggestions.iloc[i]["restaurantname"]) in new_suggestions["restaurantname"].tolist(): #check if restaurant is still suitable after adding new preferences
+                while notUnderstood:
+                    interested = input(suggestions.iloc[i]['restaurantname'] + " meets all your preferences \n Are you interested in this restaurant?").lower()
+                    if self.mLayerPerceptron.mlp_test(self.mlp, interested, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
+                        self.askExtraInfo(suggestions, i)
+                        return
+                    elif self.mLayerPerceptron.mlp_test(self.mlp, interested, self.scaler, self.id_dict) in ["negate", "deny"]:
+                        print("No problem, let's continue.")
+                        notUnderstood = False
+                    else:
+                        print("Sorry, we couldn't understand.")
+                #else:
+                #   print(suggestions.iloc[i]['restaurantname'] + " does not meet all your preferences")
+
+        print("There are no restaurants left.", end = " ")
+
+        self.getExtraPreferences(suggestions, query, True)
         
     def getSuggestions(self, query):
         """
         Retrieves the suggestions from the database, given our user input.
         """
         suggestions = self.eInfo.extract_info("data/restaurant_info.csv", query)
+        satisfied = False
         if len(suggestions) > 1:
             self.getExtraPreferences(suggestions, query)
-        
+            satisfied = True
         i = 0
-        satisfied = False
+
         while len(suggestions) > i and not satisfied:
-            print(suggestions.iloc[i]['restaurantname'] + " is a nice place", end=" ")
-            if not suggestions.iloc[[i]]["food"].empty: print("serving " + suggestions.iloc[i]["food"], end=" ")
-            if not suggestions.iloc[[i]]["area"].empty: print("in the " + suggestions.iloc[i]["area"] + " of town", end=" ")
-            if not suggestions.iloc[[i]]["pricerange"].empty: print(
-                "in the " + suggestions.iloc[i]["pricerange"] + " pricerange", end="")
-            print(".")
+            self.offerRestaurant(suggestions, i)
             choice = input(
                 "Are you interested in this restaurant?")
             if self.mLayerPerceptron.mlp_test(self.mlp, choice, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
                 satisfied = True
+                self.askExtraInfo(suggestions, i)
             elif self.mLayerPerceptron.mlp_test(self.mlp, choice, self.scaler, self.id_dict) in ["negate", "deny", "reqalts", "reqmore"]:
                 i += 1
                 #print("Looking for alternatives...")
@@ -441,32 +451,40 @@ class dialog_flow:
             self.Welcome()
             return
 
-        self.giveInformation(suggestions, i)
 
-    def giveInformation(self, suggestions, suggestionIndex):
+
+    def askExtraInfo(self, suggestions, suggestionIndex):
         """
         Asks whether the user needs extra information, and provides it where necessary.
         """
         satisfied = 0
         while not satisfied:
-            more_info = input("Would you like some more information about the restaurant?")
-            if self.mLayerPerceptron.mlp_test(self.mlp, more_info, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
-                choice = input("What information would you like to have \n 1. Phone number \n 2. Address.")
-                if choice == "1":
-                    if suggestions.iloc[[suggestionIndex]]["phone"].empty:
-                        print("Sadly we have no phone number available for this restaurant.")
-                    else: print("The phone number is " + suggestions.iloc[suggestionIndex]["phone"] + ".")
-                elif choice == "2":
-                    if suggestions.iloc[[suggestionIndex]]["addr"].empty or suggestions.iloc[[suggestionIndex]]["postcode"].empty:
-                        print("Sadly we have no address available for this restaurant.")
-                    else:
-                        print("The address is " + str(suggestions.iloc[suggestionIndex]["addr"]) + " " +
-                            str(suggestions.iloc[suggestionIndex]["postcode"]) + ".")
+            more_info = input("Would you like some more information about the restaurant?").lower()
+            if "phone number" in more_info:
+                self.giveInformation(suggestions, suggestionIndex, "1")
+            elif "address" in more_info or "postcode" in more_info:
+                self.giveInformation(suggestions, suggestionIndex, "2")
+            elif self.mLayerPerceptron.mlp_test(self.mlp, more_info, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
+                choice = input("What information would you like to have? \n 1. Phone number \n 2. Address.")
+                self.giveInformation(suggestions, suggestionIndex, choice)
             elif self.mLayerPerceptron.mlp_test(self.mlp, more_info, self.scaler, self.id_dict) in ["negate", "deny"]:
                 satisfied = True
             else:
-                print("Sorry, I didn't catch that. Please try again.")
+                print("Sorry, I didn't catch that. Please try again. Try answering \"yes\" or \"no\"")
         self.Goodbye(suggestions.iloc[suggestionIndex]['restaurantname'])
+    def giveInformation(self, suggestions, suggestionIndex, choice):
+        if choice == "1":
+            if suggestions.iloc[[suggestionIndex]]["phone"].empty:
+                print("Sadly we have no phone number available for this restaurant.")
+            else:
+                print("The phone number is " + suggestions.iloc[suggestionIndex]["phone"] + ".")
+        elif choice == "2":
+            if suggestions.iloc[[suggestionIndex]]["addr"].empty or suggestions.iloc[[suggestionIndex]][
+                "postcode"].empty:
+                print("Sadly we have no address available for this restaurant.")
+            else:
+                print("The address is " + str(suggestions.iloc[suggestionIndex]["addr"]) + " " +
+                      str(suggestions.iloc[suggestionIndex]["postcode"]) + ".")
 
     def Goodbye(self, restaurantname = ""):
         """
