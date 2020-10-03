@@ -29,6 +29,8 @@ def input(prompt = ''):
     if extractConfig['RESPONSE_DELAY']['value'].lower() == 'true':
         time.sleep(1)
 
+    if isinstance(prompt, str) and extractConfig['OUTPUT_IN_CAPS']['value'].lower() == 'true':
+        return __builtin__.input(prompt.upper())
     return __builtin__.input(prompt)
 
 def print(*args, **kwargs):

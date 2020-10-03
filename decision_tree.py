@@ -106,8 +106,12 @@ class DecisionTree:
             
             for key, value in matrix.items():
                 if key != 'total':
-                    print("Precision for " + key + ": " + str(value[key] / value['total']))
-                    print("Recall for " + key + ": " + str(value[key] / matrix['total'][key]))
+                    precision = 0 if value['total'] == 0 else value[key] / value['total']
+                    recall    = 0 if matrix['total'][key] == 0 else value[key] / matrix['total'][key]
+                    f1        = 0 if precision + recall == 0 else (2 * precision * recall) / (precision + recall)
+                    print("Precision for " + key + ": " + str(precision))
+                    print("Recall for " + key + ": " + str(recall))
+                    print("F1-measure for " + key + ": " + str(f1))
 
             print("")
             print("Total tested sentences: " + str(tested))

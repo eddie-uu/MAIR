@@ -125,21 +125,39 @@ class BaseLineSystem:
             mMatrix['total'][dialog] = mMatrix['total'][dialog] + 1
             mTested += 1
 
-        
+        print("Results on the rule-based baseline:")
+        print(10*' ' + ' | '.join(rbMatrix.keys()))
         for key, value in rbMatrix.items():
-            if key != 'total':
-                print("Precision for " + key + ": " + str(value[key] / value['total']))
-                print("Recall for " + key + ": " + str(value[key] / rbMatrix['total'][key]))
-
-        # for key, value in mMatrix.items():
-        #    if key != 'total':
-        #        print(str(value['total']))
-        #        print("Precision for " + key + ": " + str(value[key] / value['total']))
-        #        print("Recall for " + key + ": " + str(value[key] / mMatrix['total'][key]))
-
+            print("%-10s" % (key), end = '')
+            print(*value.values(), sep = 7*' ' + "|")
 
         print(str(round(rbCorrect/rbTested,3)) + " accuracy on the rule-based baseline")
+        print("Individual values for labels: ")
+        for key, value in rbMatrix.items():
+            if key != 'total':
+                precision = 0 if value['total'] == 0 else value[key] / value['total']
+                recall    = 0 if rbMatrix['total'][key] == 0 else value[key] / rbMatrix['total'][key]
+                f1        = 0 if precision + recall == 0 else (2 * precision * recall) / (precision + recall)
+                print("Precision for " + key + ": " + str(precision))
+                print("Recall for " + key + ": " + str(recall))
+                print("F1-measure for " + key + ": " + str(f1))
+
+        print("Results on the majority baseline:")
+        print(10*' ' + ' | '.join(mMatrix.keys()))
+        for key, value in mMatrix.items():
+            print("%-10s" % (key), end = '')
+            print(*value.values(), sep = 7*' ' + "|")
+
         print(str(round(mCorrect/mTested,3)) + " accuracy on the majority baseline")
+        print("Individual values for labels: ")
+        for key, value in mMatrix.items():
+            if key != 'total':
+                precision = 0 if value['total'] == 0 else value[key] / value['total']
+                recall    = 0 if mMatrix['total'][key] == 0 else value[key] / mMatrix['total'][key]
+                f1        = 0 if precision + recall == 0 else (2 * precision * recall) / (precision + recall)
+                print("Precision for " + key + ": " + str(precision))
+                print("Recall for " + key + ": " + str(recall))
+                print("F1-measure for " + key + ": " + str(f1))
 
     def classify_user_input(self):
         # Classifies input from the user into a certain dialog act group.  
