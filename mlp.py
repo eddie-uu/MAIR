@@ -86,6 +86,8 @@ def mlp(data_file, layers=(16, 32), pickle_file="data/vectors.pkl",
     scaler = preprocessing.StandardScaler().fit(train_vectors)
     train_vectors = scaler.transform(train_vectors)
     clf.fit(train_vectors, train_labels)
+    
+    to_save = []
 
     total = 0
     for sentence, true_label in zip(data.sentences_test, data.dialog_acts_test):
@@ -106,13 +108,20 @@ def mlp(data_file, layers=(16, 32), pickle_file="data/vectors.pkl",
         av_vector = scaler.transform([av_vector])
         predicted_id = clf.predict(av_vector)[0]
         predicted_label = id_to_label[predicted_id]
+
         if predicted_label == true_label:
             total += 1
+        else:
+            to_save.append((sentence, true_label, predicted_label))
+
+    with open("data/wrong_answers_mlp.txt", 'w') as f:
+        for sent_tuple in to_save: 
+            f.write(f"{' '.join(sent_tuple[0])} -- Predicted: {sent_tuple[1]} -- Actually: {sent_tuple[2]}\n")
 
     print("Accuracy:", total / len(data.sentences_test))
-    return clf, id_to_label
+    return clf, id_to_label, scaler
 
-def mlp_test(model, input_sentence, id_to_label=None, pickle_file="data/vectors.pkl"):
+def mlp_test(model, input_sentence, scaler, id_to_label=None, pickle_file="data/vectors.pkl"):
     """
         Predicts the label of a sentence based on a pre-trained machine learning
         model. Ignores words not found in the train or test set.
@@ -136,7 +145,8 @@ def mlp_test(model, input_sentence, id_to_label=None, pickle_file="data/vectors.
     
     # Set base vector to all zeroes
     av_vector = [np.zeros((vec_len,))] if sent_vectors == [] else sum(sent_vectors) / len(sent_vectors)
-    pred_id = model.predict([av_vector])[0]
+    av_vector = scaler.transform([av_vector])
+    pred_id = model.predict(av_vector)[0]
     
     return pred_id if id_to_label is None else id_to_label[pred_id]
 
@@ -148,19 +158,19 @@ def mlp_loop():
     if os.path.exists("data/mlp_model.pkl"):
         model, id_dict = pickle.load("data/mlp_model.pkl")
     else:
-        model, id_dict = mlp("data/dialog_acts.dat")
+        model, id_dict, scaler = mlp("data/dialog_acts.dat")
     print("You can quit by typing 'stop'.")
     while True:
         sentence = input("Please write your sentence here:\n")
         if sentence == "stop":
             break
-        prediction = mlp_test(model, sentence, id_dict)
+        prediction = mlp_test(model, sentence, scaler, id_dict)
         print(f"We predict your sentence belongs to the {prediction} class.")
 
 if __name__ == "__main__":
     # Run this file to save a trained model.
-    model, id_to_label = mlp("data/dialog_acts.dat")
+    model, id_to_label, scaler = mlp("data/dialog_acts.dat")
     with open("data/mlp_model.pkl", 'wb') as f_pickle:
-        pickle.dump((model, id_to_label), f_pickle)
+        pickle.dump((model, id_to_label, scaler), f_pickle)
     # Example use:
-    # print(mlp_test(model, "how about a turkish restaurant in the center", id_to_label))
+    print(mlp_test(model, "no", scaler, id_to_label))

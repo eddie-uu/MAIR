@@ -21,3 +21,4 @@ id	antecedent	consequent	truth	level	description
 20	good food, centre	busy	True	1	restaurants in the centre serving good food are always busy
 21	not romantic, moderate	children	True	1	a moderately priced, not romantic restaurant is ideal with children
 22	fast food	children	True	2	a fast food restaurant is always a hit with children
+23	bad restaurant	good restaurant	False	2	when a restaurant is bad, it cannot be good

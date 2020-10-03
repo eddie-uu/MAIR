@@ -1,0 +1,59 @@
+can i get an expensive -- Predicted: inform -- Actually: null
+are there any serving european food -- Predicted: inform -- Actually: reqalts
+i want a different res -- Predicted: reqalts -- Actually: inform
+uh are there any that serves mediterranean -- Predicted: inform -- Actually: null
+restaurant there -- Predicted: inform -- Actually: reqalts
+i want to find a -- Predicted: null -- Actually: inform
+not any more -- Predicted: deny -- Actually: negate
+that information is not important -- Predicted: deny -- Actually: inform
+i dont want that -- Predicted: deny -- Actually: null
+what is the addre -- Predicted: request -- Actually: null
+ooh thank you good bye -- Predicted: bye -- Actually: thankyou
+the pizza hutt unintelligent -- Predicted: inform -- Actually: null
+uh medium -- Predicted: inform -- Actually: null
+high priced -- Predicted: inform -- Actually: null
+what about in the west area -- Predicted: reqalts -- Actually: inform
+thank you good bye no thank you good bye -- Predicted: negate -- Actually: bye
+popular dish -- Predicted: request -- Actually: inform
+do uh -- Predicted: null -- Actually: confirm
+and the type of food at gourmet burger kitchen -- Predicted: request -- Actually: inform
+is there a chinese restaurant in the cheap price range -- Predicted: inform -- Actually: confirm
+okay uh -- Predicted: ack -- Actually: null
+good thank you good bye -- Predicted: bye -- Actually: thankyou
+no cuban food cuban food -- Predicted: negate -- Actually: inform
+food do they serve -- Predicted: request -- Actually: confirm
+okay then any -- Predicted: inform -- Actually: reqalts
+nor -- Predicted: null -- Actually: negate
+can i try another one -- Predicted: reqalts -- Actually: null
+moderately pri -- Predicted: inform -- Actually: null
+okay and ah wheres it located -- Predicted: request -- Actually: inform
+yea im looking for some spanish food -- Predicted: inform -- Actually: affirm
+what is the are -- Predicted: request -- Actually: null
+is there a venue in the west part of town -- Predicted: inform -- Actually: reqalts
+is that in the center -- Predicted: confirm -- Actually: inform
+type of foo -- Predicted: null -- Actually: inform
+um doesnt mater -- Predicted: inform -- Actually: ack
+bout -- Predicted: null -- Actually: inform
+how bout any price range -- Predicted: reqalts -- Actually: inform
+how bout the center part of town -- Predicted: reqalts -- Actually: inform
+okay how bout thai food -- Predicted: reqalts -- Actually: inform
+how about indians -- Predicted: reqalts -- Actually: null
+i dont care is there any north part of town -- Predicted: inform -- Actually: reqalts
+yea you can give me the address -- Predicted: affirm -- Actually: request
+can you change romanian food to something else -- Predicted: deny -- Actually: inform
+would you like something -- Predicted: null -- Actually: ack
+okay thats all -- Predicted: bye -- Actually: thankyou
+what about in any area -- Predicted: reqalts -- Actually: inform
+free food -- Predicted: inform -- Actually: affirm
+yea thank you good bye -- Predicted: affirm -- Actually: thankyou
+okay forget it goodbye -- Predicted: bye -- Actually: thankyou
+thank you good bye crosstalk -- Predicted: bye -- Actually: thankyou
+what about a spanish restuarant -- Predicted: inform -- Actually: reqalts
+dont care whats the phone number -- Predicted: inform -- Actually: null
+great thank you goodbye -- Predicted: bye -- Actually: thankyou
+oh i need to be in the north -- Predicted: inform -- Actually: affirm
+please -- Predicted: null -- Actually: inform
+okay let me try this again -- Predicted: repeat -- Actually: ack
+does it serve -- Predicted: request -- Actually: confirm
+thanks bye bye -- Predicted: thankyou -- Actually: bye
+about portuguese -- Predicted: inform -- Actually: reqalts
