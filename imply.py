@@ -23,7 +23,14 @@ class Implications():
             self.print_r = False
 
     def __call__(self, requirements, request):
-        # TODO: Make sure "quality" is actually in the request, not the requirements
+        """
+        When run as a function, objects of this class run the implication algorithm.
+        Depending on the settings, either the Prolog or Python version will be used.
+
+        @param requirements: list of required attributes (strings).
+        @param request: dictionary mapping the basic requirement names to their
+            current values.
+        """
         restaurants = extract_info().extract_info("data/restaurant_info.csv", request)
         if requirements == []:
             return restaurants
@@ -35,14 +42,14 @@ class Implications():
     def convert_to_prolog(self, prolog_file="data/implications.pl", fact_file="data/restaurant_info.csv", 
                         fact_data=None, rule_file="data/implications.tsv"):
         """
-            Converts the rules in implications.tsv and the facts from restaurant_info.csv
-            into a Prolog file.
+        Converts the rules in implications.tsv and the facts from restaurant_info.csv
+        into a Prolog file.
 
-            @param prolog_file: path to the output Prolog file.
-            @param fact_file: path to the file with restaurant info.
-            @param fact_data: alternatively, a pandas dataframe as extracted from the
-                same type of file.
-            @param rule_file: path to the file containing the rules (implications).
+        @param prolog_file: path to the output Prolog file.
+        @param fact_file: path to the file with restaurant info.
+        @param fact_data: alternatively, a pandas dataframe as extracted from the
+            same type of file.
+        @param rule_file: path to the file containing the rules (implications).
         """
         if os.path.exists(prolog_file):
             return False
@@ -77,21 +84,11 @@ class Implications():
         # The bodies of the rules need to be of the form a(X), b(X) etc.
         rule_data["antecedent"] = rule_data["antecedent"].apply(lambda x: re.sub(r'(?=,)', r'(X)', str(x)))
         rule_data["antecedent"] = rule_data["antecedent"].apply(lambda x: re.sub(r'(?<!,) ', r'_', str(x)))
-        # You could negate terms with not, but then inferences with a single premise
-        # would not work if that premise would be negated.
-        # rule_data["antecedent"] = rule_data["antecedent"].apply(lambda x: re.sub(r'not_', r'\+ ', str(x)))
         # Prolog terms end in a full stop.
         rule_data["antecedent"] += '(X).'
         # Now for the heads of the rules
         rule_data["consequent"] = rule_data["consequent"].replace(' ', '_', regex=True)
-        # Heads will not be negated, but rather "if A then not B" will be interpreted
-        # as adding "not B" as a separate functor.
-        # Note that a solution where it's actually negated doesn't make sense when
-        # working with Prolog. It is also intuitive: A holds under certain conditions,
-        # not A under certain other conditions, and we simply don't know whether A holds
-        # or not under all other conditions. So as an example, from the rule
-        # busy -> not romantic we can imply that when it is busy it is not romantic,
-        # but not that this is the only situation where that holds.
+        # We use separate "not_" functors
         mask = (rule_data["truth"] == False)
         rule_data.loc[mask, "consequent"] = "not_" + rule_data["consequent"]
         # Truning it into an actual Prolog rule
@@ -107,9 +104,9 @@ class Implications():
 
     def sort_file(self, filename):
         """
-            Sorts a file alphabetically.
+        Sorts a file alphabetically.
 
-            @param filename: path to file.
+        @param filename: path to file.
         """
         with open(filename, 'r') as f:
             lines = f.readlines()
@@ -119,6 +116,12 @@ class Implications():
                     f.write(line)
 
     def convert_to_python(self, impl_file="data/implications.tsv"):
+        """
+        Takes the implication file and turns it into a list of tuples, where each
+        tuple contains the antecedent followed by a set of consequents.
+
+        @param impl_file: path to tsv file containing the rules (implications).
+        """
         rules = []
         with open(impl_file, newline='') as tsv_file:
             r = csv.reader(tsv_file, delimiter='\t')
@@ -130,6 +133,13 @@ class Implications():
         return rules
 
     def implications_python(self, requirements, restaurants):
+        """
+        Given certain requirements and restaurants, determines which of those 
+        restaurants fulfill the requirements.
+
+        @param requirements: list of required attributes (strings).
+        @param restaurants: Pandas dataframe as constructed by extract_info.
+        """
         histories = []
         results = []
         for rest_dict in restaurants.to_dict('records'):
@@ -143,6 +153,16 @@ class Implications():
         return restaurants.loc[restaurants["restaurantname"].isin(list(results))]
 
     def print_histories(self, histories, requirements):
+        """
+        Prints all reasoning histories for each restaurant in the input. Also 
+        prints the conclusions that can be derived from this based on the 
+        required attributes.
+
+        @param histories: list of histories, where each history is a list where 
+            the first position represents the restaurant name, and all further
+            positions contain rule indices.
+        @param requirements: list of required attributes (strings).
+        """
         if histories == []:
             print("No restaurants comply with your initial request, and " + 
                   "therefore non comply with your newly added requirements either.")
@@ -207,6 +227,16 @@ class Implications():
                             f"whether '{req}' holds for this restaurant.")
             
     def apply_rules(self, facts, history):
+        """
+        Goes through rules until one is found where the antecedent matches the 
+        known facts, and the consequent is not known yet. If so, adds the 
+        consequent to the facts. Repeats the function until no such rules can be 
+        found. Returns the new facts and a history of rules (as rule IDs) used.
+
+        @param facts: set of known facts (strings).
+        @param history: list that corresponds to the input list with all the IDs
+            of rules that were used, in the logical order.
+        """
         for antecedent, consequent in self.rules:
             if consequent[2] == "False":
                 cons_to_add = "not " + consequent[1]

@@ -103,5 +103,10 @@
         "value": "True",
         "valueType": "bool",
         "text": "Print reasoning steps used for preference inference."
+    },
+    "PRINT_MLP_F1": {
+        "value": "True",
+        "valueType": "bool",
+        "text": "Print precision, recall & F1 for the test set of the MLP."
     }
 }
