@@ -115,6 +115,10 @@ class baseline_system(abstract_machine_learning_algorithm):
         return classification
 
     def __evaluate_results(self, baseline_type, baseline, matrix):
+        """
+        Function for evaluation all values. Shown values consist of the actual matrix, accuracy, precision, recall and f1-measure
+        """
+
         tested = 0
         correct = 0
         for output in baseline: 
@@ -128,6 +132,7 @@ class baseline_system(abstract_machine_learning_algorithm):
             matrix['total'][dialog] = matrix['total'][dialog] + 1
             tested += 1
 
+        # Print matrix
         print("Results on the " + baseline_type + " baseline:")
         print(10*' ' + ' | '.join(matrix.keys()))
         for key, value in matrix.items():

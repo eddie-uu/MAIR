@@ -62,9 +62,9 @@ class keyword_algorithm:
             area_dont_care_patterns.append({'pattern': 'any area'})
             area_dont_care_patterns.append({'pattern': 'any part'})
 
-            result    = self.checkPattern(text, area_patterns)
+            result    = self.__checkPattern(text, area_patterns)
             result    = result.split()[-1] if len(result.split()) > 1 and result != text else result
-            end_result = self.checkPattern(result, area_dont_care_patterns, 'dontcare')
+            end_result = self.__checkPattern(result, area_dont_care_patterns, 'dontcare')
 
             if len(end_result.split()) > 1 and mode == 'area':
                 end_result = 'dontcare'
@@ -83,8 +83,8 @@ class keyword_algorithm:
             food_dont_care_patterns = base_dont_care_patterns
             food_dont_care_patterns.append({'pattern': 'any type'})
 
-            result    = self.checkPattern(text, food_patterns)
-            end_result = self.checkPattern(result, food_dont_care_patterns, 'dontcare')
+            result    = self.__checkPattern(text, food_patterns)
+            end_result = self.__checkPattern(result, food_dont_care_patterns, 'dontcare')
             
             food_type = True
             for words in end_result.split():

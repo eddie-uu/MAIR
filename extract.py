@@ -41,10 +41,8 @@ class extract:
             self.dialog_acts_test  = [sentence.split(' ')[0] for sentence in test]
             self.sentences_test    = [sentence.split(' ')[1:] for sentence in test]
 
+    # Function for configuring settings used within the system dialog flow, algorithm tests and such are not affected
     def configure_settings(self):
-        """
-        Allows changing of settings.
-        """
         settings = self.extract_settings()
 
         finishedSettings = False
@@ -76,6 +74,7 @@ class extract:
                 settingKey = settingsIndex[choice]["key"]
                 settingValues = settingsIndex[choice]["value"]
 
+                # Regex for validation of possible values within settings.json (integers, booleans and enumerations)
                 validChoices = {"int": "^\d+$", "bool": 'true|false|True|False|TRUE|FALSE'}
                 print("Current setting for " + str(settingKey) + " is: " + str(settingValues["value"]))
                 print("To which value would you like to change this? (Value must be of the type: " + str(settingValues["valueType"]) + " )")
@@ -100,12 +99,14 @@ class extract:
                 print("Sorry, the given input could not be recognized")
                 time.sleep(1)
 
+    # Retrieve settings from data/settings.json
     def extract_settings(self):
         settings_file = open("data/settings.json", "r")
         json_object   = json.load(settings_file)
         settings_file.close()
         return json_object
 
+    # Private class, update the json file based on changed configurations
     def __change_settings(self, configuration):
         settings      = json.dumps(configuration, indent=4)
         settings_file = open("data/settings.json", "w")

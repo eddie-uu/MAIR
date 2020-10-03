@@ -5,6 +5,7 @@ from mlp import multi_layer_perceptron
 from extract import extract
 
 def main():
+    # List of commands
     commands = {
         '1': {'function': use_baseline,       'testing': True,  'description': 'Test baseline'},
         '2': {'function': use_decision_tree,  'testing': True,  'description': 'Test decision tree'},
@@ -16,7 +17,6 @@ def main():
         '8': {'function': configure_settings, 'testing': False, 'description': 'Change settings'}
     }
 
-    # List of commands
     print("Type one of the following numbers to execute the command: ")
     for key in commands:
         print(key + '. ' + commands[key]['description'])
