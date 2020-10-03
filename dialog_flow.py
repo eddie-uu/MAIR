@@ -182,7 +182,7 @@ class dialog_flow:
                     beginIndex += 3
                     endIndex += 3
                     if len(alternatives) < endIndex:
-                        if len(alternatives) < endIndex - 1:
+                        if len(alternatives) <  endIndex - 1:
                             endIndex -= 2
                         else:
                             endIndex -= 1
