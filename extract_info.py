@@ -26,8 +26,12 @@ class ExtractInfo:
         data = pd.read_csv(csv_file)
         # Remove "dontcare" coded inputs
         request = {k:v for k,v in request.items() if v != 'dontcare'}
+        options = {}
         for pref_type in request:
-            data = self.modify_data(data, pref_type, request[pref_type])
+            # All the different unique options in a column
+            options[pref_type] = data[pref_type].dropna().unique()
+        for pref_type in request:
+            data = self.modify_data(data, pref_type, options, request[pref_type])
         # Shuffle the data
         data = data.sample(frac=1)
         # Prettify
@@ -72,18 +76,17 @@ class ExtractInfo:
             return phone_number
         return np.nan
 
-    def modify_data(self, data, pref_type, user_input):
+    def modify_data(self, data, pref_type, options, user_input):
         """
             Removes rows from the dataset that do not match the given filter.
 
             @param data: pandas dataframe containing the restaurant data
             @param pref_type: the preference type (column header) that we're filtering
+            @param options: all the different options per preference type
             @param user_input: the input we want to filter by
         """
         user_input = user_input.lower()
-        # All the different unique options in a column
-        options = data[pref_type].dropna().unique()
-        if user_input not in options:
+        if user_input not in options[pref_type]:
             user_input = self.levenshtein_or_synonym(user_input, options)
         return data[0:0] if user_input is None else data.loc[data[pref_type] == user_input]
 

@@ -164,7 +164,10 @@ class Implications():
                     if consequent[0] == rule_id:
                         ant_print = " and ".join(antecedent)
                         print(f"Per rule {rule_id}: {ant_print} -> {consequent[1]} = {consequent[2]}")
-                        consequents.add(consequent[1])
+                        if consequent[2] == "True":
+                            consequents.add(consequent[1])
+                        else:
+                            consequents.add("not " + consequent[1])
                         break
             print("\n> Conclusions for each of your requirements:")
             for req in requirements:
@@ -194,11 +197,14 @@ class Implications():
                         print(f"Your requirement that '{req}' is false for this " +
                               "restaurant was satisfied!")
                 else:
-                    # Note: just because we couldn't derive a requirement, we cannot
-                    # make a judgment on its truth value (since the premises are
-                    # sufficient, but not necessary).
-                    print("Based on the available inferences, we cannot say " +
-                          f"whether '{req}' holds for this restaurant.")
+                    if req[:4] == "not " and req[4:] in consequents or "not " + req in consequents:
+                        print(f"The opposite of your requirement that '{req}' holds.")
+                    else:
+                        # Note: just because we couldn't derive a requirement, we cannot
+                        # make a judgment on its truth value (since the premises are
+                        # sufficient, but not necessary).
+                        print("Based on the available inferences, we cannot say " +
+                            f"whether '{req}' holds for this restaurant.")
             
     def apply_rules(self, facts, history):
         for antecedent, consequent in self.rules:
