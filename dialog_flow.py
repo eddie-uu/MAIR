@@ -10,7 +10,7 @@ import pandas as pd
 import re
 import json
 import random
-from imply import implications
+from imply import Implications
 import pickle
 import os
 
@@ -45,11 +45,12 @@ def print(*args, **kwargs):
 class DialogFlow:
     def __init__(self):
         if os.path.exists("data/mlp_model.pkl"):
-            self.mlp, self.id_dict = pickle.load("data/mlp_model.pkl")
+            with open("data/mlp_model.pkl", 'rb') as f:
+                self.mlp, self.id_dict = pickle.load(f)
         else:
             self.mlp, self.id_dict = mlp("data/dialog_acts.dat")
         self.eInfo          = ExtractInfo()
-        self.dtree          = DecisionTree()
+        # self.dtree          = DecisionTree()
         self.kAlgorithm     = KeywordAlgorithm()
         self.extract        = Extract()
         self.configurations = self.extract.extract_settings()
@@ -63,8 +64,7 @@ class DialogFlow:
         if (firstmsg == "settings"):
             self.configurateSettings()
         else:
-            # TODO: replace each predict?
-            first_msg_classification = self.dtree.predict(firstmsg) #"inform"
+            first_msg_classification = mlp_test(self.mlp, firstmsg, self.id_dict) #"inform"
             if first_msg_classification in ["inform", "hello", "thankyou"]:
                 query = self.kAlgorithm.keywordAlgorithm(firstmsg)
                 self.checkQuery(query)
@@ -275,7 +275,7 @@ class DialogFlow:
             print(" in the " + query["area"] + " of town", end="")
         print(". Is this correct? Type yes or no.")
         msg = input().lower()
-        if self.dtree.predict(msg) in ["negate", "deny"]:
+        if mlp_test(self.mlp, msg, self.id_dict) in ["negate", "deny"]:
             wrong = input("Which of the following is wrong? \n 1. Price range \n 2. Food type \n 3. Area")
             if wrong == "1":
                 query = {**query, **self.kAlgorithm.keywordAlgorithm(input("In what price range are you looking?"), mode = "pricerange")}
@@ -284,7 +284,7 @@ class DialogFlow:
             elif wrong == "3":
                 query = {**query, **self.kAlgorithm.keywordAlgorithm(input("In what area are you looking?"), mode="area")}
             self.checkPreferences(query)
-        elif self.dtree.predict(msg) in ["affirm", "thankyou"]:
+        elif mlp_test(self.mlp, msg, self.id_dict) in ["affirm", "thankyou"]:
             self.getSuggestions(query)
         else:
             print("Sorry, I didn't understand that.")
@@ -297,27 +297,27 @@ class DialogFlow:
         while not satisfied:
             fmsg = input("would you like to add more preferences?")
 
-            if self.dtree.predict(fmsg) in ["negate", "deny"]:
+            if mlp_test(self.mlp, fmsg, self.id_dict) in ["negate", "deny"]:
                 print("Let's see which restaurants are in accorandence with your wishes.")
                 satisfied = True
-            elif self.dtree.predict(fmsg) in ["affirm", "thankyou"]:
+            elif mlp_test(self.mlp, fmsg, self.id_dict) in ["affirm", "thankyou"]:
                 smsg = input("What would you like to add? Choose one of the following options.\n 1. (not) busy \n 2. duration of your visit \n 3. child friendly \n 4. romantic \n 5. serves fast food \n 6. quality of the restaurant \n 7. suitable for a date \n 8. vegetarian options")
                 if smsg == "1":
                     choice = input("Do want a restaurant that is busy?").lower()
-                    if self.dtree.predict(choice) in ["affirm", "thankyou"]:
+                    if mlp_test(self.mlp, choice, self.id_dict) in ["affirm", "thankyou"]:
                         additional_pref += ["busy"]
                         print("You want a restaurant that is busy.")
-                    elif self.dtree.predict(choice) in ["negate", "deny"]:
+                    elif mlp_test(self.mlp, choice, self.id_dict) in ["negate", "deny"]:
                         additional_pref += ["not busy"]
                         print("You want a restaurant that is not busy.")
                     else: 
                         print("Sorry I did not get that. Please try again.")
                 elif smsg == "2":
                     choice = input("Would you like to spend a lot of time in the restaurant?").lower()
-                    if self.dtree.predict(choice) in ["affirm", "thankyou"]:
+                    if mlp_test(self.mlp, choice, self.id_dict) in ["affirm", "thankyou"]:
                         additional_pref += ["long time"]
                         print("You want to spend a long time at the restaurant.")
-                    elif self.dtree.predict(choice) in ["negate", "deny"]:
+                    elif mlp_test(self.mlp, choice, self.id_dict) in ["negate", "deny"]:
                         additional_pref += ["not long time"]
                         print("You do not want to spend a long time at the restaurant.")
                     else:
@@ -330,20 +330,20 @@ class DialogFlow:
                     print("You are looking for a restaurant that is romantic.")
                 elif smsg == "5":
                     choice = input("Would you like a restaurant that serves fast food?").lower()
-                    if self.dtree.predict(choice) in ["affirm", "thankyou"]:
+                    if mlp_test(self.mlp, choice, self.id_dict) in ["affirm", "thankyou"]:
                         additional_pref += ["fast food"]
                         print("You are looking for a restaurant that serves fast food.")
-                    elif self.dtree.predict(choice) in ["negate", "deny"]:
+                    elif mlp_test(self.mlp, choice, self.id_dict) in ["negate", "deny"]:
                         additional_pref += ["no fast food"]
                         print("You are looking for a restaurant that does not serve fast food.")
                     else:
                         print("Sorry I did not get that. Please try again.")
                 elif smsg == "6":
                     choice = input("Are you looking for a high quality restaurant?").lower()
-                    if self.dtree.predict(choice) in ["affirm", "thankyou"]:
+                    if mlp_test(self.mlp, choice, self.id_dict) in ["affirm", "thankyou"]:
                         additional_pref += ["good restaurant"]
                         print("You are looking for a good restaurant.")
-                    elif self.dtree.predict(choice) in ["negate", "deny"]:
+                    elif mlp_test(self.mlp, choice, self.id_dict) in ["negate", "deny"]:
                         additional_pref += ["bad restaurant"]
                         print("You are looking for a bad restaurant.")
                     else:
@@ -355,20 +355,21 @@ class DialogFlow:
                 elif smsg == "8":
                     additional_pref += ["vegetarian"]
                     print("You are looking for a restaurant that has vegetarian options.")
-                elif self.dtree.predict(smsg) in ["negate", "deny", "reqalts", "reqmore"]:
+                elif mlp_test(self.mlp, smsg, self.id_dict) in ["negate", "deny", "reqalts", "reqmore"]:
                         print("Unfortunately, you can only choose one of the additional preferences above.")
                 else:
                     print("Sorry I did not understand that. Please try again")
             else:
                 print("Sorry I didn't understand that. Please try again.") 
         
-        new_suggestions = implications(additional_pref, query)
+        imply = Implications()
+        new_suggestions = imply(additional_pref, query)
         
         i = 0
         for restaurant in suggestions:
             if suggestions[i] in new_suggestions: #check if restaurant is still suitable after adding new preferences
                 interested = input(suggestions.iloc[i]['restaurantname'] + " meets all your preferences \n Are you interested in this restaurant?").lower()
-                if self.dtree.predict(interested) in ["affirm", "thankyou"]:
+                if mlp_test(self.mlp, interested, self.id_dict) in ["affirm", "thankyou"]:
                     self.giveInformation(suggestions, i)
                 else:
                     print("No problem, let's continue.")
@@ -398,9 +399,9 @@ class DialogFlow:
             print(".")
             choice = input(
                 "Are you interested in this restaurant?")
-            if self.dtree.predict(choice) in ["affirm", "thankyou"]:
+            if mlp_test(self.mlp, choice, self.id_dict) in ["affirm", "thankyou"]:
                 satisfied = True
-            elif self.dtree.predict(choice) in ["negate", "deny", "reqalts", "reqmore"]:
+            elif mlp_test(self.mlp, choice, self.id_dict) in ["negate", "deny", "reqalts", "reqmore"]:
                 i += 1
                 #print("Looking for alternatives...")
             else:
@@ -419,7 +420,7 @@ class DialogFlow:
         satisfied = 0
         while not satisfied:
             more_info = input("Would you like some more information about the restaurant?")
-            if self.dtree.predict(more_info) in ["affirm", "thankyou"]:
+            if mlp_test(self.mlp, more_info, self.id_dict) in ["affirm", "thankyou"]:
                 choice = input("What information would you like to have \n 1. Phone number \n 2. Address.")
                 if choice == "1":
                     if suggestions.iloc[[suggestionIndex]]["phone"].empty:
@@ -431,7 +432,7 @@ class DialogFlow:
                     else:
                         print("The address is " + str(suggestions.iloc[suggestionIndex]["addr"]) + " " +
                             str(suggestions.iloc[suggestionIndex]["postcode"]) + ".")
-            elif self.dtree.predict(more_info) in ["negate", "deny"]:
+            elif mlp_test(self.mlp, more_info, self.id_dict) in ["negate", "deny"]:
                 satisfied = True
             else:
                 print("Sorry, I didn't catch that. Please try again.")

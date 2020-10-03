@@ -93,5 +93,15 @@
         "value": "True",
         "valueType": "bool",
         "text": "Use text-to-speech for system utterances"
+    },
+    "PROLOG": {
+        "value": "False",
+        "valueType": "bool",
+        "text": "Use Prolog reasoning system instead of the default one."
+    },
+    "PRINT_REASONING": {
+        "value": "True",
+        "valueType": "bool",
+        "text": "Print reasoning steps used for preference inference."
     }
 }
