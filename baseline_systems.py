@@ -139,8 +139,9 @@ class baseline_system(abstract_machine_learning_algorithm):
             print("%-10s" % (key), end = '')
             print(*value.values(), sep = 7*' ' + "|")
 
-        print(str((round(correct/tested,3) * 100)) + "% accuracy on the " + baseline_type + " baseline")
         print("Individual values for labels: ")
+        f1_measure = 0
+        f1_length = 0
         for key, value in matrix.items():
             if key != 'total':
                 precision = 0 if value['total'] == 0 else value[key] / value['total']
@@ -149,4 +150,9 @@ class baseline_system(abstract_machine_learning_algorithm):
                 print("Precision for " + key + ": " + str(round(precision, 3)))
                 print("Recall for " + key + ": " + str(round(recall, 3)))
                 print("F1-measure for " + key + ": " + str(round(f1, 3)))
+                f1_measure += f1
+                f1_length += 1
+        
+        print(str((round(correct/tested,3) * 100)) + "% accuracy on the " + baseline_type + " baseline")
+        print(str(round(f1_measure / f1_length * 100, 3)) + "% F1-measure on the " + baseline_type + " baseline")
         

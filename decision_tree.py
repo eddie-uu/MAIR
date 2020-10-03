@@ -114,6 +114,8 @@ class decision_tree(abstract_machine_learning_algorithm):
                 print("%-10s" % (key), end = '')
                 print(*value.values(), sep = 7*' ' + "|")
             
+            f1_measure = 0
+            f1_length = 0
             for key, value in matrix.items():
                 if key != 'total':
                     precision = 0 if value['total'] == 0 else value[key] / value['total']
@@ -122,11 +124,14 @@ class decision_tree(abstract_machine_learning_algorithm):
                     print("Precision for " + key + ": " + str(round(precision, 3)))
                     print("Recall for " + key + ": " + str(round(recall, 3)))
                     print("F1-measure for " + key + ": " + str(round(f1, 3)))
+                    f1_measure += f1
+                    f1_length += 1
 
             print("")
             print("Total tested sentences: " + str(tested))
             print("Total correctly classified: " + str(correct))
             print("Accuracy: " + str(round(100 / tested * correct, 3)) + "%")
+            print("F1: " + str(round(f1_measure / f1_length * 100, 3)) + "%")
         else:
             # Console writeline
             while True:
