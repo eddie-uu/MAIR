@@ -1,9 +1,9 @@
 from __future__ import print_function
-from keyword_algorithm import KeywordAlgorithm
-from decision_tree import DecisionTree
-from mlp import mlp_test, mlp
-from extract_info import ExtractInfo
-from extract import Extract
+from keyword_algorithm import keyword_algorithm
+from decision_tree import decision_tree
+from mlp import multi_layer_perceptron
+from extract_info import extract_info
+from extract import extract
 import nltk
 import time
 import pandas as pd
@@ -22,7 +22,7 @@ except ImportError:
     # Python 3
     import builtins as __builtin__
 
-extract = Extract()
+extract = extract()
 extractConfig = extract.extract_settings()
 
 def input(prompt = ''):
@@ -42,18 +42,19 @@ def print(*args, **kwargs):
             return __builtin__.print(arg.upper())
     return __builtin__.print(*args, **kwargs)
 
-class DialogFlow:
+class dialog_flow:
     def __init__(self):
         if os.path.exists("data/mlp_model.pkl"):
             with open("data/mlp_model.pkl", 'rb') as f:
                 self.mlp, self.id_dict = pickle.load(f)
         else:
-            self.mlp, self.id_dict = mlp("data/dialog_acts.dat")
-        self.eInfo          = ExtractInfo()
-        # self.dtree          = DecisionTree()
-        self.kAlgorithm     = KeywordAlgorithm()
-        self.extract        = Extract()
-        self.configurations = self.extract.extract_settings()
+            multi_layer_p = multi_layer_perceptron()
+            self.mlp, self.id_dict = multi_layer_p.mlp("data/dialog_acts.dat")
+        self.eInfo          = extract_info()
+        # self.dtree          = decision_tree()
+        self.kAlgorithm     = keyword_algorithm()
+        self.ex             = extract()
+        self.configurations = self.ex.extract_settings()
 
     def Welcome(self):
         """

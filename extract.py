@@ -1,7 +1,7 @@
 import random
 import json
 
-class Extract:
+class extract:
     def __init__(self, file_name = '', split=0.85, seed=42):
         if (file_name != ''):
             """

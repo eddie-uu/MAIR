@@ -1,23 +1,23 @@
-from abstract_mla import AbstractMachineLearningAlgorithm
+from abstract_mla import abstract_machine_learning_algorithm
 from sklearn import datasets
 from sklearn import tree
 from sklearn.tree import export_text
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.metrics import confusion_matrix
-from extract import Extract
+from extract import extract
 import numpy as np
 import pickle
 import os
 
-class DecisionTree(AbstractMachineLearningAlgorithm):
+class decision_tree(abstract_machine_learning_algorithm):
     def __init__(self):
         print('Creating decision tree...')
         # Parsed data from "dialog_acts.dat", with 85% training data
-        extractData = Extract("data/dialog_acts.dat")
+        extract_data = extract("data/dialog_acts.dat")
 
         # Array of values from each data key
-        sentences_train   = extractData.sentences_train
-        sentences_test    = extractData.sentences_test
+        sentences_train   = extract_data.sentences_train
+        sentences_test    = extract_data.sentences_test
 
         # Get maximum length of sentence
         max_len_train = len(max(sentences_train,key=len))
@@ -25,7 +25,7 @@ class DecisionTree(AbstractMachineLearningAlgorithm):
         max_len       = max_len_test if max_len_test > max_len_train else max_len_train
 
         filename               = 'data/decision_tree.pkl'
-        decisionTreeClassifier = None
+        decision_tree_classifier = None
 
         # Make all sentences equal in length to parse with OneHotEncoder to binary
         for sentence in sentences_train:
@@ -35,23 +35,23 @@ class DecisionTree(AbstractMachineLearningAlgorithm):
             for n in range(len(sentence), max_len, 1): sentence.insert(n, '')
 
         # Convert string lists to binary lists, since SciKit decision tree does not support string data        
-        oneHotEncoder = OneHotEncoder(sparse=False, handle_unknown='ignore')
-        oneHotEncoder.fit(sentences_train)
+        one_hot_encoder = OneHotEncoder(sparse=False, handle_unknown='ignore')
+        one_hot_encoder.fit(sentences_train)
         
         if os.path.exists(filename):
-            decisionTreeClassifier = pickle.load(open(filename, 'rb'))
+            decision_tree_classifier = pickle.load(open(filename, 'rb'))
         else:
             # Create the decision tree
-            binarySentences = oneHotEncoder.transform(sentences_train)
-            decisionTreeClassifier = tree.DecisionTreeClassifier()
-            decisionTreeClassifier = decisionTreeClassifier.fit(binarySentences, extractData.dialog_acts_train)
+            binarySentences = one_hot_encoder.transform(sentences_train)
+            decision_tree_classifier = tree.DecisionTreeClassifier()
+            decision_tree_classifier = decision_tree_classifier.fit(binarySentences, extract_data.dialog_acts_train)
 
-            pickle.dump(decisionTreeClassifier, open(filename, 'wb'))
+            pickle.dump(decision_tree_classifier, open(filename, 'wb'))
 
-        self.oneHotEncoder = oneHotEncoder
-        self.decisionTree  = decisionTreeClassifier
+        self.one_hot_encoder = one_hot_encoder
+        self.decision_tree  = decision_tree_classifier
         self.max_len       = max_len
-        self.extractData   = extractData
+        self.extract_data   = extract_data
 
     def predict(self, choice):
         # Label user input
@@ -62,18 +62,18 @@ class DecisionTree(AbstractMachineLearningAlgorithm):
         else:
             choice = choice[0:self.max_len]
 
-        prediction = self.oneHotEncoder.transform([choice])
+        prediction = self.one_hot_encoder.transform([choice])
         answer     = self.decisionTree.predict(prediction)
 
         return answer[0]
 
     # overriding abstract method
-    def performAlgorithm(self, decisionType = False):
+    def perform_algorithm(self, decisionType = False):
         # Make all sentences equal in length to parse with OneHotEncoder to binary
-        for sentence in self.extractData.sentences_train:
+        for sentence in self.extract_data.sentences_train:
             for n in range(len(sentence), self.max_len, 1): sentence.insert(n, '')
 
-        for sentence in self.extractData.sentences_test:
+        for sentence in self.extract_data.sentences_test:
             for n in range(len(sentence), self.max_len, 1): sentence.insert(n, '')
   
         # Write 'test' in console to start testing sequence
@@ -82,21 +82,21 @@ class DecisionTree(AbstractMachineLearningAlgorithm):
             tested  = 0
             correct = 0
 
-            self.extractData.dialog_acts_train.append('total')
+            self.extract_data.dialog_acts_train.append('total')
 
-            for matrixAct in self.extractData.dialog_acts_train:
+            for matrixAct in self.extract_data.dialog_acts_train:
                 if matrixAct not in matrix:
                     matrix[matrixAct] = {}
-                    for matrixActSecond in self.extractData.dialog_acts_train:
+                    for matrixActSecond in self.extract_data.dialog_acts_train:
                         if matrixActSecond not in matrix[matrixAct]:
                             matrix[matrixAct][matrixActSecond] = 0
 
             f = open("data/wrong answers.txt", "w")
-            for n in range(0, len(self.extractData.dialog_acts_test), 1):
-                dialog     = self.extractData.dialog_acts_test[n]
-                sentence   = self.extractData.sentences_test[n]
-                prediction = self.oneHotEncoder.transform([sentence])
-                answer     = self.decisionTree.predict(prediction)
+            for n in range(0, len(self.extract_data.dialog_acts_test), 1):
+                dialog     = self.extract_data.dialog_acts_test[n]
+                sentence   = self.extract_data.sentences_test[n]
+                prediction = self.one_hot_encoder.transform([sentence])
+                answer     = self.decision_tree.predict(prediction)
                 tested     = tested + 1
                         
                 if (answer[0] == dialog):
@@ -142,8 +142,8 @@ class DecisionTree(AbstractMachineLearningAlgorithm):
                 else:
                     choice = choice[0:self.max_len]
 
-                prediction = self.oneHotEncoder.transform([choice])
-                answer     = self.decisionTree.predict(prediction)
+                prediction = self.one_hot_encoder.transform([choice])
+                answer     = self.decision_tree.predict(prediction)
 
                 print("Answer is: " + answer[0])
 

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod 
   
-class AbstractMachineLearningAlgorithm(ABC): 
+class abstract_machine_learning_algorithm(ABC): 
 
     # abstract method 
-    def performAlgorithm(self, decisionType): 
+    def perform_algorithm(self, decisionType): 
         pass

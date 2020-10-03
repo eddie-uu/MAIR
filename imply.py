@@ -2,15 +2,15 @@ from pyswip import Prolog
 import os
 import pandas as pd
 import re
-from extract_info import ExtractInfo
-from extract import Extract
+from extract_info import extract_info
+from extract import extract
 import csv
 from collections import defaultdict
 
 class Implications():
 
     def __init__(self, impl_file="data/implications.tsv", data_file="data/restaurant_info.csv"):
-        settings = Extract().extract_settings()
+        settings = extract().extract_settings()
         if str(settings["PROLOG"]["value"]) == "True":
             self.prolog = True
             self.convert_to_prolog(rule_file=impl_file, fact_file=data_file)
@@ -24,7 +24,7 @@ class Implications():
 
     def __call__(self, requirements, request):
         # TODO: Make sure "quality" is actually in the request, not the requirements
-        restaurants = ExtractInfo().extract_info("data/restaurant_info.csv", request)
+        restaurants = extract_info().extract_info("data/restaurant_info.csv", request)
         if requirements == []:
             return restaurants
         if self.prolog:

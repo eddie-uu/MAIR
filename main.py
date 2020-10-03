@@ -1,7 +1,7 @@
-from baseline_systems import BaseLineSystem
-from decision_tree import DecisionTree
-from dialog_flow import DialogFlow
-from mlp import mlp_loop, mlp
+from baseline_systems import baseline_system
+from decision_tree import decision_tree
+from dialog_flow import dialog_flow
+from mlp import multi_layer_perceptron
 
 def main():
     commands = {
@@ -25,18 +25,19 @@ def main():
         command['function'](command['testing'])
 
 def useBaseLine(testing = False):
-    baseLineSystem = BaseLineSystem()
-    baseLineSystem.performAlgorithm(testing)
+    bls = baseline_system()
+    bls.perform_algorithm(testing)
 
 def useDecisionTree(testing = False):
-    decisionTree = DecisionTree()
-    decisionTree.performAlgorithm(testing)
+    dt = decision_tree()
+    dt.perform_algorithm(testing)
 
 def useMLP(testing = False):
-    mlp("data/dialog_acts.dat") if testing else mlp_loop()
+    mlp = multi_layer_perceptron()
+    mlp.perform_algorithm(testing)
 
 def useDialogFlow(testing = False):
-    dialogFlow = DialogFlow()
+    dialogFlow = dialog_flow()
     dialogFlow.Welcome()
 
 main()
