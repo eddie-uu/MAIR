@@ -57,6 +57,7 @@ class DialogFlow:
         """
         Starts the dialog, and begins the state transitioning function.
         """
+        print(self.eInfo.extract_info("data/restaurant_info.csv", {'pricerange': 'cheap', 'food': 'french'}))
         print("Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.")
         firstmsg = input()
         if (firstmsg == "settings"):
@@ -74,10 +75,8 @@ class DialogFlow:
         Checks whether the current query still has enough available restaurant options.
         """
         solutions = self.eInfo.extract_info("data/restaurant_info.csv", query)
-        print(len(solutions))
-        print(query)
         if len(solutions) == 0:
-            self.alternativeSuggestions(query)
+            self.alternativeSuggestions(query, solutions)
         if len(solutions) == 1 or len(query) == 3:
             if "pricerange" not in query:
                 query["pricerange"] = "dontcare"
@@ -90,86 +89,109 @@ class DialogFlow:
         if len(solutions) > 1:
             self.getUserPreferences(query)
 
-    def alternativeSuggestions(self, oldquery):
+    def alternativeSuggestions(self, oldquery, emptyFrame):
         """
         Offers alternative suggestions if there are none matching the (old) query.
         """
-        print("There are no suggestions that satisfy your preferences. The following alternatives are available:")
-        alternatives = []
-        newquery = oldquery
+        print("There are no suggestions that satisfy your preferences. Here are some alternatives:")
+        alternatives = emptyFrame
+        newquery = oldquery.copy()
         #PRICERANGE SUBSTITUTIONS
         if "pricerange" in oldquery.keys():
             if oldquery["pricerange"] == "cheap":
                 newquery["pricerange"] = "moderate"
-                alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+                alternatives = pd.concat([alternatives, self.eInfo.extract_info("data/restaurant_info.csv", newquery)])
             elif oldquery["pricerange"] == "moderate":
                 newquery["pricerange"] = "expensive"
-                alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
-        newquery = oldquery
+                alternatives = pd.concat([alternatives, self.eInfo.extract_info("data/restaurant_info.csv", newquery)])
+        newquery = oldquery.copy()
         #AREA SUBSTITUTIONS
         if "area" in oldquery.keys():
             if oldquery["area"] in ["centre", "north", "west"]:
                 for area in ["centre", "north", "west"]:
                     newquery["area"] = area
-                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+                    alternatives = pd.concat([alternatives, self.eInfo.extract_info("data/restaurant_info.csv", newquery)])
             if oldquery["area"] in ["centre", "north", "east"]:
                 for area in ["centre", "north", "east"]:
                     newquery["area"] = area
-                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+                    alternatives = pd.concat([alternatives, self.eInfo.extract_info("data/restaurant_info.csv", newquery)])
             if oldquery["area"] in ["centre", "south", "west"]:
                 for area in ["centre", "south", "west"]:
                     newquery["area"] = area
-                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+                    alternatives = pd.concat([alternatives, self.eInfo.extract_info("data/restaurant_info.csv", newquery)])
             if oldquery["area"] in ["centre", "south", "east"]:
                 for area in ["centre", "south", "east"]:
                     newquery["area"] = area
-                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+                    alternatives = pd.concat([alternatives, self.eInfo.extract_info("data/restaurant_info.csv", newquery)])
 
         #FOODTYPE SUBSTITUTIONS
-        newquery = oldquery
+        newquery = oldquery.copy()
         if "food" in oldquery.keys():
             if oldquery["food"] in ["thai", "chinese", "korean", "vietnamese", "asian oriental"]:
                 for food in ["thai", "chinese", "korean", "vietnamese", "asian oriental"]:
                     newquery["food"] = food
-                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+                    alternatives = pd.concat([alternatives, self.eInfo.extract_info("data/restaurant_info.csv", newquery)])
             if oldquery["food"] in ["mediterranean", "spanish", "portuguese", "italian", "romanian", "tuscan", "catalan"]:
                 for food in ["mediterranean", "spanish", "portuguese", "italian", "romanian", "tuscan", "catalan"]:
                     newquery["food"] = food
-                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+                    alternatives = pd.concat([alternatives, self.eInfo.extract_info("data/restaurant_info.csv", newquery)])
             if oldquery["food"] in ["french", "european", "bistro", "swiss", "gastropub", "traditional"]:
                 for food in ["french", "european", "bistro", "swiss", "gastropub", "traditional"]:
                     newquery["food"] = food
-                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+                    alternatives = pd.concat([alternatives, self.eInfo.extract_info("data/restaurant_info.csv", newquery)])
             if oldquery["food"] in ["north american", "steakhouse", "british"]:
                 for food in ["north american", "steakhouse", "british"]:
                     newquery["food"] = food
-                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+                    alternatives = pd.concat([alternatives, self.eInfo.extract_info("data/restaurant_info.csv", newquery)])
             if oldquery["food"] in ["lebanese", "turkish", "persian"]:
                 for food in ["lebanese", "turkish", "persian"]:
                     newquery["food"] = food
-                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
+                    alternatives = pd.concat([alternatives, self.eInfo.extract_info("data/restaurant_info.csv", newquery)])
             if oldquery["food"] in ["international", "modern european", "fusion"]:
                 for food in ["international", "modern european", "fusion"]:
                     newquery["food"] = food
-                    alternatives.append(self.eInfo.extract_info("data/restaurant_info.csv", newquery))
-        random.shuffle(alternatives)
-        for i in range(0, 3):
-            print(str(i) + ": ", end="")
-            print(alternatives[i]["restaurantname"] + " is a nice place", end=" ")
-            if not alternatives[i]["food"].empty: print("serving " + alternatives[i]["food"], end=" ")
-            if not alternatives[i]["area"].empty: print("in the " + alternatives[i]["area"] + " of town", end=" ")
-            if not alternatives[i]["pricerange"].empty: print(
-                "in the " + alternatives[i]["pricerange"] + " pricerange", end="")
+                    alternatives = pd.concat([alternatives, self.eInfo.extract_info("data/restaurant_info.csv", newquery)])
+        alternatives = alternatives.sample(frac=1)
+        print("alternatives:")
+        print(alternatives)
+        print("done")
+        notSatisfied = True
+        beginIndex = 0
+        endIndex = 3
+        while notSatisfied:
+            self.giveAlternatives(alternatives, beginIndex, endIndex)
+            print("Do you want to:")
+            print("1. Change your preferences")
+            print("2. Choose one of these alternatives")
+            if len(alternatives) > endIndex:
+                print("3. Request other alternatives")
+            inp = input()
+            if inp == "1":
+                self.restatePreferences(oldquery)
+                notSatisfied = False
+            if inp == "2":
+                suggindex = input("Which suggestion would you like?")
+                self.giveInformation(alternatives, suggindex-1)
+                notSatisfied = False
+            if len(alternatives) > endIndex:
+                if inp == "3":
+                    beginIndex += 3
+                    endIndex += 3
+                    if len(alternatives) < endIndex:
+                        if len(alternatives) < endIndex - 1:
+                            endIndex -= 2
+                        else:
+                            endIndex -= 1
+
+    def giveAlternatives(self, alternatives, beginIndex, endIndex):
+        for i in range(beginIndex, endIndex):
+            print(str(i + 1) + ": ", end="")
+            print(str(alternatives.iloc[i]["restaurantname"]) + " is a nice place", end=" ")
+            if not alternatives.iloc[[i]]["food"].empty: print("serving " + str(alternatives.iloc[i]["food"]), end=" ")
+            if not alternatives.iloc[[i]]["area"].empty: print("in the " + str(alternatives.iloc[i]["area"]) + " of town", end=" ")
+            if not alternatives.iloc[[i]]["pricerange"].empty: print(
+                "in the " + str(alternatives.iloc[i]["pricerange"]) + " pricerange", end="")
             print(".")
-        print("Do you want to:")
-        print("1. Change your preferences")
-        print("2. Choose one of these alternatives")
-        inp = input()
-        if inp == 1:
-            self.restatePreferences(oldquery)
-        if inp == 2:
-            suggindex = input("Which suggestion would you like?")
-            self.giveInformation(suggestions, suggindex)
 
     def restatePreferences(self, query):
         """
@@ -299,7 +321,7 @@ class DialogFlow:
             fmsg = input("would you like to add more preferences?")
 
             if mlp_test(self.mlp, fmsg, self.id_dict) in ["negate", "deny"]:
-                print("Let's see which restaurants are in accorandence with your wishes.")
+                print("Let's see which restaurants are in accordance with your wishes.")
                 satisfied = True
             elif mlp_test(self.mlp, fmsg, self.id_dict) in ["affirm", "thankyou"]:
                 smsg = input("What would you like to add? Choose one of the following options.\n 1. (not) busy \n 2. duration of your visit \n 3. child friendly \n 4. romantic \n 5. serves fast food \n 6. quality of the restaurant \n 7. suitable for a date \n 8. vegetarian options")
