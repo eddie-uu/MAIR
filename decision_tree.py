@@ -68,9 +68,6 @@ class DecisionTree:
         # Write 'test' in console to start testing sequence
         if (decisionType == 'test'):
             matrix      = {}
-            labels      = []
-            predictions = []
-            actually    = []
             tested      = 0
             correct     = 0
 
@@ -79,7 +76,6 @@ class DecisionTree:
             for matrixAct in self.extractData.dialog_acts_train:
                 if matrixAct not in matrix:
                     matrix[matrixAct] = {}
-                    labels.append(matrixAct)
                     for matrixActSecond in self.extractData.dialog_acts_train:
                         if matrixActSecond not in matrix[matrixAct]:
                             matrix[matrixAct][matrixActSecond] = 0
@@ -97,9 +93,7 @@ class DecisionTree:
                 else:
                     s = ' '.join(sentence)
                     f.write(s + " -- Predicted: " + answer[0] + " -- Actually: " + dialog + "\n")
-                    
-                predictions.append(answer[0])
-                actually.append(dialog)
+
                 matrix[answer[0]][dialog] = matrix[answer[0]][dialog] + 1
                 matrix[answer[0]]['total'] = matrix[answer[0]]['total'] + 1
                 matrix['total'][dialog] = matrix['total'][dialog] + 1
@@ -110,15 +104,8 @@ class DecisionTree:
                 print("%-10s" % (key), end = '')
                 print(*value.values(), sep = 7*' ' + "|")
             
-            totalTrue = 0
-            totalPrecisionPredicted = 0
-            totalRecallPredicted = 0
-
             for key, value in matrix.items():
                 if key != 'total':
-                    totalTrue += value[key]
-                    totalPrecisionPredicted += value['total']
-                    totalRecallPredicted += matrix['total'][key]
                     print("Precision for " + key + ": " + str(value[key] / value['total']))
                     print("Recall for " + key + ": " + str(value[key] / matrix['total'][key]))
 
