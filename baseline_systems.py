@@ -1,10 +1,11 @@
+from abstract_mla import AbstractMachineLearningAlgorithm
 from extract import Extract
 
-class BaseLineSystem:
+class BaseLineSystem(AbstractMachineLearningAlgorithm):
     def __init__(self):
         self.extractData = Extract("data/dialog_acts.dat")
 
-    def majority_baseline(self, input):
+    def majorityBaseline(self, input):
         """
             Returns a classification (list) that labels every utterance with the most common dialog act, given a dataset.
             The index of a value in the classification list corresponds with the same index in the testset.
@@ -29,7 +30,7 @@ class BaseLineSystem:
             
         return classification
 
-    def rule_based_baseline(self, input):
+    def ruleBasedBaseline(self, input):
         """
             Returns a classification that labels every utterance based on a pre-defined ruleset, given a dataset.
 
@@ -41,7 +42,7 @@ class BaseLineSystem:
 
             The index of a value in the classification list corresponds with the same index in the testset.
 
-            @param input: should consist of the same keys as in majority_baseline()
+            @param input: should consist of the same keys as in majorityBaseline()
         """
         classification  = []
         check_data_type = isinstance(input, Extract)
@@ -78,14 +79,15 @@ class BaseLineSystem:
 
         return classification
 
+    # overriding abstract method
     def performAlgorithm(self, decisionType = False):
         if decisionType:
             """
                 Calculates the accuracy of both baseline classifications and prints them to the console.
                 Accuracy is calculated by taking the number of correct classifications and dividing it by the total number of classifications.
             """ 
-            mBaseline  = self.majority_baseline(self.extractData)
-            rbBaseline = self.rule_based_baseline(self.extractData)  
+            mBaseline  = self.majorityBaseline(self.extractData)
+            rbBaseline = self.ruleBasedBaseline(self.extractData)  
             mMatrix    = {}
             rbMatrix   = {}
 
@@ -109,8 +111,8 @@ class BaseLineSystem:
             sentence = (str(input('Enter sentence: '))).lower().split()
             
             if (len(sentence) > 0):
-                print('Majority classification is: '  + self.majority_baseline(self.extractData)[0])
-                print('Rule based classification is: '  + self.rule_based_baseline(sentence)[0])
+                print('Majority classification is: '  + self.majorityBaseline(self.extractData)[0])
+                print('Rule based classification is: '  + self.ruleBasedBaseline(sentence)[0])
 
     def evaluateResults(self, baselineType, baseline, matrix):
         tested = 0

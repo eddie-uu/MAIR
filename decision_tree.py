@@ -1,3 +1,4 @@
+from abstract_mla import AbstractMachineLearningAlgorithm
 from sklearn import datasets
 from sklearn import tree
 from sklearn.tree import export_text
@@ -8,7 +9,7 @@ import numpy as np
 import pickle
 import os
 
-class DecisionTree:
+class DecisionTree(AbstractMachineLearningAlgorithm):
     def __init__(self):
         print('Creating decision tree...')
         # Parsed data from "dialog_acts.dat", with 85% training data
@@ -66,6 +67,7 @@ class DecisionTree:
 
         return answer[0]
 
+    # overriding abstract method
     def performAlgorithm(self, decisionType = False):
         # Make all sentences equal in length to parse with OneHotEncoder to binary
         for sentence in self.extractData.sentences_train:
