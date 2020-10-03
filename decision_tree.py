@@ -15,7 +15,6 @@ class DecisionTree:
         extractData = Extract("data/dialog_acts.dat")
 
         # Array of values from each data key
-        dialog_acts_train = extractData.dialog_acts_train
         sentences_train   = extractData.sentences_train
         sentences_test    = extractData.sentences_test
 
@@ -24,6 +23,9 @@ class DecisionTree:
         max_len_test  = len(max(sentences_test,key=len))
         max_len       = max_len_test if max_len_test > max_len_train else max_len_train
 
+        filename               = 'data/decision_tree.pkl'
+        decisionTreeClassifier = None
+
         # Make all sentences equal in length to parse with OneHotEncoder to binary
         for sentence in sentences_train:
             for n in range(len(sentence), max_len, 1): sentence.insert(n, '')
@@ -31,13 +33,9 @@ class DecisionTree:
         for sentence in sentences_test:
             for n in range(len(sentence), max_len, 1): sentence.insert(n, '')
 
-        decisionTreeClassifier = None
-
         # Convert string lists to binary lists, since SciKit decision tree does not support string data        
         oneHotEncoder = OneHotEncoder(sparse=False, handle_unknown='ignore')
         oneHotEncoder.fit(sentences_train)
-
-        filename = 'data/decision_tree.pkl'
         
         if os.path.exists(filename):
             decisionTreeClassifier = pickle.load(open(filename, 'rb'))
@@ -45,14 +43,14 @@ class DecisionTree:
             # Create the decision tree
             binarySentences = oneHotEncoder.transform(sentences_train)
             decisionTreeClassifier = tree.DecisionTreeClassifier()
-            decisionTreeClassifier = decisionTreeClassifier.fit(binarySentences, dialog_acts_train)
+            decisionTreeClassifier = decisionTreeClassifier.fit(binarySentences, extractData.dialog_acts_train)
 
             pickle.dump(decisionTreeClassifier, open(filename, 'wb'))
 
         self.oneHotEncoder = oneHotEncoder
-        self.decisionTree = decisionTreeClassifier
-        self.max_len = max_len
-        self.extractData = extractData
+        self.decisionTree  = decisionTreeClassifier
+        self.max_len       = max_len
+        self.extractData   = extractData
 
     def predict(self, choice):
         # Label user input
@@ -68,7 +66,7 @@ class DecisionTree:
 
         return answer[0]
 
-    def performDecisionTree(self, decisionType):
+    def performAlgorithm(self, decisionType = False):
         # Make all sentences equal in length to parse with OneHotEncoder to binary
         for sentence in self.extractData.sentences_train:
             for n in range(len(sentence), self.max_len, 1): sentence.insert(n, '')
@@ -77,10 +75,10 @@ class DecisionTree:
             for n in range(len(sentence), self.max_len, 1): sentence.insert(n, '')
   
         # Write 'test' in console to start testing sequence
-        if (decisionType == 'test'):
-            matrix      = {}
-            tested      = 0
-            correct     = 0
+        if decisionType:
+            matrix  = {}
+            tested  = 0
+            correct = 0
 
             self.extractData.dialog_acts_train.append('total')
 
@@ -120,15 +118,14 @@ class DecisionTree:
                     precision = 0 if value['total'] == 0 else value[key] / value['total']
                     recall    = 0 if matrix['total'][key] == 0 else value[key] / matrix['total'][key]
                     f1        = 0 if precision + recall == 0 else (2 * precision * recall) / (precision + recall)
-                    print("Precision for " + key + ": " + str(precision))
-                    print("Recall for " + key + ": " + str(recall))
-                    print("F1-measure for " + key + ": " + str(f1))
+                    print("Precision for " + key + ": " + str(round(precision, 3)))
+                    print("Recall for " + key + ": " + str(round(recall, 3)))
+                    print("F1-measure for " + key + ": " + str(round(f1, 3)))
 
             print("")
             print("Total tested sentences: " + str(tested))
             print("Total correctly classified: " + str(correct))
-            print("Finished testing")
-            print("Accuracy: " + str(float(100 / tested * correct)) + "%")
+            print("Accuracy: " + str(round(100 / tested * correct, 3)) + "%")
         else:
             # Console writeline
             while True:

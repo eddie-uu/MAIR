@@ -48,10 +48,10 @@ class DialogFlow:
             self.mlp, self.id_dict = pickle.load("data/mlp_model.pkl")
         else:
             self.mlp, self.id_dict = mlp("data/dialog_acts.dat")
-        self.eInfo = ExtractInfo()
-        self.dtree = DecisionTree()
-        self.kAlgorithm = KeywordAlgorithm()
-        self.extract = Extract()
+        self.eInfo          = ExtractInfo()
+        self.dtree          = DecisionTree()
+        self.kAlgorithm     = KeywordAlgorithm()
+        self.extract        = Extract()
         self.configurations = self.extract.extract_settings()
 
     def Welcome(self):

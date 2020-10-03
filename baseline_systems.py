@@ -61,7 +61,7 @@ class BaseLineSystem:
             {'key': 'repeat',   'value': ['again', 'repeat', 'back']},
             {'key': 'restart',  'value': ['start', 'over', 'reset', 'restart']},
             {'key': 'request',  'value': ['address', 'phone', 'number']},
-            {'key': 'confirm',  'value': ['serve', 'is', 'does']}, # or sentence[0] == 'is' or sentence[0] == 'does':
+            {'key': 'confirm',  'value': ['serve', 'is', 'does']},
             {'key': 'null',     'value': ['wait', 'unintelligible', 'noise', 'cough', 'sorry', 'sil', 'knocking', 'um', 'laughing']}
         ]
 
@@ -78,93 +78,68 @@ class BaseLineSystem:
 
         return classification
 
-    def testBaselines(self):
-        """
-            Calculates the accuracy of both baseline classifications and prints them to the console.
-            Accuracy is calculated by taking the number of correct classifications and dividing it by the total number of classifications.
-        """ 
-        mBaseline  = self.majority_baseline(self.extractData)
-        rbBaseline = self.rule_based_baseline(self.extractData)  
-        mMatrix    = {}
-        rbMatrix   = {}
-        mTested    = 0
-        rbTested   = 0
-        mCorrect   = 0
-        rbCorrect  = 0
+    def performAlgorithm(self, decisionType = False):
+        if decisionType:
+            """
+                Calculates the accuracy of both baseline classifications and prints them to the console.
+                Accuracy is calculated by taking the number of correct classifications and dividing it by the total number of classifications.
+            """ 
+            mBaseline  = self.majority_baseline(self.extractData)
+            rbBaseline = self.rule_based_baseline(self.extractData)  
+            mMatrix    = {}
+            rbMatrix   = {}
 
-        self.extractData.dialog_acts_train.append('total')
+            self.extractData.dialog_acts_train.append('total')
 
-        for matrixAct in self.extractData.dialog_acts_train:
-            if matrixAct not in rbMatrix:
-                rbMatrix[matrixAct] = {}
-                mMatrix[matrixAct] = {}
-                for matrixActSecond in self.extractData.dialog_acts_train:
-                    if matrixActSecond not in rbMatrix[matrixAct]:
-                        rbMatrix[matrixAct][matrixActSecond] = 0
-                        mMatrix[matrixAct][matrixActSecond] = 0
-        
-        for output in rbBaseline:
-            dialog = self.extractData.dialog_acts_test[rbTested]
+            for matrixAct in self.extractData.dialog_acts_train:
+                if matrixAct not in rbMatrix:
+                    rbMatrix[matrixAct] = {}
+                    mMatrix[matrixAct] = {}
+                    for matrixActSecond in self.extractData.dialog_acts_train:
+                        if matrixActSecond not in rbMatrix[matrixAct]:
+                            rbMatrix[matrixAct][matrixActSecond] = 0
+                            mMatrix[matrixAct][matrixActSecond] = 0
+            
+            self.evaluateResults("rule-based", rbBaseline, rbMatrix)
+            print("")
+            self.evaluateResults("majority", mBaseline, mMatrix)
+        else:
+            # Classifies input from the user into a certain dialog act group.  
+            
+            sentence = (str(input('Enter sentence: '))).lower().split()
+            
+            if (len(sentence) > 0):
+                print('Majority classification is: '  + self.majority_baseline(self.extractData)[0])
+                print('Rule based classification is: '  + self.rule_based_baseline(sentence)[0])
+
+    def evaluateResults(self, baselineType, baseline, matrix):
+        tested = 0
+        correct = 0
+        for output in baseline: 
+            dialog = self.extractData.dialog_acts_test[tested]
             answer = output
             if dialog == answer:
-                rbCorrect += 1
+                correct += 1
             
-            rbMatrix[answer][dialog] = rbMatrix[answer][dialog] + 1
-            rbMatrix[answer]['total'] = rbMatrix[answer]['total'] + 1
-            rbMatrix['total'][dialog] = rbMatrix['total'][dialog] + 1
-            rbTested += 1
+            matrix[answer][dialog] = matrix[answer][dialog] + 1
+            matrix[answer]['total'] = matrix[answer]['total'] + 1
+            matrix['total'][dialog] = matrix['total'][dialog] + 1
+            tested += 1
 
-        for output in mBaseline: 
-            dialog = self.extractData.dialog_acts_test[mTested]
-            answer = output
-            if dialog == answer:
-                mCorrect += 1
-            
-            mMatrix[answer][dialog] = mMatrix[answer][dialog] + 1
-            mMatrix[answer]['total'] = mMatrix[answer]['total'] + 1
-            mMatrix['total'][dialog] = mMatrix['total'][dialog] + 1
-            mTested += 1
-
-        print("Results on the rule-based baseline:")
-        print(10*' ' + ' | '.join(rbMatrix.keys()))
-        for key, value in rbMatrix.items():
+        print("Results on the " + baselineType + " baseline:")
+        print(10*' ' + ' | '.join(matrix.keys()))
+        for key, value in matrix.items():
             print("%-10s" % (key), end = '')
             print(*value.values(), sep = 7*' ' + "|")
 
-        print(str(round(rbCorrect/rbTested,3)) + " accuracy on the rule-based baseline")
+        print(str((round(correct/tested,3) * 100)) + "% accuracy on the " + baselineType + " baseline")
         print("Individual values for labels: ")
-        for key, value in rbMatrix.items():
+        for key, value in matrix.items():
             if key != 'total':
                 precision = 0 if value['total'] == 0 else value[key] / value['total']
-                recall    = 0 if rbMatrix['total'][key] == 0 else value[key] / rbMatrix['total'][key]
+                recall    = 0 if matrix['total'][key] == 0 else value[key] / matrix['total'][key]
                 f1        = 0 if precision + recall == 0 else (2 * precision * recall) / (precision + recall)
-                print("Precision for " + key + ": " + str(precision))
-                print("Recall for " + key + ": " + str(recall))
-                print("F1-measure for " + key + ": " + str(f1))
-
-        print("Results on the majority baseline:")
-        print(10*' ' + ' | '.join(mMatrix.keys()))
-        for key, value in mMatrix.items():
-            print("%-10s" % (key), end = '')
-            print(*value.values(), sep = 7*' ' + "|")
-
-        print(str(round(mCorrect/mTested,3)) + " accuracy on the majority baseline")
-        print("Individual values for labels: ")
-        for key, value in mMatrix.items():
-            if key != 'total':
-                precision = 0 if value['total'] == 0 else value[key] / value['total']
-                recall    = 0 if mMatrix['total'][key] == 0 else value[key] / mMatrix['total'][key]
-                f1        = 0 if precision + recall == 0 else (2 * precision * recall) / (precision + recall)
-                print("Precision for " + key + ": " + str(precision))
-                print("Recall for " + key + ": " + str(recall))
-                print("F1-measure for " + key + ": " + str(f1))
-
-    def classify_user_input(self):
-        # Classifies input from the user into a certain dialog act group.  
-        
-        sentence = (str(input('Enter sentence: '))).lower().split()
-        
-        if (len(sentence) > 0):
-            print('Majority classification is: '  + self.majority_baseline(self.extractData)[0])
-            print('Rule based classification is: '  + self.rule_based_baseline(sentence)[0])
+                print("Precision for " + key + ": " + str(round(precision, 3)))
+                print("Recall for " + key + ": " + str(round(recall, 3)))
+                print("F1-measure for " + key + ": " + str(round(f1, 3)))
         

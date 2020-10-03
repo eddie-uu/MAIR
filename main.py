@@ -26,12 +26,11 @@ def main():
 
 def useBaseLine(testing = False):
     baseLineSystem = BaseLineSystem()
-    baseLineSystem.testBaselines() if testing else baseLineSystem.classify_user_input()
-
+    baseLineSystem.performAlgorithm(testing)
 
 def useDecisionTree(testing = False):
-    dt = DecisionTree()
-    dt.performDecisionTree('test') if testing else dt.performDecisionTree('')
+    decisionTree = DecisionTree()
+    decisionTree.performAlgorithm(testing)
 
 def useMLP(testing = False):
     mlp("data/dialog_acts.dat") if testing else mlp_loop()
