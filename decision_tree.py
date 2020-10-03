@@ -63,7 +63,7 @@ class decision_tree(abstract_machine_learning_algorithm):
             choice = choice[0:self.max_len]
 
         prediction = self.one_hot_encoder.transform([choice])
-        answer     = self.decisionTree.predict(prediction)
+        answer     = self.decision_tree.predict(prediction)
 
         return answer[0]
 

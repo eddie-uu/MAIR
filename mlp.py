@@ -174,8 +174,8 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
 
 # if __name__ == "__main__":
     # Run this file to save a trained model.
-#    model, id_to_label, scaler = mlp("data/dialog_acts.dat")
-#    with open("data/mlp_model.pkl", 'wb') as f_pickle:
-#        pickle.dump((model, id_to_label), f_pickle)
+    #model, id_to_label, scaler = mlp("data/dialog_acts.dat")
+    #with open("data/mlp_model.pkl", 'wb') as f_pickle:
+    #    pickle.dump((model, id_to_label, scaler), f_pickle)
     # Example use:
 #    print(mlp_test(model, "no", scaler, id_to_label))
