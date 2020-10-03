@@ -1,7 +1,6 @@
 from abstract_mla import abstract_machine_learning_algorithm
 from sklearn import datasets
 from sklearn import tree
-from sklearn.tree import export_text
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.metrics import confusion_matrix
 from extract import extract

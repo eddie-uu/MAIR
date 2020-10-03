@@ -4,13 +4,13 @@ from decision_tree import decision_tree
 from mlp import multi_layer_perceptron
 from extract_info import extract_info
 from extract import extract
+from imply import Implications
 import nltk
 import time
 import pandas as pd
 import re
 import json
 import random
-from imply import Implications
 import pickle
 import os
 
@@ -22,8 +22,7 @@ except ImportError:
     # Python 3
     import builtins as __builtin__
 
-ex = extract()
-extractConfig = ex.extract_settings()
+extractConfig = extract().extract_settings()
 
 def input(prompt = ''):
     if extractConfig['RESPONSE_DELAY']['value'].lower() == 'true':
@@ -47,8 +46,7 @@ class dialog_flow:
         self.mLayerPerceptron = multi_layer_perceptron()
         self.eInfo          = extract_info()
         self.kAlgorithm     = keyword_algorithm()
-        self.ext            = extract()
-        self.configurations = self.ext.extract_settings()
+        self.configurations = extract().extract_settings()
         
         if os.path.exists("data/mlp_model.pkl"):
             with open("data/mlp_model.pkl", 'rb') as f:
@@ -209,66 +207,6 @@ class dialog_flow:
         elif wrong == "3":
             query = {**query, **self.kAlgorithm.keyword_algorithm(input("In what area are you looking?"), mode="area")}
         self.getSuggestions(query)
-
-    def configurateSettings(self):
-        """
-        Allows changing of settings.
-        """
-        settings = self.ext.extract_settings()
-        self.configurations['RESPONSE_DELAY']['value'] = 'false'
-
-        finishedSettings = False
-        while not finishedSettings:
-            print("Which setting would you like to change?")
-            counter = 1
-            settingsIndex = {}
-
-            for setting in settings:
-                print(str(counter) + ". " + settings[setting]["text"])
-                settingsIndex[str(counter)] = {"key": setting, "value": settings[setting]} 
-                counter += 1
-            
-            saveAndRestart = counter
-            cancel = counter + 1
-            print(str(saveAndRestart) + ". Save and close")
-            print(str(cancel) + ". Cancel")
-
-            choice = input("> ")
-
-            if (choice == str(saveAndRestart)):
-                finishedSettings = True
-                self.ext.change_setting(settings)
-                print("Configurations have been saved, closing application now...")
-            elif (choice == str(cancel)):
-                finishedSettings = True
-                print("Configurations will remain the same, closing application now...")
-            elif choice in settingsIndex:
-                settingKey = settingsIndex[choice]["key"]
-                settingValues = settingsIndex[choice]["value"]
-
-                validChoices = {"int": "^\d+$", "bool": 'true|false|True|False|TRUE|FALSE'}
-                print("Current setting for " + str(settingKey) + " is: " + str(settingValues["value"]))
-                print("To which value would you like to change this? (Value must be of the type: " + str(settingValues["valueType"]) + " )")
-
-                if (settingValues["valueType"] == "ENUM"):
-                    enumOptions = ""
-                    for option in settingValues["valueOptions"]:
-                        print("- " + str(option["value"]))
-                        enumOptions += str(option["value"]).lower() + "|"
-                    validChoices["ENUM"] = enumOptions[:-1] if len(enumOptions) > 0 else enumOptions
-
-                choice = input("> ")
-
-                pattern = re.compile(validChoices[str(settingValues["valueType"])])
-                if pattern.match(choice) != None:
-                    print("Settings for " + settingKey + " have been changed from " + str(settingValues["value"]) + " to " + choice)
-                    settings[settingKey]["value"] = choice
-                else:
-                    print("Sorry, the given input is invalid")
-                time.sleep(1)
-            else:
-                print("Sorry, the given input could not be recognized")
-                time.sleep(1)
 
     def getUserPreferences(self, query):
         """

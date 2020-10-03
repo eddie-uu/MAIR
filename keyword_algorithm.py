@@ -4,25 +4,25 @@ class keyword_algorithm:
     def __init(self):
         pass
 
-    # Checks regex patterns (matching keywords) in sentence and returns either the sentence back if not found or the keyword match
-    def checkPattern(self, text, patterns, default_value = ''):
-        for pattern in patterns:
-            match = re.search(pattern['pattern'], text)
-            if match:
-                text = match.group(pattern['group']) if default_value == '' else default_value 
-        return text
-
     # Perform the algorithm for a sentence, pass a search mode (food, area or pricerange) if context is mentioned
     def keyword_algorithm(self, text, mode = ''):
         response = {}
         sentences = text.split('and')
 
         for sentence in sentences:
-            self.perform_algorithm(sentence, mode, response)
+            self.__perform_algorithm(sentence, mode, response)
         
         return response
 
-    def perform_algorithm(self, text, mode, response):
+    # Checks regex patterns (matching keywords) in sentence and returns either the sentence back if not found or the keyword match
+    def __checkPattern(self, text, patterns, default_value = ''):
+        for pattern in patterns:
+            match = re.search(pattern['pattern'], text)
+            if match:
+                text = match.group(pattern['group']) if default_value == '' else default_value 
+        return text
+
+    def __perform_algorithm(self, text, mode, response):
         text = text.lower()
 
         # General patterns for any option
@@ -39,9 +39,9 @@ class keyword_algorithm:
             price_dont_care_patterns.append({'pattern': 'any price'})
             
             # Check the given sentence
-            result    = self.checkPattern(text, price_patterns)
+            result    = self.__checkPattern(text, price_patterns)
             result    = result.split()[-1] if len(result.split()) > 1 and result != text else result
-            end_result = self.checkPattern(result, price_dont_care_patterns, 'dontcare')
+            end_result = self.__checkPattern(result, price_dont_care_patterns, 'dontcare')
             
             # If the given answer is invalid and the context is specific for pricerange, return dontcare
             if len(end_result.split()) > 1 and mode == 'pricerange':

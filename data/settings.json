@@ -85,7 +85,7 @@
         "text": "Allow users to change their preferences or not"
     },
     "OUTPUT_IN_CAPS": {
-        "value": "true",
+        "value": "false",
         "valueType": "bool",
         "text": "OUTPUT IN ALL CAPS OR NOT"
     },
@@ -100,7 +100,7 @@
         "text": "Use Prolog reasoning system instead of the default one."
     },
     "PRINT_REASONING": {
-        "value": "True",
+        "value": "true",
         "valueType": "bool",
         "text": "Print reasoning steps used for preference inference."
     }

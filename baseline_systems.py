@@ -5,7 +5,42 @@ class baseline_system(abstract_machine_learning_algorithm):
     def __init__(self):
         self.extract_data = extract("data/dialog_acts.dat")
 
-    def majority_baseline(self, input):
+    # overriding abstract method
+    def perform_algorithm(self, decision_type = False):
+        if decision_type:
+            """
+                Calculates the accuracy of both baseline classifications and prints them to the console.
+                Accuracy is calculated by taking the number of correct classifications and dividing it by the total number of classifications.
+            """ 
+            m_baseline  = self.__majority_baseline(self.extract_data)
+            rb_baseline = self.__rule_based_baseline(self.extract_data)  
+            m_matrix    = {}
+            rb_matrix   = {}
+
+            self.extract_data.dialog_acts_train.append('total')
+
+            for matrix_act in self.extract_data.dialog_acts_train:
+                if matrix_act not in rb_matrix:
+                    rb_matrix[matrix_act] = {}
+                    m_matrix[matrix_act] = {}
+                    for matrix_act_second in self.extract_data.dialog_acts_train:
+                        if matrix_act_second not in rb_matrix[matrix_act]:
+                            rb_matrix[matrix_act][matrix_act_second] = 0
+                            m_matrix[matrix_act][matrix_act_second] = 0
+            
+            self.__evaluate_results("rule-based", rb_baseline, rb_matrix)
+            print("")
+            self.__evaluate_results("majority", m_baseline, m_matrix)
+        else:
+            # Classifies input from the user into a certain dialog act group.  
+            
+            sentence = (str(input('Enter sentence: '))).lower().split()
+            
+            if (len(sentence) > 0):
+                print('Majority classification is: '  + self.__majority_baseline(self.extract_data)[0])
+                print('Rule based classification is: '  + self.__rule_based_baseline(sentence)[0])
+
+    def __majority_baseline(self, input):
         """
             Returns a classification (list) that labels every utterance with the most common dialog act, given a dataset.
             The index of a value in the classification list corresponds with the same index in the testset.
@@ -30,7 +65,7 @@ class baseline_system(abstract_machine_learning_algorithm):
             
         return classification
 
-    def rule_based_baseline(self, input):
+    def __rule_based_baseline(self, input):
         """
             Returns a classification that labels every utterance based on a pre-defined ruleset, given a dataset.
 
@@ -79,42 +114,7 @@ class baseline_system(abstract_machine_learning_algorithm):
 
         return classification
 
-    # overriding abstract method
-    def perform_algorithm(self, decision_type = False):
-        if decision_type:
-            """
-                Calculates the accuracy of both baseline classifications and prints them to the console.
-                Accuracy is calculated by taking the number of correct classifications and dividing it by the total number of classifications.
-            """ 
-            m_baseline  = self.majority_baseline(self.extract_data)
-            rb_baseline = self.rule_based_baseline(self.extract_data)  
-            m_matrix    = {}
-            rb_matrix   = {}
-
-            self.extract_data.dialog_acts_train.append('total')
-
-            for matrix_act in self.extract_data.dialog_acts_train:
-                if matrix_act not in rb_matrix:
-                    rb_matrix[matrix_act] = {}
-                    m_matrix[matrix_act] = {}
-                    for matrix_act_second in self.extract_data.dialog_acts_train:
-                        if matrix_act_second not in rb_matrix[matrix_act]:
-                            rb_matrix[matrix_act][matrix_act_second] = 0
-                            m_matrix[matrix_act][matrix_act_second] = 0
-            
-            self.evaluate_results("rule-based", rb_baseline, rb_matrix)
-            print("")
-            self.evaluate_results("majority", m_baseline, m_matrix)
-        else:
-            # Classifies input from the user into a certain dialog act group.  
-            
-            sentence = (str(input('Enter sentence: '))).lower().split()
-            
-            if (len(sentence) > 0):
-                print('Majority classification is: '  + self.majority_baseline(self.extract_data)[0])
-                print('Rule based classification is: '  + self.rule_based_baseline(sentence)[0])
-
-    def evaluate_results(self, baseline_type, baseline, matrix):
+    def __evaluate_results(self, baseline_type, baseline, matrix):
         tested = 0
         correct = 0
         for output in baseline: 
