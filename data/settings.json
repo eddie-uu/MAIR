@@ -9,20 +9,20 @@
         "valueType": "bool",
         "text": "Ask user about correctness of match for Levenshtein results"
     },
-    "BASELINE_CLASSIFIER": {
-        "value": "recognition",
+    "CURRENT_CLASSIFIER": {
+        "value": "mlp",
         "valueType": "ENUM",
         "valueOptions": [
             {
-                "name": "Dialog act recognition",
-                "value": "recognition"
+                "name": "Decision Tree",
+                "value": "dt"
             },
             {
-                "name": "Machine learning classifier",
-                "value": "classifier"
+                "name": "Multi layer perceptron",
+                "value": "mlp"
             }
         ],
-        "text": "Use your baseline for dialog act recognition instead of the machine learning classifier"
+        "text": "Use either the decision tree or mlp for the dialog system"
     },
     "RESPONSE_DELAY": {
         "value": "False",

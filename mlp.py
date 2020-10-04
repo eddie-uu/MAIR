@@ -174,7 +174,7 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
               f"recall {round(av_rec,4)} and F1 {round(av_f1,4)}.")
         
 
-    def predict(self, model, input_sentence, scaler, id_to_label=None, pickle_file="data/vectors.pkl"):
+    def predict(self, input_sentence, model, scaler, id_to_label=None, pickle_file="data/vectors.pkl"):
         """
             Predicts the label of a sentence based on a pre-trained machine learning
             model. Ignores words not found in the train or test set.
@@ -212,12 +212,12 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
             model, id_dict = pickle.load("data/mlp_model.pkl")
         else:
             model, id_dict, scaler = self.mlp("data/dialog_acts.dat")
-        print("You can quit by typing 'stop'.")
+        print("You can quit by typing 'bye'.")
         while True:
             sentence = input("Please write your sentence here:\n")
-            if sentence == "stop":
+            if sentence == "bye":
                 break
-            prediction = self.predict(model, sentence, scaler, id_dict)
+            prediction = self.predict(sentence, model, scaler, id_dict)
             print(f"We predict your sentence belongs to the {prediction} class.")
 
     def perform_algorithm(self, testing):
@@ -230,4 +230,4 @@ if __name__ == "__main__":
     with open("data/mlp_model.pkl", 'wb') as f_pickle:
         pickle.dump((model, id_to_label, scaler), f_pickle)
     # Example use:
-    # print(mlp.predict(model, "how about a turkish restaurant in the center", scaler, id_to_label))
+    # print(mlp.predict("how about a turkish restaurant in the center", model, scaler, id_to_label))

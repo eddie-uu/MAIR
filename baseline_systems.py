@@ -40,6 +40,9 @@ class baseline_system(abstract_machine_learning_algorithm):
                 print('Majority classification is: '  + self.__majority_baseline(self.extract_data)[0])
                 print('Rule based classification is: '  + self.__rule_based_baseline(sentence)[0])
 
+    def predict(self, *kwargs):
+        pass
+
     def __majority_baseline(self, input):
         """
             Returns a classification (list) that labels every utterance with the most common dialog act, given a dataset.

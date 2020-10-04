@@ -52,9 +52,9 @@ class decision_tree(abstract_machine_learning_algorithm):
         self.max_len         = max_len
         self.extract_data    = extract_data
 
-    def predict(self, choice):
+    def predict(self, input_sentence, model, scaler, id_to_label=None, pickle_file = ""):
         # Label user input
-        choice = choice.lower().split(' ')
+        choice = input_sentence.lower().split(' ')
 
         if (len(choice) < self.max_len):
             for n in range(len(choice), self.max_len, 1): choice.insert(n, '')
@@ -90,7 +90,7 @@ class decision_tree(abstract_machine_learning_algorithm):
                         if matrix_act_second not in matrix[matrix_act]:
                             matrix[matrix_act][matrix_act_second] = 0
 
-            f = open("data/wrong answers.txt", "w")
+            f = open("data/wrong_answers_decision_tree.txt", "w")
             for n in range(0, len(self.extract_data.dialog_acts_test), 1):
                 dialog     = self.extract_data.dialog_acts_test[n]
                 sentence   = self.extract_data.sentences_test[n]
