@@ -1,0 +1,235 @@
+Type one of the following numbers to execute the command:
+1. Test baseline
+2. Test decision tree
+3. Test neural network
+4. Baseline
+5. Decision tree
+6. Neural network
+7. Dialog
+8. Change settings
+> 7
+Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.
+> Can I have an expensive restaurant?
+For what type of food are you looking?
+> Italian
+In what area are you looking?
+> any
+Would you like to add more preferences?
+> no
+Let's see which restaurants are in accordance with your wishes.
+Frankie And Bennys meets all your preferences
+ Are you interested in this restaurant?yes
+Would you like some more information about the restaurant?yes
+What information would you like to have?
+ 1. Phone number
+ 2. Address.
+> 1
+The phone number is 01223 412 430.
+Would you like some more information about the restaurant?
+> address
+The address is Cambridge Leisure Park Clifton Way, Cherry Hinton c.b 1.
+Would you like some more information about the restaurant?
+> no
+We hope you have a great meal at Frankie And Bennys!
+--------------------------------------------------------------
+Type one of the following numbers to execute the command:
+1. Test baseline
+2. Test decision tree
+3. Test neural network
+4. Baseline
+5. Decision tree
+6. Neural network
+7. Dialog
+8. Change settings
+> 7
+Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.
+> Any restaurant.
+Would you like to add more preferences?
+> yes
+What would you like to add? Choose one of the following options.
+ 1. (not) busy
+ 2. duration of your visit
+ 3. child friendly
+ 4. romantic
+ 5. serves fast food
+ 6. quality of the restaurant
+ 7. suitable for a date
+ 8. vegetarian options
+> 8
+You are looking for a restaurant that has vegetarian options.
+Would you like to add more preferences?
+> yes
+What would you like to add? Choose one of the following options.
+ 1. (not) busy
+ 2. duration of your visit
+ 3. child friendly
+ 4. romantic
+ 5. serves fast food
+ 6. quality of the restaurant
+ 7. suitable for a date
+ 8. vegetarian options
+> 4
+You are looking for a restaurant that is romantic.
+Would you like to add more preferences?
+> no
+Let's see which restaurants are in accordance with your wishes.
+The Gandhi meets all your preferences
+ Are you interested in this restaurant?
+> no
+No problem, let's continue.
+La Margherita meets all your preferences
+ Are you interested in this restaurant?
+> yes
+Would you like some more information about the restaurant?
+> no
+We hope you have a great meal at La Margherita!
+--------------------------------------------------------------
+Type one of the following numbers to execute the command:
+1. Test baseline
+2. Test decision tree
+3. Test neural network
+4. Baseline
+5. Decision tree
+6. Neural network
+7. Dialog
+8. Change settings
+> 7
+Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.
+I would like a moderately priced restaurant in the noorth part of town.
+For what type of food are you looking?
+> any
+Would you like to add more preferences?
+> no
+Let's see which restaurants are in accordance with your wishes.
+Restaurant Alimentum meets all your preferences
+ Are you interested in this restaurant?
+> yes
+Would you like some more information about the restaurant?
+> no
+We hope you have a great meal at Restaurant Alimentum!
+--------------------------------------------------------------
+Type one of the following numbers to execute the command:
+1. Test baseline
+2. Test decision tree
+3. Test neural network
+4. Baseline
+5. Decision tree
+6. Neural network
+7. Dialog
+8. Change settings
+> 7
+Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.
+> I'm looking for a cheap restaurant and it should serve international food.
+There are no suggestions that satisfy your preferences. Here are some alternatives:
+1: The River Bar Steakhouse And Grill is a nice place serving modern european in the centre of town in the cheap pricerange.
+2: Bloomsbury Restaurant is a nice place serving international in the north of town in the moderate pricerange.
+3: J Restaurant is a nice place serving fusion in the centre of town in the cheap pricerange.
+Do you want to:
+1. Change your preferences
+2. Choose one of these alternatives
+3. Request other alternatives
+> 3
+4: The Varsity Restaurant is a nice place serving international in the centre of town in the moderate pricerange.
+Do you want to:
+1. Change your preferences
+2. Choose one of these alternatives
+> 2
+Which suggestion would you like?
+> 2
+Would you like some more information about the restaurant?
+> yes
+What information would you like to have?
+ 1. Phone number
+ 2. Address.2
+The address is Crowne Plaza Hotel 20 Downing Street c.b 2.
+Would you like some more information about the restaurant?
+> phone number
+The phone number is 08719 429 180.
+Would you like some more information about the restaurant?
+> no
+We hope you have a great meal at Bloomsbury Restaurant!
+--------------------------------------------------------------
+Type one of the following numbers to execute the command:
+1. Test baseline
+2. Test decision tree
+3. Test neural network
+4. Baseline
+5. Decision tree
+6. Neural network
+7. Dialog
+8. Change settings
+> 7
+Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.
+> I'm looking for Persian food, please.
+There is only one restaurant available that satisfies your preferences:
+1: Hakka is a nice place serving persian in the north of town in the cheap pricerange.
+Are you interested in this restaurant?
+> yes
+Would you like some more information about the restaurant?
+> no
+We hope you have a great meal at Hakka!
+--------------------------------------------------------------
+Type one of the following numbers to execute the command:
+1. Test baseline
+2. Test decision tree
+3. Test neural network
+4. Baseline
+5. Decision tree
+6. Neural network
+7. Dialog
+8. Change settings
+> 7
+Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.
+> cheap
+For what type of food are you looking?
+> any
+In what area are you looking?
+> any
+Would you like to add more preferences?
+> yes
+What would you like to add? Choose one of the following options.
+ 1. (not) busy
+ 2. duration of your visit
+ 3. child friendly
+ 4. romantic
+ 5. serves fast food
+ 6. quality of the restaurant
+ 7. suitable for a date
+ 8. vegetarian options
+> 6
+Are you looking for a high quality restaurant?
+> yes
+You are looking for a good restaurant.
+Would you like to add more preferences?
+> yes
+What would you like to add? Choose one of the following options.
+ 1. (not) busy
+ 2. duration of your visit
+ 3. child friendly
+ 4. romantic
+ 5. serves fast food
+ 6. quality of the restaurant
+ 7. suitable for a date
+ 8. vegetarian options
+> 2
+Would you like to spend a lot of time in the restaurant?
+> yes
+You want to spend a long time at the restaurant.
+Would you like to add more preferences?
+> no
+Let's see which restaurants are in accordance with your wishes.
+The Gandhi meets all your preferences
+ Are you interested in this restaurant?
+> yes
+Would you like some more information about the restaurant?
+> sure
+What information would you like to have?
+ 1. Phone number
+ 2. Address.2
+The address is 72 Regent Street, City Centre nan.
+Would you like some more information about the restaurant?
+> jdhhjasbgdfh
+Sorry, I didn't catch that. Please try again. Try answering "yes" or "no"
+Would you like some more information about the restaurant?
+> no
+We hope you have a great meal at The Gandhi!

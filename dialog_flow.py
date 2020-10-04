@@ -340,7 +340,9 @@ class dialog_flow:
                 print("Let's see which restaurants are in accordance with your wishes.")
                 satisfied = True
             elif self.algorithm.predict(fmsg, self.mlp, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
-                smsg = input("What would you like to add? Choose one of the following options.\n 1. (not) busy \n 2. duration of your visit \n 3. child friendly \n 4. romantic \n 5. serves fast food \n 6. quality of the restaurant \n 7. suitable for a date \n 8. vegetarian options")
+                smsg = input("What would you like to add? Choose one of the following options.\n 1. (not) busy \n 2. duration of " +
+                             "your visit \n 3. child friendly \n 4. romantic \n 5. serves fast food \n 6. quality of the restaurant " +
+                             "\n 7. suitable for a date \n 8. vegetarian options")
                 if smsg == "1":
                     choice = input("Do want a restaurant that is busy?").lower()
                     if self.algorithm.predict(choice, self.mlp, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
@@ -407,8 +409,8 @@ class dialog_flow:
                 query["quality"] = quality
         imply = Implications()
         new_suggestions = imply(additional_pref, query)
-        not_understood = True
         for i in range(len(suggestions)):
+            not_understood = True
             if str(suggestions.iloc[i]["restaurantname"]) in new_suggestions["restaurantname"].tolist(): #check if restaurant is still suitable after adding new preferences
                 while not_understood:
                     interested = input(suggestions.iloc[i]['restaurantname'] + " meets all your preferences \n Are you interested in this restaurant?").lower()
