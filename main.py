@@ -38,6 +38,6 @@ def useMLP(testing = False):
 
 def useDialogFlow(testing = False):
     dialogFlow = dialog_flow()
-    dialogFlow.Welcome()
+    dialogFlow.welcome()
 
 main()
