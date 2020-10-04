@@ -411,8 +411,8 @@ class dialog_flow:
                 query["quality"] = quality
         imply = Implications()
         new_suggestions = imply(additional_pref, query)
-        not_understood = True
         for i in range(len(suggestions)):
+            not_understood = True
             if str(suggestions.iloc[i]["restaurantname"]) in new_suggestions["restaurantname"].tolist(): #check if restaurant is still suitable after adding new preferences
                 while not_understood:
                     interested = input(suggestions.iloc[i]['restaurantname'] + " meets all your preferences \n Are you interested in this restaurant?").lower()
