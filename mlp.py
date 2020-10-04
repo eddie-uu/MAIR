@@ -1,13 +1,21 @@
 from abstract_mla import abstract_machine_learning_algorithm
 from extract import extract
-from collections import defaultdict
+from collections import defaultdict, Counter
 from sklearn import preprocessing
 from sklearn.neural_network import MLPClassifier
 import numpy as np
 import pickle
 import os
+from extract import extract
 
 class multi_layer_perceptron(abstract_machine_learning_algorithm):
+    def __init__(self):
+        settings = extract().extract_settings()
+        if str(settings["PRINT_MLP_F1"]["value"]) == "True":
+            self.print_f1 = True
+        else:
+            self.print_f1 = False
+    
     def mlp(self, data_file, layers=(16, 32), pickle_file="data/vectors.pkl", 
             emb_file="data/fasttext_English.vec", split=0.85, seed=42, 
             print_missing=False):
@@ -77,12 +85,7 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
             train_vectors.append(av_vector)
             train_labels.append(conv_train_labels[i])
 
-        # Start of alternative code that tries multiple different layer size configs.
-        # print("Trying different configurations...")
-        # for l1 in range(5, 50, 5):
-        #     for l2 in range(10, 100, 10):
-
-        print("Training multilayer perceptron...")
+        print("Training multilayer perceptron...\n")
         clf = MLPClassifier(solver='lbfgs', max_iter=1000, alpha=1e-5, hidden_layer_sizes=layers, random_state=seed)
         # sklearn expects standardized data
         scaler = preprocessing.StandardScaler().fit(train_vectors)
@@ -90,6 +93,8 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
         clf.fit(train_vectors, train_labels)
         
         to_save = []
+        # For F1 score, maps predicted classes to their actual correct counts.
+        counts_per_class = {c:Counter() for c in id_to_label.values()}
 
         total = 0
         for sentence, true_label in zip(data.sentences_test, data.dialog_acts_test):
@@ -111,17 +116,63 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
             predicted_id = clf.predict(av_vector)[0]
             predicted_label = id_to_label[predicted_id]
 
+            counts_per_class[predicted_label][true_label] += 1
+
             if predicted_label == true_label:
                 total += 1
             else:
                 to_save.append((sentence, true_label, predicted_label))
 
+        # Save incorrectly labeled answers for manual inspection
         with open("data/wrong_answers_mlp.txt", 'w') as f:
             for sent_tuple in to_save: 
                 f.write(f"{' '.join(sent_tuple[0])} -- Predicted: {sent_tuple[1]} -- Actually: {sent_tuple[2]}\n")
+        
+        if self.print_f1:
+            self.f1_score(counts_per_class)
 
-        print("Accuracy:", total / len(data.sentences_test))
+        print("\nOverall accuracy:", round(total / len(data.sentences_test), 4))
+
         return clf, id_to_label, scaler
+        
+    def f1_score(self, counts_per_class):
+        """
+        Prints the precision, recall and F1 scores given the classification.
+
+        @param counts_per_class: dictionary, maps classes predicted by the model
+            to counters with the real labels of items in the given class.
+        """
+        totals = [0,0,0]
+        usable_labels = 0
+
+        for label, count_dict in counts_per_class.items():
+            true_pos = count_dict[label]
+            positives = sum(count_dict.values())
+            if positives == 0:
+                print(f"The label '{label}' was never never chosen by the algorithm.")
+                print("As such, it will not be considered in the averages.\n")
+                continue
+            precision = true_pos / positives
+            label_total = sum(cnt[label] for cnt in counts_per_class.values())
+            if label_total == 0:
+                print(f"The label '{label}' is not in the test set.")
+                print("As such, it will not be considered in the averages.\n")
+                continue
+            recall = true_pos / label_total
+            f1 = 2 * precision * recall / (precision + recall)
+            print(f"'{label}' has a precision of {round(precision,4)} and a recall " +
+                  f"of {round(recall,4)}. F1 score is {round(f1,4)}.\n")
+            totals[0] += precision
+            totals[1] += recall
+            totals[2] += f1
+            usable_labels += 1
+        
+        av_prec = totals[0] / usable_labels
+        av_rec = totals[1] / usable_labels
+        av_f1 = totals[2] / usable_labels
+        print(f"\nAverage precision per predicted class is {round(av_prec,4)}, " +
+              f"recall {round(av_rec,4)} and F1 {round(av_f1,4)}.")
+        
 
     def mlp_test(self, model, input_sentence, scaler, id_to_label=None, pickle_file="data/vectors.pkl"):
         """
@@ -172,10 +223,11 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
     def perform_algorithm(self, testing):
         self.mlp("data/dialog_acts.dat") if testing else self.mlp_loop()
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
     # Run this file to save a trained model.
-    #model, id_to_label, scaler = mlp("data/dialog_acts.dat")
-    #with open("data/mlp_model.pkl", 'wb') as f_pickle:
-    #    pickle.dump((model, id_to_label, scaler), f_pickle)
+    mlp = multi_layer_perceptron()
+    model, id_to_label, scaler = mlp.mlp("data/dialog_acts.dat")
+    with open("data/mlp_model.pkl", 'wb') as f_pickle:
+        pickle.dump((model, id_to_label, scaler), f_pickle)
     # Example use:
-#    print(mlp_test(model, "no", scaler, id_to_label))
+    # print(mlp.mlp_test(model, "how about a turkish restaurant in the center", scaler, id_to_label))

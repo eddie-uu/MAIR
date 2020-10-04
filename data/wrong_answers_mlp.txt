@@ -5,24 +5,22 @@ uh are there any that serves mediterranean -- Predicted: inform -- Actually: nul
 restaurant there -- Predicted: inform -- Actually: reqalts
 i want to find a -- Predicted: null -- Actually: inform
 not any more -- Predicted: deny -- Actually: negate
-hello and welcome -- Predicted: hello -- Actually: null
 that information is not important -- Predicted: deny -- Actually: inform
 i dont want that -- Predicted: deny -- Actually: null
 what is the addre -- Predicted: request -- Actually: null
 ooh thank you good bye -- Predicted: bye -- Actually: thankyou
 the pizza hutt unintelligent -- Predicted: inform -- Actually: null
 uh medium -- Predicted: inform -- Actually: null
+high priced -- Predicted: inform -- Actually: null
 what about in the west area -- Predicted: reqalts -- Actually: inform
 thank you good bye no thank you good bye -- Predicted: negate -- Actually: bye
 popular dish -- Predicted: request -- Actually: inform
-yea im looking for a moderately priced restaurant -- Predicted: inform -- Actually: affirm
 do uh -- Predicted: null -- Actually: confirm
 and the type of food at gourmet burger kitchen -- Predicted: request -- Actually: inform
 is there a chinese restaurant in the cheap price range -- Predicted: inform -- Actually: confirm
 okay uh -- Predicted: ack -- Actually: null
 good thank you good bye -- Predicted: bye -- Actually: thankyou
 no cuban food cuban food -- Predicted: negate -- Actually: inform
-lebanese damn it just listen to me -- Predicted: inform -- Actually: null
 food do they serve -- Predicted: request -- Actually: confirm
 okay then any -- Predicted: inform -- Actually: reqalts
 nor -- Predicted: null -- Actually: negate

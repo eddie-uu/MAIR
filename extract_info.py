@@ -124,5 +124,6 @@ class extract_info:
 
 if __name__ == "__main__":
     # An example
-#    print(extract_info().extract_info("data/restaurant_info.csv", {"pricerange":"expensiive", "area":"center", "food":"thai!"}))
-    print(extract_info().extract_info("data/restaurant_info.csv", {"pricerange":"cheap", "food":"gastropub"}))
+    # print(extract_info().extract_info("data/restaurant_info.csv", {"pricerange":"expensiive", "area":"center", "food":"thai!"}))
+    # print(extract_info().extract_info("data/restaurant_info.csv", {"pricerange":"cheap", "food":"gastropub"}))
+    print(extract_info().extract_info("data/restaurant_info.csv", {"pricerange":"moderately", "food":"cuban"}))
