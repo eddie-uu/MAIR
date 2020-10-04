@@ -4,6 +4,8 @@ user queries and a database of restaurants in Cambridge. The system works as a
 command line program, where the user can type in queries and interact with the 
 system in different ways.
 
+Github: https://github.com/eddie-uu/MAIR.
+
 ## Setup
 ### You will need Python version 3.6 or higher.
 ### The following libraries need to be installed for succesfull execution of the project:
@@ -36,7 +38,7 @@ and type the following command in your console to start the execution:
 At first, you will be presented with 8 different options. Type the number (1-8) to use 
 the system in the corresponding way. See section on `main.py` for more information.
 
-You can view example dialogs with the system in `examples.txt`.
+For inspiration, you can view example dialogs with the system in `examples.txt`.
 
 ## Files
 
@@ -119,6 +121,11 @@ Make sure to delete this file if you change `dialog_acts.dat`. You can produce t
 ### `data/dialog_acts.dat`
 
 Preprocessed training data for training the dialog classifiers. First word on a line is the label.
+
+### `data/examples.txt`
+
+Contains a few example interactions with the dialogue system. The examples are chosen to show a range
+of what the system is capable of.
 
 ### `data/fasttext_English.vec`
 
