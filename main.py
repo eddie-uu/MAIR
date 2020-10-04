@@ -40,7 +40,7 @@ def use_mlp(testing = False):
 
 def use_dialog_flow(testing = False):
     dialogFlow = dialog_flow()
-    dialogFlow.Welcome()
+    dialogFlow.welcome()
 
 def configure_settings(testing = False):
     settings = extract()
