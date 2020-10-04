@@ -14,8 +14,6 @@ from imply import Implications
 import pickle
 import os
 
-nltk.download('wordnet')
-
 try:
     import __builtin__
 except ImportError:
