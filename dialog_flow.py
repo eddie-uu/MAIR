@@ -99,9 +99,9 @@ class dialog_flow:
         first_msg_classification = self.mLayerPerceptron.mlp_test(self.mlp, first_msg, self.scaler, self.id_dict) #"inform"
         if first_msg_classification in ["inform", "thankyou", "request"]:
             query = self.kAlgorithm.keyword_algorithm(first_msg)
-            self.check_query(query)
+            self.__check_query(query)
         elif first_msg_classification == "bye":
-            self.Goodbye()
+            self.__goodbye()
         elif first_msg_classification == "hello":
             self.welcome()
         else:
@@ -109,7 +109,7 @@ class dialog_flow:
             self.welcome()
 
 
-    def check_query(self, query):
+    def __check_query(self, query):
         '''
         Checks whether the current query still has enough available restaurant options.
         If the number of suggestions is 2 or higher, proceed normally by asking more preferences.
@@ -125,7 +125,7 @@ class dialog_flow:
         '''
         solutions = self.eInfo.extract_info("data/restaurant_info.csv", query)
         if len(solutions) == 0:
-            self.alternative_suggestions(query, solutions)
+            self.__alternative_suggestions(query, solutions)
         if len(solutions) == 1 or len(query) == 3:
             if "pricerange" not in query:
                 query["pricerange"] = "dontcare"
@@ -135,11 +135,11 @@ class dialog_flow:
                 query["area"] = "dontcare"
             if len(solutions) == 1:
                 print("There is only one restaurant available that satisfies your preferences:")
-            self.get_suggestions(query)
+            self.__get_suggestions(query)
         if len(solutions) > 1:
-            self.get_user_preferences(query)
+            self.__get_user_preferences(query)
 
-    def alternative_suggestions(self, old_query, empty_frame):
+    def __alternative_suggestions(self, old_query, empty_frame):
         '''
         Offers alternative suggestions if there are none matching the (old) query.
         Example of how an alternative suggestion is determined: if the user is looking for a cheap restaurant,
@@ -219,10 +219,10 @@ class dialog_flow:
         while not_satisfied:
             if end_index > len(alternatives):
                 for i in range(begin_index, len(alternatives)):
-                    self.offer_restaurant(alternatives, i)
+                    self.__offer_restaurant(alternatives, i)
             else:
                 for i in range(begin_index, end_index):
-                    self.offer_restaurant(alternatives, i)
+                    self.__offer_restaurant(alternatives, i)
             print("Do you want to:")
             print("1. Change your preferences")
             print("2. Choose one of these alternatives")
@@ -230,11 +230,11 @@ class dialog_flow:
                 print("3. Request other alternatives")
             inp = input()
             if inp == "1":
-                self.restate_preferences(old_query)
+                self.__restate_preferences(old_query)
                 not_satisfied = False
             if inp == "2":
                 suggindex = input("Which suggestion would you like?")
-                self.ask_extra_info(alternatives, int(suggindex) - 1)
+                self.__ask_extra_info(alternatives, int(suggindex) - 1)
                 not_satisfied = False
             if len(alternatives) > end_index:
                 if inp == "3":
@@ -242,7 +242,7 @@ class dialog_flow:
                     end_index += int(self.configurations["ALTERNATIVES_NUMBER"]["value"])
 
 
-    def offer_restaurant(self, restaurantList, index):
+    def __offer_restaurant(self, restaurantList, index):
         '''
         Offers (via printing to console) a selected restaurant to the user.
 
@@ -257,7 +257,7 @@ class dialog_flow:
                "in the " + str(restaurantList.iloc[index]["pricerange"]) + " pricerange", end="")
         print(".")
 
-    def restate_preferences(self, query):
+    def __restate_preferences(self, query):
         '''
         Allows the user to modify their query if something is wrong.
         '''
@@ -269,28 +269,28 @@ class dialog_flow:
             query = {**query, **self.kAlgorithm.keyword_algorithm(input("For what type of food are you looking?"), mode="food")}
         elif wrong == "3":
             query = {**query, **self.kAlgorithm.keyword_algorithm(input("In what area are you looking?"), mode="area")}
-        self.get_suggestions(query)
+        self.__get_suggestions(query)
 
-    def get_user_preferences(self, query):
+    def __get_user_preferences(self, query):
         '''
         Finds out what type of restaurant the user is looking for, by asking every possible preference and checking if the query
         still has enough matches.
         '''
         if "pricerange" not in query.keys():
             query = {**query, **self.kAlgorithm.keyword_algorithm(input("In what price range are you looking?"), mode="pricerange")}
-            self.check_query(query)
+            self.__check_query(query)
             return
         if "food" not in query.keys():
             query = {**query, **self.kAlgorithm.keyword_algorithm(input("For what type of food are you looking?"), mode="food")}
-            self.check_query(query)
+            self.__check_query(query)
             return
         if "area" not in query.keys():
             query = {**query, **self.kAlgorithm.keyword_algorithm(input("In what area are you looking?"), mode="area")}
-            self.check_query(query)
+            self.__check_query(query)
             return
 
 
-    def check_preferences(self, query):
+    def __check_preferences(self, query):
         '''
         Confirms the retrieved preferences with the user, and modifies them if needed.
         '''
@@ -311,14 +311,14 @@ class dialog_flow:
                 query = {**query, **self.kAlgorithm.keyword_algorithm(input("For what type of food are you looking?"), mode="food")}
             elif wrong == "3":
                 query = {**query, **self.kAlgorithm.keyword_algorithm(input("In what area are you looking?"), mode="area")}
-            self.check_preferences(query)
+            self.__check_preferences(query)
         elif self.mLayerPerceptron.mlp_test(self.mlp, msg, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
-            self.get_suggestions(query)
+            self.__get_suggestions(query)
         else:
             print("Sorry, I didn't understand that.")
-            self.check_preferences(query)
+            self.__check_preferences(query)
 
-    def get_extra_preferences(self, suggestions, query, again=False):
+    def __get_extra_preferences(self, suggestions, query, again=False):
         '''
         Determines the user's extra preferences, such as romantic, fast food, for children or long time.
 
@@ -387,7 +387,7 @@ class dialog_flow:
                         print("You are looking for a bad restaurant.")
                     else:
                         print("Sorry I did not get that. Please try again.")
-                        self.get_extra_preferences(suggestions, query)
+                        self.__get_extra_preferences(suggestions, query)
                 elif smsg == "7":
                     additional_pref += ["date"]
                     print("You are looking for a restaurant that is suitable for a date.")
@@ -413,7 +413,7 @@ class dialog_flow:
                 while not_understood:
                     interested = input(suggestions.iloc[i]['restaurantname'] + " meets all your preferences \n Are you interested in this restaurant?").lower()
                     if self.mLayerPerceptron.mlp_test(self.mlp, interested, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
-                        self.ask_extra_info(suggestions, i)
+                        self.__ask_extra_info(suggestions, i)
                         return
                     elif self.mLayerPerceptron.mlp_test(self.mlp, interested, self.scaler, self.id_dict) in ["negate", "deny"]:
                         print("No problem, let's continue.")
@@ -422,9 +422,9 @@ class dialog_flow:
                         print("Sorry, we couldn't understand.")
         print("There are no restaurants left.", end = " ")
 
-        self.get_extra_preferences(suggestions, query, True)
+        self.__get_extra_preferences(suggestions, query, True)
         
-    def get_suggestions(self, query):
+    def __get_suggestions(self, query):
         '''
         Retrieves the suggestions from the database that match the preferences of the user. This function only works for
         the base preferences (food, area, pricerange). For the extra preferences, see the imply.py file.
@@ -432,17 +432,17 @@ class dialog_flow:
         suggestions = self.eInfo.extract_info("data/restaurant_info.csv", query)
         satisfied = False
         if len(suggestions) > 1:
-            self.get_extra_preferences(suggestions, query)
+            self.__get_extra_preferences(suggestions, query)
             satisfied = True
         i = 0
 
         while len(suggestions) > i and not satisfied:
-            self.offer_restaurant(suggestions, i)
+            self.__offer_restaurant(suggestions, i)
             choice = input(
                 "Are you interested in this restaurant?")
             if self.mLayerPerceptron.mlp_test(self.mlp, choice, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
                 satisfied = True
-                self.ask_extra_info(suggestions, i)
+                self.__ask_extra_info(suggestions, i)
             elif self.mLayerPerceptron.mlp_test(self.mlp, choice, self.scaler, self.id_dict) in ["negate", "deny", "reqalts", "reqmore"]:
                 i += 1
                 #print("Looking for alternatives...")
@@ -454,7 +454,7 @@ class dialog_flow:
             return
 
 
-    def ask_extra_info(self, suggestions, suggestion_index):
+    def __ask_extra_info(self, suggestions, suggestion_index):
         '''
         Asks whether the user needs extra information about the selected restaurant, and which information is desired.
         Parameters are used to identify the selected restaurant.
@@ -476,9 +476,9 @@ class dialog_flow:
                 satisfied = True
             else:
                 print("Sorry, I didn't catch that. Please try again. Try answering \"yes\" or \"no\"")
-        self.Goodbye(suggestions.iloc[suggestion_index]['restaurantname'])
+        self.__goodbye(suggestions.iloc[suggestion_index]['restaurantname'])
 
-    def give_information(self, suggestions, suggestion_index, choice):
+    def __give_information(self, suggestions, suggestion_index, choice):
         '''
         Gives the requested information about the selected restaurant.
 
@@ -498,7 +498,7 @@ class dialog_flow:
                 print("The address is " + str(suggestions.iloc[suggestion_index]["addr"]) + " " +
                       str(suggestions.iloc[suggestion_index]["postcode"]) + ".")
 
-    def Goodbye(self, restaurantname=""):
+    def __goodbye(self, restaurantname=""):
         """
         Ends the dialog.
         """

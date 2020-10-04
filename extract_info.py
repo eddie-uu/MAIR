@@ -87,7 +87,7 @@ class extract_info:
         """
         user_input = user_input.lower()
         if user_input not in options[pref_type]:
-            user_input = self.levenshtein_or_synonym(user_input, options[pref_type])
+            user_input = self.__levenshtein_or_synonym(user_input, options[pref_type])
         return data[0:0] if user_input is None else data.loc[data[pref_type] == user_input]
 
     def __levenshtein_or_synonym(self, word, options):
