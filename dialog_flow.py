@@ -54,17 +54,21 @@ except ImportError:
 extractConfig = extract().extract_settings()
 
 def input(prompt = ''):
+    # Response delay if true in settings
     if extractConfig['RESPONSE_DELAY']['value'].lower() == 'true':
         time.sleep(1)
 
+    # All caps output if true in settings
     if isinstance(prompt, str) and extractConfig['OUTPUT_IN_CAPS']['value'].lower() == 'true':
         return __builtin__.input(prompt.upper())
     return __builtin__.input(prompt)
 
 def print(*args, **kwargs):
+    # Response delay if true in settings
     if extractConfig['RESPONSE_DELAY']['value'].lower() == 'true':
         time.sleep(1)
 
+    # All caps output if true in settings
     for arg in args:
         if isinstance(arg, str) and extractConfig['OUTPUT_IN_CAPS']['value'].lower() == 'true':
             return __builtin__.print(arg.upper(), **kwargs)
