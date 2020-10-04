@@ -278,4 +278,3 @@ if __name__ == "__main__":
     # An example
     impl = Implications()
     print(impl(["vegetarian", "not romantic"], {"pricerange":"cheap", "quality":"good food"}))
-    # print(impl(["romantic"], {"pricerange":"cheap", "quality":"good food"}))

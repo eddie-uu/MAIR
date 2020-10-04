@@ -18,7 +18,7 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
     
     def mlp(self, data_file, layers=(16, 32), pickle_file="data/vectors.pkl", 
             emb_file="data/fasttext_English.vec", split=0.85, seed=42, 
-            print_missing=False):
+            print_missing=False, print_measures=False):
         """
             Trains a multilayer perceptron (feedforward neural network) on the average 
             word embeddings of labeled sentences.
@@ -39,6 +39,7 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
             @param print_missing: if set to True, prints out sentences from both the
                 test and train set that could not be identified due to their words
                 not being present in the pre-trained embeddings.
+            @param print_measures: if set to True, prints out performance measures.
         """
         data = extract(data_file, split=split, seed=seed)
 
@@ -128,10 +129,9 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
             for sent_tuple in to_save: 
                 f.write(f"{' '.join(sent_tuple[0])} -- Predicted: {sent_tuple[2]} -- Actually: {sent_tuple[1]}\n")
         
-        if self.print_f1:
+        if print_measures:
             self.f1_score(counts_per_class)
-
-        print("\nOverall accuracy:", round(total / len(data.sentences_test), 4))
+            print("\nOverall accuracy:", round(total / len(data.sentences_test), 4))
 
         return clf, id_to_label, scaler
         
@@ -149,29 +149,34 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
             true_pos = count_dict[label]
             positives = sum(count_dict.values())
             if positives == 0:
-                print(f"The label '{label}' was never never chosen by the algorithm.")
-                print("As such, it will not be considered in the averages.\n")
+                if self.print_f1:
+                    print(f"The label '{label}' was never never chosen by the algorithm.")
+                    print("As such, it will not be considered in the averages.\n")
                 continue
             precision = true_pos / positives
             label_total = sum(cnt[label] for cnt in counts_per_class.values())
             if label_total == 0:
-                print(f"The label '{label}' is not in the test set.")
-                print("As such, it will not be considered in the averages.\n")
+                if self.print_f1:
+                    print(f"The label '{label}' is not in the test set.")
+                    print("As such, it will not be considered in the averages.\n")
                 continue
             recall = true_pos / label_total
             f1 = 2 * precision * recall / (precision + recall)
-            print(f"'{label}' has a precision of {round(precision,4)} and a recall " +
-                  f"of {round(recall,4)}. F1 score is {round(f1,4)}. ("
-                  f"{positives} samples)")
+            if self.print_f1:
+                print(f"'{label}' has a precision of {round(precision,4)} and a recall " +
+                    f"of {round(recall,4)}. F1 score is {round(f1,4)}. ("
+                    f"{positives} samples)")
             if positives > 10:
                 totals[0] += precision
                 totals[1] += recall
                 totals[2] += f1
                 usable_labels += 1
-                print()
+                if self.print_f1:
+                    print()
             else:
-                print("Due to the small number of samples, this will not be " +
-                      "considered in the averages.\n")
+                if self.print_f1:
+                    print("Due to the small number of samples, this will not be " +
+                        "considered in the averages.\n")
         
         av_prec = totals[0] / usable_labels
         av_rec = totals[1] / usable_labels
@@ -215,8 +220,8 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
             the user can type sentences to be classified.
         """
         if os.path.exists("data/mlp_model.pkl"):
-            with open("data/mlp_model.pkl", 'wb') as f_pickle:
-                model, id_dict = pickle.load(f_pickle)
+            with open("data/mlp_model.pkl", 'rb') as f_pickle:
+                model, id_dict, scaler = pickle.load(f_pickle)
         else:
             model, id_dict, scaler = self.mlp("data/dialog_acts.dat")
         print("You can quit by typing 'bye'.")
@@ -227,14 +232,23 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
             prediction = self.predict(sentence, model, scaler, id_dict)
             print(f"We predict your sentence belongs to the {prediction} class.")
 
-    def perform_algorithm(self, testing):
-        self.mlp("data/dialog_acts.dat") if testing else self.mlp_loop()
+    def perform_algorithm(self, testing=True):
+        """
+            Main call to run the MLP, you can choose to print out the evaluations
+            or to run the model as a classification algorithm for user input.
+
+            @param testing: True = print evaluation, False = user input.
+        """
+        if testing:
+            model, id_to_label, scaler = self.mlp("data/dialog_acts.dat", print_measures=True)
+            with open("data/mlp_model.pkl", 'wb') as f_pickle:
+                pickle.dump((model, id_to_label, scaler), f_pickle)
+        else:
+            self.mlp_loop()
 
 if __name__ == "__main__":
     # Run this file to save a trained model.
     mlp = multi_layer_perceptron()
-    model, id_to_label, scaler = mlp.mlp("data/dialog_acts.dat")
-    with open("data/mlp_model.pkl", 'wb') as f_pickle:
-        pickle.dump((model, id_to_label, scaler), f_pickle)
+    mlp.perform_algorithm()
     # Example use:
     # print(mlp.predict("how about a turkish restaurant in the center", model, scaler, id_to_label))
