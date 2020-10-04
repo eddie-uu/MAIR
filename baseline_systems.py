@@ -28,9 +28,9 @@ class baseline_system(abstract_machine_learning_algorithm):
                             rb_matrix[matrix_act][matrix_act_second] = 0
                             m_matrix[matrix_act][matrix_act_second] = 0
             
-            self.__evaluate_results("rule-based", rb_baseline, rb_matrix)
-            print("")
             self.__evaluate_results("majority", m_baseline, m_matrix)
+            print("")
+            self.__evaluate_results("rule-based", rb_baseline, rb_matrix)
         else:
             # Classifies input from the user into a certain dialog act group.  
             
@@ -144,8 +144,8 @@ class baseline_system(abstract_machine_learning_algorithm):
         f1_length = 0
         for key, value in matrix.items():
             if key != 'total':
-                precision = 0 if value['total'] == 0 else value[key] / value['total']
-                recall    = 0 if matrix['total'][key] == 0 else value[key] / matrix['total'][key]
+                precision = 0 if value['total'] == 0 else value[key] / value['total'] * 100
+                recall    = 0 if matrix['total'][key] == 0 else value[key] / matrix['total'][key] * 100
                 f1        = 0 if precision + recall == 0 else (2 * precision * recall) / (precision + recall)
                 print("Precision for " + key + ": " + str(round(precision, 3)))
                 print("Recall for " + key + ": " + str(round(recall, 3)))
@@ -154,5 +154,5 @@ class baseline_system(abstract_machine_learning_algorithm):
                 f1_length += 1
         
         print(str((round(correct/tested,3) * 100)) + "% accuracy on the " + baseline_type + " baseline")
-        print(str(round(f1_measure / f1_length * 100, 3)) + "% F1-measure on the " + baseline_type + " baseline")
+        print(str(round(f1_measure / f1_length, 3)) + "% F1-measure on the " + baseline_type + " baseline")
         

@@ -118,8 +118,8 @@ class decision_tree(abstract_machine_learning_algorithm):
             f1_length = 0
             for key, value in matrix.items():
                 if key != 'total':
-                    precision = 0 if value['total'] == 0 else value[key] / value['total']
-                    recall    = 0 if matrix['total'][key] == 0 else value[key] / matrix['total'][key]
+                    precision = 0 if value['total'] == 0 else value[key] / value['total'] * 100
+                    recall    = 0 if matrix['total'][key] == 0 else value[key] / matrix['total'][key] * 100
                     f1        = 0 if precision + recall == 0 else (2 * precision * recall) / (precision + recall)
                     print("Precision for " + key + ": " + str(round(precision, 3)))
                     print("Recall for " + key + ": " + str(round(recall, 3)))
@@ -131,7 +131,7 @@ class decision_tree(abstract_machine_learning_algorithm):
             print("Total tested sentences: " + str(tested))
             print("Total correctly classified: " + str(correct))
             print("Accuracy: " + str(round(100 / tested * correct, 3)) + "%")
-            print("F1: " + str(round(f1_measure / f1_length * 100, 3)) + "%")
+            print("F1: " + str(round(f1_measure / f1_length, 3)) + "%")
         else:
             # Console writeline
             while True:
