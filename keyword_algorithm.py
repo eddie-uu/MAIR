@@ -85,7 +85,7 @@ class keyword_algorithm:
 
             result    = self.__checkPattern(text, food_patterns)
             end_result = self.__checkPattern(result, food_dont_care_patterns, 'dontcare')
-            
+
             food_type = True
             for words in end_result.split():
                 if len(words) < 3: food_type = False
