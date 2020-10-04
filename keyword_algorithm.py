@@ -77,7 +77,7 @@ class keyword_algorithm:
         if mode == 'food' or mode == '':
             food_patterns = [{'pattern': '(.+?) (food)', 'group': 1},
                             {'pattern': '(serving|serves|serve) (.*)', 'group': 2},
-                            {'pattern': '(with|about) (.*)', 'group': 2},
+                            {'pattern': '(with|about|for a) (.*)', 'group': 2},
                             {'pattern': '(for|a) (.*)', 'group': 2},
                             {'pattern': '(.+?) (restaurant)', 'group': 1}]
             food_dont_care_patterns = base_dont_care_patterns
