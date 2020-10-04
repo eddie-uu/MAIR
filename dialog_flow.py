@@ -94,7 +94,7 @@ class dialog_flow:
         '''
 
         first_msg = input("Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.")
-        first_msg_classification = self.algorithm.predict(first_msg, self.mlp, self.scaler, self.id_dict) #"inform"
+        first_msg_classification = self.algorithm.predict(first_msg, self.mlp, self.scaler, self.id_dict)
         if first_msg_classification in ["inform", "thankyou", "request"]:
             query = self.kAlgorithm.keyword_algorithm(first_msg)
             self.__check_query(query)
@@ -445,7 +445,6 @@ class dialog_flow:
                 self.__ask_extra_info(suggestions, i)
             elif self.algorithm.predict(choice, self.mlp, self.scaler, self.id_dict) in ["negate", "deny", "reqalts", "reqmore"]:
                 i += 1
-                #print("Looking for alternatives...")
             else:
                 print("Sorry, I didn't catch that. Please try again.")
         if not satisfied:
