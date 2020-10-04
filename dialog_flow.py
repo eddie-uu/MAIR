@@ -13,6 +13,7 @@ import json
 import random
 import pickle
 import os
+import sys
 
 nltk.download('wordnet')
 
@@ -96,7 +97,7 @@ class dialog_flow:
 
         print("Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.")
         first_msg = input()
-        first_msg_classification = self.mLayerPerceptron.mlp_test(self.mlp, first_msg, self.scaler, self.id_dict) #"inform"
+        first_msg_classification = self.mLayerPerceptron.predict(self.mlp, first_msg, self.scaler, self.id_dict) #"inform"
         if first_msg_classification in ["inform", "thankyou", "request"]:
             query = self.kAlgorithm.keyword_algorithm(first_msg)
             self.__check_query(query)
@@ -208,7 +209,7 @@ class dialog_flow:
                 for food in ["international", "modern european", "fusion"]:
                     new_query["food"] = food
                     alternatives = pd.concat([alternatives, self.eInfo.extract_info("data/restaurant_info.csv", new_query)])
-        alternatives = alternatives.sample(frac=1)
+        alternatives = alternatives.sample(frac=1).drop_duplicates()
         not_satisfied = True
         begin_index = 0
         end_index = int(self.configurations["ALTERNATIVES_NUMBER"]["value"])
@@ -303,7 +304,7 @@ class dialog_flow:
             print(" in the " + query["area"] + " of town", end="")
         print(". Is this correct? Type yes or no.")
         msg = input().lower()
-        if self.mLayerPerceptron.mlp_test(self.mlp, msg, self.scaler, self.id_dict) in ["negate", "deny"]:
+        if self.mLayerPerceptron.predict(self.mlp, msg, self.scaler, self.id_dict) in ["negate", "deny"]:
             wrong = input("Which of the following is wrong? \n 1. Price range \n 2. Food type \n 3. Area")
             if wrong == "1":
                 query = {**query, **self.kAlgorithm.keyword_algorithm(input("In what price range are you looking?"), mode = "pricerange")}
@@ -312,7 +313,7 @@ class dialog_flow:
             elif wrong == "3":
                 query = {**query, **self.kAlgorithm.keyword_algorithm(input("In what area are you looking?"), mode="area")}
             self.__check_preferences(query)
-        elif self.mLayerPerceptron.mlp_test(self.mlp, msg, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
+        elif self.mLayerPerceptron.predict(self.mlp, msg, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
             self.__get_suggestions(query)
         else:
             print("Sorry, I didn't understand that.")
@@ -336,27 +337,27 @@ class dialog_flow:
                 again = False
             else:
                 fmsg = input("Would you like to add more preferences?")
-            if self.mLayerPerceptron.mlp_test(self.mlp, fmsg, self.scaler, self.id_dict) in ["negate", "deny"]:
+            if self.mLayerPerceptron.predict(self.mlp, fmsg, self.scaler, self.id_dict) in ["negate", "deny"]:
                 print("Let's see which restaurants are in accordance with your wishes.")
                 satisfied = True
-            elif self.mLayerPerceptron.mlp_test(self.mlp, fmsg, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
+            elif self.mLayerPerceptron.predict(self.mlp, fmsg, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
                 smsg = input("What would you like to add? Choose one of the following options.\n 1. (not) busy \n 2. duration of your visit \n 3. child friendly \n 4. romantic \n 5. serves fast food \n 6. quality of the restaurant \n 7. suitable for a date \n 8. vegetarian options")
                 if smsg == "1":
                     choice = input("Do want a restaurant that is busy?").lower()
-                    if self.mLayerPerceptron.mlp_test(self.mlp, choice, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
+                    if self.mLayerPerceptron.predict(self.mlp, choice, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
                         additional_pref += ["busy"]
                         print("You want a restaurant that is busy.")
-                    elif self.mLayerPerceptron.mlp_test(self.mlp, choice, self.scaler, self.id_dict) in ["negate", "deny"]:
+                    elif self.mLayerPerceptron.predict(self.mlp, choice, self.scaler, self.id_dict) in ["negate", "deny"]:
                         additional_pref += ["not busy"]
                         print("You want a restaurant that is not busy.")
                     else: 
                         print("Sorry I did not get that. Please try again.")
                 elif smsg == "2":
                     choice = input("Would you like to spend a lot of time in the restaurant?").lower()
-                    if self.mLayerPerceptron.mlp_test(self.mlp, choice, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
+                    if self.mLayerPerceptron.predict(self.mlp, choice, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
                         additional_pref += ["long time"]
                         print("You want to spend a long time at the restaurant.")
-                    elif self.mLayerPerceptron.mlp_test(self.mlp, choice, self.scaler, self.id_dict) in ["negate", "deny"]:
+                    elif self.mLayerPerceptron.predict(self.mlp, choice, self.scaler, self.id_dict) in ["negate", "deny"]:
                         additional_pref += ["not long time"]
                         print("You do not want to spend a long time at the restaurant.")
                     else:
@@ -369,20 +370,20 @@ class dialog_flow:
                     print("You are looking for a restaurant that is romantic.")
                 elif smsg == "5":
                     choice = input("Would you like a restaurant that serves fast food?").lower()
-                    if self.mLayerPerceptron.mlp_test(self.mlp, choice, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
+                    if self.mLayerPerceptron.predict(self.mlp, choice, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
                         additional_pref += ["fast food"]
                         print("You are looking for a restaurant that serves fast food.")
-                    elif self.mLayerPerceptron.mlp_test(self.mlp, choice, self.scaler, self.id_dict) in ["negate", "deny"]:
+                    elif self.mLayerPerceptron.predict(self.mlp, choice, self.scaler, self.id_dict) in ["negate", "deny"]:
                         additional_pref += ["no fast food"]
                         print("You are looking for a restaurant that does not serve fast food.")
                     else:
                         print("Sorry I did not get that. Please try again.")
                 elif smsg == "6":
                     choice = input("Are you looking for a high quality restaurant?").lower()
-                    if self.mLayerPerceptron.mlp_test(self.mlp, choice, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
+                    if self.mLayerPerceptron.predict(self.mlp, choice, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
                         additional_pref += ["good restaurant"]
                         print("You are looking for a good restaurant.")
-                    elif self.mLayerPerceptron.mlp_test(self.mlp, choice, self.scaler, self.id_dict) in ["negate", "deny"]:
+                    elif self.mLayerPerceptron.predict(self.mlp, choice, self.scaler, self.id_dict) in ["negate", "deny"]:
                         additional_pref += ["bad restaurant"]
                         print("You are looking for a bad restaurant.")
                     else:
@@ -394,7 +395,7 @@ class dialog_flow:
                 elif smsg == "8":
                     additional_pref += ["vegetarian"]
                     print("You are looking for a restaurant that has vegetarian options.")
-                elif self.mLayerPerceptron.mlp_test(self.mlp, smsg, self.scaler, self.id_dict) in ["negate", "deny", "reqalts", "reqmore"]:
+                elif self.mLayerPerceptron.predict(self.mlp, smsg, self.scaler, self.id_dict) in ["negate", "deny", "reqalts", "reqmore"]:
                         print("Unfortunately, you can only choose one of the additional preferences above.")
                 else:
                     print("Sorry I did not understand that. Please try again")
@@ -412,10 +413,10 @@ class dialog_flow:
             if str(suggestions.iloc[i]["restaurantname"]) in new_suggestions["restaurantname"].tolist(): #check if restaurant is still suitable after adding new preferences
                 while not_understood:
                     interested = input(suggestions.iloc[i]['restaurantname'] + " meets all your preferences \n Are you interested in this restaurant?").lower()
-                    if self.mLayerPerceptron.mlp_test(self.mlp, interested, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
+                    if self.mLayerPerceptron.predict(self.mlp, interested, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
                         self.__ask_extra_info(suggestions, i)
                         return
-                    elif self.mLayerPerceptron.mlp_test(self.mlp, interested, self.scaler, self.id_dict) in ["negate", "deny"]:
+                    elif self.mLayerPerceptron.predict(self.mlp, interested, self.scaler, self.id_dict) in ["negate", "deny"]:
                         print("No problem, let's continue.")
                         not_understood = False
                     else:
@@ -440,10 +441,10 @@ class dialog_flow:
             self.__offer_restaurant(suggestions, i)
             choice = input(
                 "Are you interested in this restaurant?")
-            if self.mLayerPerceptron.mlp_test(self.mlp, choice, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
+            if self.mLayerPerceptron.predict(self.mlp, choice, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
                 satisfied = True
                 self.__ask_extra_info(suggestions, i)
-            elif self.mLayerPerceptron.mlp_test(self.mlp, choice, self.scaler, self.id_dict) in ["negate", "deny", "reqalts", "reqmore"]:
+            elif self.mLayerPerceptron.predict(self.mlp, choice, self.scaler, self.id_dict) in ["negate", "deny", "reqalts", "reqmore"]:
                 i += 1
                 #print("Looking for alternatives...")
             else:
@@ -469,10 +470,10 @@ class dialog_flow:
                 self.give_information(suggestions, suggestion_index, "1")
             elif "address" in more_info or "postcode" in more_info:
                 self.give_information(suggestions, suggestion_index, "2")
-            elif self.mLayerPerceptron.mlp_test(self.mlp, more_info, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
+            elif self.mLayerPerceptron.predict(self.mlp, more_info, self.scaler, self.id_dict) in ["affirm", "thankyou"]:
                 choice = input("What information would you like to have? \n 1. Phone number \n 2. Address.")
                 self.give_information(suggestions, suggestion_index, choice)
-            elif self.mLayerPerceptron.mlp_test(self.mlp, more_info, self.scaler, self.id_dict) in ["negate", "deny"]:
+            elif self.mLayerPerceptron.predict(self.mlp, more_info, self.scaler, self.id_dict) in ["negate", "deny"]:
                 satisfied = True
             else:
                 print("Sorry, I didn't catch that. Please try again. Try answering \"yes\" or \"no\"")
@@ -505,3 +506,4 @@ class dialog_flow:
         if restaurantname != "":
             print("We hope you have a great meal at " + restaurantname + "!")
         else: print("Goodbye!")
+        sys.exit()
