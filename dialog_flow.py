@@ -54,14 +54,12 @@ except ImportError:
 extractConfig = extract().extract_settings()
 
 def input(prompt = ''):
-    # Response delay if true in settings
-    if extractConfig['RESPONSE_DELAY']['value'].lower() == 'true':
-        time.sleep(1)
+    print(prompt)
 
     # All caps output if true in settings
     if isinstance(prompt, str) and extractConfig['OUTPUT_IN_CAPS']['value'].lower() == 'true':
-        return __builtin__.input(prompt.upper())
-    return __builtin__.input(prompt)
+        return __builtin__.input(">")
+    return __builtin__.input(">")
 
 def print(*args, **kwargs):
     # Response delay if true in settings
@@ -98,8 +96,7 @@ class dialog_flow:
         Starts the dialog, and begins the state transitioning function.
         '''
 
-        print("Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.")
-        first_msg = input()
+        first_msg = input("Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.")
         first_msg_classification = self.algorithm.predict(first_msg, self.mlp, self.scaler, self.id_dict) #"inform"
         if first_msg_classification in ["inform", "thankyou", "request"]:
             query = self.kAlgorithm.keyword_algorithm(first_msg)
