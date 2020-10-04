@@ -9,90 +9,30 @@
         "valueType": "bool",
         "text": "Ask user about correctness of match for Levenshtein results"
     },
-    "PREFERENCES_RANDOM_ORDER": {
-        "value": "True",
-        "valueType": "bool",
-        "text": "Allow preferences to be stated in random order or not"
-    },
-    "MULTIPLE_UTTERANCES_RESTRICTED": {
-        "value": "True",
-        "valueType": "bool",
-        "text": "Allow preferences to be stated in a single utterance only, or in multiple utterances with one preference per utterance only, or without restrictions (any number of utterances and any number of preferences per utterance)"
-    },
-    "BASELINE_CLASSIFIER": {
-        "value": "recognition",
+    "CURRENT_CLASSIFIER": {
+        "value": "mlp",
         "valueType": "ENUM",
         "valueOptions": [
             {
-                "name": "Dialog act recognition",
-                "value": "recognition"
+                "name": "Decision Tree",
+                "value": "dt"
             },
             {
-                "name": "Machine learning classifier",
-                "value": "classifier"
+                "name": "Multi layer perceptron",
+                "value": "mlp"
             }
         ],
-        "text": "Use your baseline for dialog act recognition instead of the machine learning classifier"
-    },
-    "ARTIFICIAL_ERRORS": {
-        "value": "True",
-        "valueType": "bool",
-        "text": "Insert artificial errors in preference extraction"
-    },
-    "SUGGESTIONS_AFTER_FIRST": {
-        "value": "True",
-        "valueType": "bool",
-        "text": "Start offering suggestions after the first preference type is recognized vs. wait until all preference types are recognized"
-    },
-    "INFORMAL_PHRASING": {
-        "value": "True",
-        "valueType": "bool",
-        "text": "Use formal or informal phrases in system utterances"
-    },
-    "DIALOG_RESTARTS": {
-        "value": "True",
-        "valueType": "bool",
-        "text": "Allow dialog restarts or not"
+        "text": "Use either the decision tree or mlp for the dialog system"
     },
     "RESPONSE_DELAY": {
         "value": "False",
         "valueType": "bool",
         "text": "Introduce a delay before showing system responses"
     },
-    "LARGE_NUMBER_RECOMMENDATION": {
-        "value": "small",
-        "valueType": "ENUM",
-        "valueOptions": [
-            {
-                "name": "Large",
-                "value": "large"
-            },
-            {
-                "name": "Small",
-                "value": "small"
-            }
-        ],
-        "text": "Always offer a small or large number of recommendations"
-    },
-    "CONFIRMATION_PREFERENCES": {
-        "value": "True",
-        "valueType": "bool",
-        "text": "Ask confirmation for each preference or not"
-    },
-    "CHANGE_PREFERENCES": {
-        "value": "True",
-        "valueType": "bool",
-        "text": "Allow users to change their preferences or not"
-    },
     "OUTPUT_IN_CAPS": {
-        "value": "False",
+        "value": "false",
         "valueType": "bool",
         "text": "OUTPUT IN ALL CAPS OR NOT"
-    },
-    "TEXT_TO_SPEECH": {
-        "value": "True",
-        "valueType": "bool",
-        "text": "Use text-to-speech for system utterances"
     },
     "PROLOG": {
         "value": "False",
@@ -100,7 +40,7 @@
         "text": "Use Prolog reasoning system instead of the default one."
     },
     "PRINT_REASONING": {
-        "value": "True",
+        "value": "true",
         "valueType": "bool",
         "text": "Print reasoning steps used for preference inference."
     },

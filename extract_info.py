@@ -31,19 +31,19 @@ class extract_info:
             # All the different unique options in a column
             options[pref_type] = data[pref_type].dropna().unique()
         for pref_type in request:
-            data = self.modify_data(data, pref_type, options, request[pref_type])
+            data = self.__modify_data(data, pref_type, options, request[pref_type])
         # Shuffle the data
         data = data.sample(frac=1)
         # Prettify
         capt = lambda m: " ".join([word.capitalize() for word in m.split(" ")])
         data["restaurantname"] = data["restaurantname"].apply(capt)
-        data["phone"] = data["phone"].apply(self.fix_phone_number)
-        data["addr"] = data["addr"].apply(self.add_comma)
+        data["phone"] = data["phone"].apply(self.__fix_phone_number)
+        data["addr"] = data["addr"].apply(self.__add_comma)
         # Can't capitalize a float
         data["addr"] = data["addr"].apply(lambda m: capt(m) if isinstance(m, str) else np.nan)
         return data
 
-    def add_comma(self, address):
+    def __add_comma(self, address):
         """
         Yes, all this for a comma. It adds a comma after the last mention of road-like
         words, so that you get a prettier address like: "84 Regent Street, City Centre"
@@ -61,7 +61,7 @@ class extract_info:
                 break
         return address
 
-    def fix_phone_number(self, phone_number):
+    def __fix_phone_number(self, phone_number):
         """
             Makes 11 digit phone numbers look real nice. (others only less ugly)
 
@@ -76,7 +76,7 @@ class extract_info:
             return phone_number
         return np.nan
 
-    def modify_data(self, data, pref_type, options, user_input):
+    def __modify_data(self, data, pref_type, options, user_input):
         """
             Removes rows from the dataset that do not match the given filter.
 
@@ -87,10 +87,10 @@ class extract_info:
         """
         user_input = user_input.lower()
         if user_input not in options[pref_type]:
-            user_input = self.levenshtein_or_synonym(user_input, options[pref_type])
+            user_input = self.__levenshtein_or_synonym(user_input, options[pref_type])
         return data[0:0] if user_input is None else data.loc[data[pref_type] == user_input]
 
-    def levenshtein_or_synonym(self, word, options):
+    def __levenshtein_or_synonym(self, word, options):
         """
             Inputs a target word and a list of options. It then chooses one of the
             options that best matches the word, or none of them. It determines this

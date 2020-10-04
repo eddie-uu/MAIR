@@ -1,7 +1,6 @@
 from abstract_mla import abstract_machine_learning_algorithm
 from sklearn import datasets
 from sklearn import tree
-from sklearn.tree import export_text
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.metrics import confusion_matrix
 from extract import extract
@@ -49,13 +48,13 @@ class decision_tree(abstract_machine_learning_algorithm):
             pickle.dump(decision_tree_classifier, open(filename, 'wb'))
 
         self.one_hot_encoder = one_hot_encoder
-        self.decision_tree  = decision_tree_classifier
-        self.max_len       = max_len
-        self.extract_data   = extract_data
+        self.decision_tree   = decision_tree_classifier
+        self.max_len         = max_len
+        self.extract_data    = extract_data
 
-    def predict(self, choice):
+    def predict(self, input_sentence, model, scaler, id_to_label=None, pickle_file = ""):
         # Label user input
-        choice = choice.lower().split(' ')
+        choice = input_sentence.lower().split(' ')
 
         if (len(choice) < self.max_len):
             for n in range(len(choice), self.max_len, 1): choice.insert(n, '')
@@ -68,7 +67,7 @@ class decision_tree(abstract_machine_learning_algorithm):
         return answer[0]
 
     # overriding abstract method
-    def perform_algorithm(self, decisionType = False):
+    def perform_algorithm(self, decision_type = False):
         # Make all sentences equal in length to parse with OneHotEncoder to binary
         for sentence in self.extract_data.sentences_train:
             for n in range(len(sentence), self.max_len, 1): sentence.insert(n, '')
@@ -77,21 +76,21 @@ class decision_tree(abstract_machine_learning_algorithm):
             for n in range(len(sentence), self.max_len, 1): sentence.insert(n, '')
   
         # Write 'test' in console to start testing sequence
-        if decisionType:
+        if decision_type:
             matrix  = {}
             tested  = 0
             correct = 0
 
             self.extract_data.dialog_acts_train.append('total')
 
-            for matrixAct in self.extract_data.dialog_acts_train:
-                if matrixAct not in matrix:
-                    matrix[matrixAct] = {}
-                    for matrixActSecond in self.extract_data.dialog_acts_train:
-                        if matrixActSecond not in matrix[matrixAct]:
-                            matrix[matrixAct][matrixActSecond] = 0
+            for matrix_act in self.extract_data.dialog_acts_train:
+                if matrix_act not in matrix:
+                    matrix[matrix_act] = {}
+                    for matrix_act_second in self.extract_data.dialog_acts_train:
+                        if matrix_act_second not in matrix[matrix_act]:
+                            matrix[matrix_act][matrix_act_second] = 0
 
-            f = open("data/wrong answers.txt", "w")
+            f = open("data/wrong_answers_decision_tree.txt", "w")
             for n in range(0, len(self.extract_data.dialog_acts_test), 1):
                 dialog     = self.extract_data.dialog_acts_test[n]
                 sentence   = self.extract_data.sentences_test[n]
@@ -115,19 +114,24 @@ class decision_tree(abstract_machine_learning_algorithm):
                 print("%-10s" % (key), end = '')
                 print(*value.values(), sep = 7*' ' + "|")
             
+            f1_measure = 0
+            f1_length = 0
             for key, value in matrix.items():
                 if key != 'total':
-                    precision = 0 if value['total'] == 0 else value[key] / value['total']
-                    recall    = 0 if matrix['total'][key] == 0 else value[key] / matrix['total'][key]
+                    precision = 0 if value['total'] == 0 else value[key] / value['total'] * 100
+                    recall    = 0 if matrix['total'][key] == 0 else value[key] / matrix['total'][key] * 100
                     f1        = 0 if precision + recall == 0 else (2 * precision * recall) / (precision + recall)
                     print("Precision for " + key + ": " + str(round(precision, 3)))
                     print("Recall for " + key + ": " + str(round(recall, 3)))
                     print("F1-measure for " + key + ": " + str(round(f1, 3)))
+                    f1_measure += f1
+                    f1_length += 1
 
             print("")
             print("Total tested sentences: " + str(tested))
             print("Total correctly classified: " + str(correct))
             print("Accuracy: " + str(round(100 / tested * correct, 3)) + "%")
+            print("F1: " + str(round(f1_measure / f1_length, 3)) + "%")
         else:
             # Console writeline
             while True:

@@ -4,25 +4,25 @@ class keyword_algorithm:
     def __init(self):
         pass
 
-    # Checks regex patterns (matching keywords) in sentence and returns either the sentence back if not found or the keyword match
-    def checkPattern(self, text, patterns, defaultValue = ''):
-        for pattern in patterns:
-            match = re.search(pattern['pattern'], text)
-            if match:
-                text = match.group(pattern['group']) if defaultValue == '' else defaultValue 
-        return text
-
     # Perform the algorithm for a sentence, pass a search mode (food, area or pricerange) if context is mentioned
     def keyword_algorithm(self, text, mode = ''):
         response = {}
         sentences = text.split('and')
 
         for sentence in sentences:
-            self.perform_algorithm(sentence, mode, response)
+            self.__perform_algorithm(sentence, mode, response)
         
         return response
 
-    def perform_algorithm(self, text, mode, response):
+    # Checks regex patterns (matching keywords) in sentence and returns either the sentence back if not found or the keyword match
+    def __checkPattern(self, text, patterns, default_value = ''):
+        for pattern in patterns:
+            match = re.search(pattern['pattern'], text)
+            if match:
+                text = match.group(pattern['group']) if default_value == '' else default_value 
+        return text
+
+    def __perform_algorithm(self, text, mode, response):
         text = text.lower()
 
         # General patterns for any option
@@ -39,9 +39,9 @@ class keyword_algorithm:
             price_dont_care_patterns.append({'pattern': 'any price'})
             
             # Check the given sentence
-            result    = self.checkPattern(text, price_patterns)
+            result    = self.__checkPattern(text, price_patterns)
             result    = result.split()[-1] if len(result.split()) > 1 and result != text else result
-            end_result = self.checkPattern(result, price_dont_care_patterns, 'dontcare')
+            end_result = self.__checkPattern(result, price_dont_care_patterns, 'dontcare')
             
             # If the given answer is invalid and the context is specific for pricerange, return dontcare
             if len(end_result.split()) > 1 and mode == 'pricerange':
@@ -62,9 +62,9 @@ class keyword_algorithm:
             area_dont_care_patterns.append({'pattern': 'any area'})
             area_dont_care_patterns.append({'pattern': 'any part'})
 
-            result    = self.checkPattern(text, area_patterns)
+            result    = self.__checkPattern(text, area_patterns)
             result    = result.split()[-1] if len(result.split()) > 1 and result != text else result
-            end_result = self.checkPattern(result, area_dont_care_patterns, 'dontcare')
+            end_result = self.__checkPattern(result, area_dont_care_patterns, 'dontcare')
 
             if len(end_result.split()) > 1 and mode == 'area':
                 end_result = 'dontcare'
@@ -77,24 +77,24 @@ class keyword_algorithm:
         if mode == 'food' or mode == '':
             food_patterns = [{'pattern': '(.+?) (food)', 'group': 1},
                             {'pattern': '(serving|serves|serve) (.*)', 'group': 2},
-                            {'pattern': '(with|about) (.*)', 'group': 2},
+                            {'pattern': '(with|about|for a) (.*)', 'group': 2},
                             {'pattern': '(for|a) (.*)', 'group': 2},
                             {'pattern': '(.+?) (restaurant)', 'group': 1}]
             food_dont_care_patterns = base_dont_care_patterns
             food_dont_care_patterns.append({'pattern': 'any type'})
 
-            result    = self.checkPattern(text, food_patterns)
-            end_result = self.checkPattern(result, food_dont_care_patterns, 'dontcare')
-            
-            foodType = True
+            result    = self.__checkPattern(text, food_patterns)
+            end_result = self.__checkPattern(result, food_dont_care_patterns, 'dontcare')
+
+            food_type = True
             for words in end_result.split():
-                if len(words) < 3: foodType = False
+                if len(words) < 3: food_type = False
 
-            if not foodType and mode == 'food':
+            if not food_type and mode == 'food':
                 end_result = 'dontcare'
-                foodType  = True
+                food_type  = True
 
-            if foodType and end_result != '':
+            if food_type and end_result != '':
                 response['food'] = end_result
         
         return response
