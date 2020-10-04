@@ -15,7 +15,6 @@ import pickle
 import os
 import sys
 
-nltk.download('wordnet')
 
 """
 This file controls the main dialog flow. A typical dialog will have the following flow:

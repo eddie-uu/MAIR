@@ -126,7 +126,7 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
         # Save incorrectly labeled answers for manual inspection
         with open("data/wrong_answers_mlp.txt", 'w') as f:
             for sent_tuple in to_save: 
-                f.write(f"{' '.join(sent_tuple[0])} -- Predicted: {sent_tuple[1]} -- Actually: {sent_tuple[2]}\n")
+                f.write(f"{' '.join(sent_tuple[0])} -- Predicted: {sent_tuple[2]} -- Actually: {sent_tuple[1]}\n")
         
         if self.print_f1:
             self.f1_score(counts_per_class)
@@ -161,11 +161,17 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
             recall = true_pos / label_total
             f1 = 2 * precision * recall / (precision + recall)
             print(f"'{label}' has a precision of {round(precision,4)} and a recall " +
-                  f"of {round(recall,4)}. F1 score is {round(f1,4)}.\n")
-            totals[0] += precision
-            totals[1] += recall
-            totals[2] += f1
-            usable_labels += 1
+                  f"of {round(recall,4)}. F1 score is {round(f1,4)}. ("
+                  f"{positives} samples)")
+            if positives > 10:
+                totals[0] += precision
+                totals[1] += recall
+                totals[2] += f1
+                usable_labels += 1
+                print()
+            else:
+                print("Due to the small number of samples, this will not be " +
+                      "considered in the averages.\n")
         
         av_prec = totals[0] / usable_labels
         av_rec = totals[1] / usable_labels
@@ -209,7 +215,8 @@ class multi_layer_perceptron(abstract_machine_learning_algorithm):
             the user can type sentences to be classified.
         """
         if os.path.exists("data/mlp_model.pkl"):
-            model, id_dict = pickle.load("data/mlp_model.pkl")
+            with open("data/mlp_model.pkl", 'wb') as f_pickle:
+                model, id_dict = pickle.load(f_pickle)
         else:
             model, id_dict, scaler = self.mlp("data/dialog_acts.dat")
         print("You can quit by typing 'bye'.")
