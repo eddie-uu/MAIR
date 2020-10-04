@@ -47,7 +47,7 @@
     "PRINT_MLP_F1": {
         "value": "True",
         "valueType": "bool",
-        "text": "Print precision, recall & F1 for the test set of the MLP."
+        "text": "Print precision, recall & F1 for the test set of the MLP for all classes (True) or only the average (False)."
     },
     "ALTERNATIVES_NUMBER": {
         "value": "3",

@@ -277,5 +277,4 @@ class Implications():
 if __name__ == "__main__":
     # An example
     impl = Implications()
-    print(impl(["good restaurant"], {"pricerange":"expensive", "area":"centre"}))
-    # print(impl(["romantic"], {"pricerange":"cheap", "quality":"good food"}))
+    print(impl(["vegetarian", "not romantic"], {"pricerange":"cheap", "quality":"good food"}))

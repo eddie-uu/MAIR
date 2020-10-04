@@ -15,7 +15,6 @@ import pickle
 import os
 import sys
 
-nltk.download('wordnet')
 
 """
 This file controls the main dialog flow. A typical dialog will have the following flow:
@@ -55,17 +54,16 @@ except ImportError:
 extractConfig = extract().extract_settings()
 
 def input(prompt = ''):
-    if extractConfig['RESPONSE_DELAY']['value'].lower() == 'true':
-        time.sleep(1)
+    print(prompt)
 
-    if isinstance(prompt, str) and extractConfig['OUTPUT_IN_CAPS']['value'].lower() == 'true':
-        return __builtin__.input(prompt.upper())
-    return __builtin__.input(prompt)
+    return __builtin__.input(">")
 
 def print(*args, **kwargs):
+    # Response delay if true in settings
     if extractConfig['RESPONSE_DELAY']['value'].lower() == 'true':
         time.sleep(1)
 
+    # All caps output if true in settings
     for arg in args:
         if isinstance(arg, str) and extractConfig['OUTPUT_IN_CAPS']['value'].lower() == 'true':
             return __builtin__.print(arg.upper(), **kwargs)
@@ -95,9 +93,8 @@ class dialog_flow:
         Starts the dialog, and begins the state transitioning function.
         '''
 
-        print("Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.")
-        first_msg = input()
-        first_msg_classification = self.algorithm.predict(first_msg, self.mlp, self.scaler, self.id_dict) #"inform"
+        first_msg = input("Hello, welcome to our restaurant system. What kind of restaurant are you looking for? You can ask for restaurants by area, price range or food type.")
+        first_msg_classification = self.algorithm.predict(first_msg, self.mlp, self.scaler, self.id_dict)
         if first_msg_classification in ["inform", "thankyou", "request"]:
             query = self.kAlgorithm.keyword_algorithm(first_msg)
             self.__check_query(query)
@@ -408,8 +405,8 @@ class dialog_flow:
                 query["quality"] = quality
         imply = Implications()
         new_suggestions = imply(additional_pref, query)
-        not_understood = True
         for i in range(len(suggestions)):
+            not_understood = True
             if str(suggestions.iloc[i]["restaurantname"]) in new_suggestions["restaurantname"].tolist(): #check if restaurant is still suitable after adding new preferences
                 while not_understood:
                     interested = input(suggestions.iloc[i]['restaurantname'] + " meets all your preferences \n Are you interested in this restaurant?").lower()
@@ -446,7 +443,6 @@ class dialog_flow:
                 self.__ask_extra_info(suggestions, i)
             elif self.algorithm.predict(choice, self.mlp, self.scaler, self.id_dict) in ["negate", "deny", "reqalts", "reqmore"]:
                 i += 1
-                #print("Looking for alternatives...")
             else:
                 print("Sorry, I didn't catch that. Please try again.")
         if not satisfied:
