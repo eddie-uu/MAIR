@@ -56,9 +56,6 @@ extractConfig = extract().extract_settings()
 def input(prompt = ''):
     print(prompt)
 
-    # All caps output if true in settings
-    if isinstance(prompt, str) and extractConfig['OUTPUT_IN_CAPS']['value'].lower() == 'true':
-        return __builtin__.input(">")
     return __builtin__.input(">")
 
 def print(*args, **kwargs):
