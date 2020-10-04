@@ -1,0 +1,57 @@
+{
+    "LEVENSHTEIN_EDIT_DISTANCE": {
+        "value": "4",
+        "valueType": "int",
+        "text": "Levenshtein edit distance for preference extraction"
+    },
+    "CORRECTNESS_LEVENSHTEIN": {
+        "value": "True",
+        "valueType": "bool",
+        "text": "Ask user about correctness of match for Levenshtein results"
+    },
+    "CURRENT_CLASSIFIER": {
+        "value": "mlp",
+        "valueType": "ENUM",
+        "valueOptions": [
+            {
+                "name": "Decision Tree",
+                "value": "dt"
+            },
+            {
+                "name": "Multi layer perceptron",
+                "value": "mlp"
+            }
+        ],
+        "text": "Use either the decision tree or mlp for the dialog system"
+    },
+    "RESPONSE_DELAY": {
+        "value": "False",
+        "valueType": "bool",
+        "text": "Introduce a delay before showing system responses"
+    },
+    "OUTPUT_IN_CAPS": {
+        "value": "false",
+        "valueType": "bool",
+        "text": "OUTPUT IN ALL CAPS OR NOT"
+    },
+    "PROLOG": {
+        "value": "False",
+        "valueType": "bool",
+        "text": "Use Prolog reasoning system instead of the default one."
+    },
+    "PRINT_REASONING": {
+        "value": "true",
+        "valueType": "bool",
+        "text": "Print reasoning steps used for preference inference."
+    },
+    "PRINT_MLP_F1": {
+        "value": "True",
+        "valueType": "bool",
+        "text": "Print precision, recall & F1 for the test set of the MLP."
+    },
+    "ALTERNATIVES_NUMBER": {
+        "value": "3",
+        "valueType": "int",
+        "text": "Changes the maximum number of alternatives shown when there are no matches for the current preference"
+    }
+}

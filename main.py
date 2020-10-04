@@ -1,60 +1,49 @@
-from extract import extract_data
-from baseline_systems import majority_baseline
-from baseline_systems import rule_based_baseline
-from baseline_systems import testBaselines
-from decision_tree import decisionTree
-from dialog_flow import Welcome
-from mlp import mlp, mlp_test
+from baseline_systems import baseline_system
+from decision_tree import decision_tree
+from dialog_flow import dialog_flow
+from mlp import multi_layer_perceptron
+from extract import extract
 
 def main():
     # List of commands
+    commands = {
+        '1': {'function': use_baseline,       'testing': True,  'description': 'Test baseline'},
+        '2': {'function': use_decision_tree,  'testing': True,  'description': 'Test decision tree'},
+        '3': {'function': use_mlp,            'testing': True,  'description': 'Test neural network'},
+        '4': {'function': use_baseline,       'testing': False, 'description': 'Baseline'},
+        '5': {'function': use_decision_tree,  'testing': False, 'description': 'Decision tree'},
+        '6': {'function': use_mlp,            'testing': False, 'description': 'Neural network'},
+        '7': {'function': use_dialog_flow,    'testing': False, 'description': 'Dialog'},
+        '8': {'function': configure_settings, 'testing': False, 'description': 'Change settings'}
+    }
+
     print("Type one of the following numbers to execute the command: ")
-    print("1. test baseline")
-    print("2. test decision tree")
-    print("3. test neural network")
-    print("4. baseline")
-    print("5. decision tree")
-    print("6. neural network")
-    print("7. dialog")
+    for key in commands:
+        print(key + '. ' + commands[key]['description'])
 
     userInput = input("> ")
+    if userInput in commands.keys():
+        command = commands[userInput]
+        command['function'](command['testing'])
 
-    if userInput == '1':
-        data = extract_data("dialog_acts.dat")
-        testBaselines(data)
-    elif userInput == '2':
-        # decisionTree('test')
-        print('decision tree')
-    elif userInput == '3':
-        mlp("dialog_acts.dat")
-    elif userInput == '4':
-        classify_user_input()
-    elif userInput == '5':
-        print('a')
-        # decisionTree('')
-    elif userInput == '6':
-        print("Currently not implemented.")
-    elif userInput == '7':
-        Welcome()
-        # See mlp_test for explanation.
-        # model, id_dict = mlp("dialog_acts.dat")
-        # print("You can quit by typing 'stop'.")
-        # while True:
-        #     sentence = input("Please write your sentence here:\n")
-        #     if sentence == "stop":
-        #         break
-        #     prediction = mlp_test(model, sentence, id_dict)
-        #     print(f"We predict your sentence belongs to the {prediction} class.")
+def use_baseline(testing = False):
+    bls = baseline_system()
+    bls.perform_algorithm(testing)
 
-def classify_user_input():
-    data = extract_data("dialog_acts.dat")
-    
-    """
-    Classifies input from the user into a certain dialog act group.  
-    """
-    
-    sentence = (str(input('Enter sentence: '))).lower().split()
-    
-    if (len(sentence) > 0):
-        print('Majority classification is: '  + majority_baseline(data)[0])
-        print('Rule based classification is: '  + rule_based_baseline(sentence)[0])
+def use_decision_tree(testing = False):
+    dt = decision_tree()
+    dt.perform_algorithm(testing)
+
+def use_mlp(testing = False):
+    mlp = multi_layer_perceptron()
+    mlp.perform_algorithm(testing)
+
+def use_dialog_flow(testing = False):
+    dialogFlow = dialog_flow()
+    dialogFlow.welcome()
+
+def configure_settings(testing = False):
+    settings = extract()
+    settings.configure_settings()
+
+main()
