@@ -33,12 +33,16 @@ class baseline_system(abstract_machine_learning_algorithm):
             self.__evaluate_results("rule-based", rb_baseline, rb_matrix)
         else:
             # Classifies input from the user into a certain dialog act group.  
-            
-            sentence = (str(input('Enter sentence: '))).lower().split()
-            
-            if (len(sentence) > 0):
-                print('Majority classification is: '  + self.__majority_baseline(self.extract_data)[0])
-                print('Rule based classification is: '  + self.__rule_based_baseline(sentence)[0])
+            while True:
+                sentence = (str(input('Enter sentence: '))).lower().split()
+
+                if (len(sentence) > 0):
+                    print('Majority classification is: '  + self.__majority_baseline(self.extract_data)[0])
+                    print('Rule based classification is: '  + self.__rule_based_baseline(sentence)[0])
+
+                # Quit program if the answer given is labeled 'bye'
+                if sentence[0] == 'bye': break
+
 
     def predict(self, *kwargs):
         pass
